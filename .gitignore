@@ -1,0 +1,7 @@
+docs/build/*
+Manifest.toml
+*.scss
+*.css
+.vscode
+*style.jl
+.DS_Store

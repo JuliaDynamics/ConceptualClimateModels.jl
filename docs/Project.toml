@@ -1,0 +1,9 @@
+[deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
+DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
+DynamicalSystems = "61744808-ddfa-5f27-97ff-6e42cc95d634"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+ProcessBasedModelling = "ca969041-2cf3-4b10-bc21-86f4417093eb"

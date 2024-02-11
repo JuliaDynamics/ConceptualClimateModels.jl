@@ -1,0 +1,18 @@
+name = "EnergyBalanceModels"
+uuid = "3e640dcb-3446-4ed7-aadb-0366b77312ec"
+authors = ["Datseris <datseris.george@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+DynamicalSystemsBase = "6e36e845-645a-534a-86f2-f5d4aa5a06b4"
+NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
+ProcessBasedModelling = "ca969041-2cf3-4b10-bc21-86f4417093eb"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
+
+[compat]
+DynamicalSystemsBase = "3.4"
+NaNMath = "1"
+ProcessBasedModelling = "0.1"
+Reexport = "1.2"
+Roots = "2"
