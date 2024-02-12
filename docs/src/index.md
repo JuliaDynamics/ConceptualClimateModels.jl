@@ -1,69 +1,23 @@
 # EnergyBalanceModels.jl
 
-# ## Variables and default values
+## Global symbolic variables
 
-...
+For convenience, EnergyBalanceModels.jl defines and exports these global variables:
 
-# ## Temperature
-
-```@docs
-BasicRadiationBalance
-ΔTLinearRelaxation
+```@example MAIN
+using EnergyBalanceModels
+GLOBAL_EBM_VARIABLES
 ```
 
-# ## Longwave
+## Default values, limits, etc.
 
-```@docs
-LinearOLR
-LinearClearSkyOLR
-EmissivityStefanBoltzmanOLR
-EmissivityFeedbackTanh
-EmissivitySellers1969
-SoedergrenClearSkyEmissivity
-```
+## Integration with DynamicalSystems.jl
 
-# ## Shortwave
+EnergyBalanceModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) in many ways.
 
-```@docs
-DirectAlbedoAddition
-CoAlbedoProduct
-SeparatedClearAllSkyAlbedo
-```
-
-# ## Ice/snow
-
-```@docs
-IceAlbedoFeedback
-```
-
-# ## Insolation
-
-```@docs
-AstronomicalForcingDeSaedeleer
-```
-
-# ## Forcings
-
-```@docs
-CO2Forcing
-```
-
-# ## Clouds
-
-```@docs
-CloudAlbedoExponential
-CloudAlbedoLinear
-EmissivityCumulativeSubtraction
-BudykoOLR
-```
-
-# ## Utils
+# ## Utilities
 
 ```@docs
 TanhProcess
 ```
 
-# ## References
-
-```@bibliography
-```
