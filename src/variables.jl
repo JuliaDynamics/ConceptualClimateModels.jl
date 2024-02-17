@@ -5,26 +5,31 @@
 # will exist in the equations.
 
 const GLOBAL_EBM_VARIABLES = @variables begin
-    T(t) = 290.0       [description = "temperature, in Kelvin"]
-    S(t) = 1.0         [description = "insolation in units relative to solar constant"]
-    f(t) = 0.0         [description = "external forcing, normalized to units of the solar constant"]
-    α(t) = 0.3         [description = "planetary albedo, unitless"]
-    α_ice(t) = 0.05    [description = "albedo of ice, unitless"]
-    α_cloud(t) = 0.1   [description = "albedo of clouds, unitless"]
-    ΔT(t) = 17.0       [description = "equator to pole temperature difference, in Kelvin"]
-    ε(t) = 0.5         [description = "planetary effective emissivity, unitless"]
-    C(t) = 0.6744      [description = "cloud fraction, unitless"]
-    ℓ(t) = 0.8         [description = "sine of latitude of ice-line"]
-    CO2(t) = 400       [description = "CO2 concentration, in ppm"]
+    T(t) = 290.0       # [description = "temperature, in Kelvin"]
+    S(t) = 1.0         # [description = "insolation in units relative to solar constant"]
+    f(t) = 0.0         # [description = "external forcing, normalized to units of the solar constant"]
+    α(t) = 0.3         # [description = "planetary albedo, unitless"]
+    α_ice(t) = 0.05    # [description = "albedo of ice, unitless"]
+    α_cloud(t) = 0.1   # [description = "albedo of clouds, unitless"]
+    ΔT(t) = 17.0       # [description = "equator to pole temperature difference, in Kelvin"]
+    ε(t) = 0.5         # [description = "planetary effective emissivity, unitless"]
+    C(t) = 0.6744      # [description = "cloud fraction, unitless"]
+    ℓ(t) = 0.8         # [description = "sine of latitude of ice-line"]
+    CO2(t) = 400       # [description = "CO2 concentration, in ppm"]
     # Observables that can never be dynamic variables and hence have no default value:
-    OLR(t) [description = "outgoing longwave radiation"]
-    ASR(t) [description = "absorved shortwave radiation"]
+    OLR(t) # [description = "outgoing longwave radiation"]
+    ASR(t) # [description = "absorved shortwave radiation"]
 end
 
 # TODO: Should we do this export...?
 export T, S, f, α, α_ice, α_cloud, ΔT, ε, ℓ, C, CO2, OLR, ASR
 
-# This function is only meaningful for dynamic variables
+# This function is only meaningful for dynamic variables!
+"""
+    physically_plausible_limits(x)
+
+Return a tuple (min, max) of limiting values for the variable `x`.
+"""
 function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
     if var[1] == 'T'
         return (200, 350)
@@ -39,3 +44,5 @@ function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
         "Please edit function `physically_plausible_limits` and add one.")
     end
 end
+
+physically_plausible_limits(var) = physically_plausible_limits(string(ModelingToolkit.getname(var)))
