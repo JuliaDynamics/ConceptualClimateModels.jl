@@ -1,8 +1,12 @@
 # EnergyBalanceModels.jl
 
+
+
 ## [Premade symbolic variable instances](@id global_vars)
 
-For convenience, EnergyBalanceModels.jl defines and exports some symbolic variables. These are used throughout the library as the default variables in [implemented processes](@id processes).
+For convenience, EnergyBalanceModels.jl defines and exports some symbolic variables
+that we [list below](@ref list_vars). These are used throughout the library as the
+default variables in [implemented processes](@id processes).
 When going through documentation strings of processes, such as [`BasicRadiationBalance`](@ref),
 you will notice that the function call signature is like:
 
@@ -10,13 +14,22 @@ you will notice that the function call signature is like:
 BasicRadiationBalance(; T=T, kwargs...)
 ```
 
-This `T=T` means that the keyword argument `T`, which represents the "temperature variable", takes the value of `EnergyBalanceModels.T`, which itself is a premade symbolic variable instance that is exported by EnergyBalanceModels.jl. You can pass in your own variables instead, by doing
+This `T=T` means that the keyword argument `T`, which represents the
+"temperature variable", takes the value of `EnergyBalanceModels.T`,
+which itself is a premade symbolic variable instance that is exported by
+EnergyBalanceModels.jl. You can pass in your own variables instead, by doing
 ```julia
-@variables T1_tropics = 310.0
+@variables begin
+    (T1_tropics(t) = 290.0), [bounds = (200.0, 350.0), description = "temperature in tropical box 1, in Kelvin"]
+end
 BasicRadiationBalance(; T=T1_tropics, kwargs...)
 ```
+_(you would also need to give `T1_tropics` to all other processes that utilize temperature)_
 
-The exported symbolic variables are:
+Defining variables with the extra `bounds, description` annotations is
+useful for integrating with the rest of the functionality of the library.
+
+### [List of premade variables](@id list_vars)
 
 ```@example MAIN
 using EnergyBalanceModels
@@ -28,7 +41,7 @@ PREDEFINED_EBM_VARIABLES
 All [exported symbolic variable instances](@ref) are defiled with a default value and have plausible physical limits that can be obtained with the following function:
 
 ```@docs
-physically_plausible_limits(::String)
+physically_plausible_limits(::Any)
 ```
 
 e.g.,

@@ -2,12 +2,7 @@
 
 Predefined processes are provided in this page.
 Those extracted by the literature cite their according resource.
-Note that by default all processes utilize the globally-exported [predefined variables](@ref variables) of EnergyBalanceModels.jl.
-This is conveyed in the documentation strings by writing something like
-```
-f(; T = T, kw...)
-```
-this means that the variable representing "T" will be by default the global symbolic variable `T`. You could of course provide any other variable, such as `T1` or `T2` if you have two "boxes" with different temperatures for example.
+Note that by default all processes utilize the globally-exported [predefined variables](@ref global_vars) of EnergyBalanceModels.jl.
 
 ## Temperature
 
@@ -58,6 +53,5 @@ CO2Forcing
 ```@docs
 CloudAlbedoExponential
 CloudAlbedoLinear
-EmissivityCumulativeSubtraction
 BudykoOLR
 ```

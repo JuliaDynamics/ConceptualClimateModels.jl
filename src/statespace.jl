@@ -6,10 +6,9 @@ The states need to be named as the limits are deduced from the function
 `physically_plausible_limits(varname::String)`.
 """
 function physically_plausible_limits(ds::DynamicalSystem)
-    sys = referrenced_sciml_model(ds)
-    vars = ModelingToolkit.states(sys)
-    varstrings = @. string(ModelingToolkit.getname(vars))
-    minmax = physically_plausible_limits.(varstrings)
+    model = referrenced_sciml_model(ds)
+    vars = ModelingToolkit.states(model)
+    minmax = physically_plausible_limits.(vars)
     return minmax
 end
 
