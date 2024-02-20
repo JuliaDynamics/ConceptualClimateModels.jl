@@ -4,7 +4,7 @@
 # In the final generated energy balance model it is not necessary that all of these
 # will exist in the equations.
 
-const GLOBAL_EBM_VARIABLES = @variables begin
+const PREDEFINED_EBM_VARIABLES = @variables begin
     T(t) = 290.0       # [description = "temperature, in Kelvin"]
     S(t) = 1.0         # [description = "insolation in units relative to solar constant"]
     f(t) = 0.0         # [description = "external forcing, normalized to units of the solar constant"]
@@ -34,13 +34,17 @@ function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
     if var[1] == 'T'
         return (200, 350)
     elseif var == "α_ice" || var == "α_clouds"
-        return (0, 0.75)
-    elseif var[1] == 'α' || var[1] == 'ε' || var[1] == 'C'
+        return (0, 0.5)
+    elseif var[1] == 'α' || var[1] == 'ε' || var[1] == 'C' || var[1] == 'ℓ'
         return (0, 1)
     elseif var == "ΔT"
         return (5.0, 60.0)
+    elseif var == "CO2"
+        return (200.0, 1600.0)
+    elseif !isnothing(default_value(var))
+        return (0.8default_value(var), 1.2default_value(var))
     else
-        error("Unpsecified plausible physical limits for $(var). "*
+        error("Unpsecified plausible physical limits for $(var) or no default value. "*
         "Please edit function `physically_plausible_limits` and add one.")
     end
 end
