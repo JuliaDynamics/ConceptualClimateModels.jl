@@ -1,24 +1,11 @@
-module EnergyBalanceModels
+module ConceptualClimateModels
 
 # Use the README as the module docs
 @doc let
     path = joinpath(dirname(@__DIR__), "README.md")
     include_dependency(path)
     read(path, String)
-end EnergyBalanceModels
-
-
-# Rules: all variables have a default value.
-# All processes are represented via `Equation`s. Everything returns `Equation`s.
-# Specifications are given as Spec files to the main equation.
-# TODO:
-# The spec files specify what processes to use for each fundamental component
-# of the energy balance equations. Processes that are not given
-# specs are not included (or have a dummy default spec that makes them be
-# constants; e.g., albedo of clouds being 0.1 or so.)
-# Multiple dispatch is then used to create the equations for each processes
-# and also to decide whether to include any additional processes.
-# We can find the spec files by their subtyping relation
+end ConceptualClimateModels
 
 using Reexport
 @reexport using ProcessBasedModelling # exports `t` as time

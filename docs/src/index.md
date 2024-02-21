@@ -1,10 +1,10 @@
-# EnergyBalanceModels.jl
+# ConceptualClimateModels.jl
 
 
 
 ## [Premade symbolic variable instances](@id global_vars)
 
-For convenience, EnergyBalanceModels.jl defines and exports some symbolic variables
+For convenience, ConceptualClimateModels.jl defines and exports some symbolic variables
 that we [list below](@ref list_vars). These are used throughout the library as the
 default variables in [implemented processes](@id processes).
 When going through documentation strings of processes, such as [`BasicRadiationBalance`](@ref),
@@ -15,9 +15,9 @@ BasicRadiationBalance(; T=T, kwargs...)
 ```
 
 This `T=T` means that the keyword argument `T`, which represents the
-"temperature variable", takes the value of `EnergyBalanceModels.T`,
+"temperature variable", takes the value of `ConceptualClimateModels.T`,
 which itself is a premade symbolic variable instance that is exported by
-EnergyBalanceModels.jl. You can pass in your own variables instead, by doing
+ConceptualClimateModels.jl. You can pass in your own variables instead, by doing
 ```julia
 @variables begin
     (T1_tropics(t) = 290.0), [bounds = (200.0, 350.0), description = "temperature in tropical box 1, in Kelvin"]
@@ -32,7 +32,7 @@ useful for integrating with the rest of the functionality of the library.
 ### [List of premade variables](@id list_vars)
 
 ```@example MAIN
-using EnergyBalanceModels
+using ConceptualClimateModels
 PREDEFINED_EBM_VARIABLES
 ```
 
@@ -53,7 +53,7 @@ physically_plausible_limits(T)
 
 ## Integration with DynamicalSystems.jl
 
-EnergyBalanceModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) in many ways.
+ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) in many ways.
 
 
 ```@docs

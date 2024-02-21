@@ -6,7 +6,7 @@ export CO2Forcing
 Create the equation ``f ~ CO2f \\log_2(CO2/400)`` which describes the
 forcing added to the TOA energy balance due to CO2 concentrations,
 assumming the `OLR` expression is calibrated for 0 added forcing at 400 ppm
-which is the default for OLR expressions provided by EnergyBalanceModels.jl.
+which is the default for OLR expressions provided by ConceptualClimateModels.jl.
 
 The default value of ``f`` comes from Eq. (3.2) of [Bastiaansen2023](@cite) which cites IPCC-5,
 while [Etminan2016](@cite) report practically the same value assuming a constant

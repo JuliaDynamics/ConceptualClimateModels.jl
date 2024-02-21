@@ -1,2 +1,2 @@
-using EnergyBalanceModels
+using ConceptualClimateModels
 using Test

@@ -2,7 +2,7 @@
 
 Predefined processes are provided in this page.
 Those extracted by the literature cite their according resource.
-Note that by default all processes utilize the globally-exported [predefined variables](@ref global_vars) of EnergyBalanceModels.jl.
+Note that by default all processes utilize the globally-exported [predefined variables](@ref global_vars) of ConceptualClimateModels.jl.
 
 ## Temperature
 

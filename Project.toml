@@ -1,4 +1,4 @@
-name = "EnergyBalanceModels"
+name = "ConceptualClimateModels"
 uuid = "3e640dcb-3446-4ed7-aadb-0366b77312ec"
 authors = ["Datseris <datseris.george@gmail.com>"]
 version = "0.1.0"
@@ -16,3 +16,4 @@ NaNMath = "1"
 ProcessBasedModelling = "0.1"
 Reexport = "1.2"
 Roots = "2"
+julia = "1.9"

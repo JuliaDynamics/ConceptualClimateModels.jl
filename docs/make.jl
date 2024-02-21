@@ -1,6 +1,6 @@
 cd(@__DIR__)
 
-using EnergyBalanceModels
+using ConceptualClimateModels
 
 import Downloads
 Downloads.download(
@@ -22,11 +22,11 @@ bib = CitationBibliography(
     style=:authoryear
 )
 
-build_docs_with_style(pages, EnergyBalanceModels;
+build_docs_with_style(pages, ConceptualClimateModels;
     authors = "George Datseris <datseris.george@gmail.com>",
     bib,
     # We need to remove the cross references because we don't list here
     # the whole `DynamicalSystem` API...
     warnonly = [:doctest, :missing_docs, :cross_references],
-    repo = Remotes.GitHub("JuliaDynamics", "EnergyBalanceModels.jl")
+    repo = Remotes.GitHub("JuliaDynamics", "ConceptualClimateModels.jl")
 )
