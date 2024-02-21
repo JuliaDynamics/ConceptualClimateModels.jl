@@ -11,6 +11,8 @@ include("build_docs_with_style.jl")
 
 pages =  [
     "Introduction" => "index.md",
+    "Predefined processes" => "processes.md",
+    "References" => "references.md",
 ]
 
 using DocumenterCitations

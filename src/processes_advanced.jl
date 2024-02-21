@@ -12,7 +12,7 @@ The rest of the input arguments should be real numbers or `@parameter` named par
 
 The process creates the expression:
 ```
-variable ~ left + (right - mvap)*(1 + tanh(2(driver - reference)/scale))*0.5
+variable ~ left + (right - left)*(1 + tanh(2(driver - reference)/scale))*0.5
 ```
 i.e., a tanh formula that goes from value `left` to value `right` as a function of `driver`
 over a range of `scale` being centered at `reference`.
