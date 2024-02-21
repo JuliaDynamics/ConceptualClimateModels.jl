@@ -9,6 +9,7 @@ Note that by default all processes utilize the globally-exported [predefined var
 ```@docs
 BasicRadiationBalance
 ΔTLinearRelaxation
+ΔTStommelModel
 ```
 
 ## Longwave radiation

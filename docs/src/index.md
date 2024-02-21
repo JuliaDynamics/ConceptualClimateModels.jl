@@ -1,7 +1,5 @@
 # ConceptualClimateModels.jl
 
-
-
 ## [Premade symbolic variable instances](@id global_vars)
 
 For convenience, ConceptualClimateModels.jl defines and exports some symbolic variables

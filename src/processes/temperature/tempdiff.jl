@@ -31,3 +31,27 @@ and (60, 90) latitudes. The timescale is taken as 2 months, although if
 function ΔTLinearRelaxation(; ΔT, τ = 5e6, A = 36.53, B = 0.658)
     ExpRelaxation(ΔT,  -B*(T - C_to_K) + A, τ)
 end
+
+"""
+    ΔTStommelModel(; ΔT=ΔT, ΔS=ΔS, η1 = 2, η2 = 1, η3 = 0.3)
+
+Create the equations
+```math
+\\dot{\\Delta T} = \\eta_1 - \\Delta T - |\\Delta T - \\Delta S| \\Delta T
+\\dot{\\Delta S} = \\eta_2 - \\eta_3\\Delta S - |\\Delta T - \\Delta S| \\Delta S
+```
+which are the two equations of the Stommel box model for Atlantic thermohaline circulation
+[Stommel1961](@cite), here presented in nondimensionalized form [Lohmann2021](@cite), so that
+temperature and sality are normalized by their coefficients ``a_T, a_S`` relating them
+to the density of water
+```math
+\\rho = \\rho_0 [1 - a_T(T - T_0) + a_S(S-S_0)]
+```
+for some reference values.
+"""
+function ΔTStommelModel(; ΔT=ΔT, ΔS=ΔS, η1 = 2, η2 = 1, η3 = 0.3)
+    return [
+        TimeDerivative(ΔT, η1 - ΔT - abs(ΔT - ΔS)*ΔT),
+        TimeDerivative(ΔS, η2 - η3*ΔS - abs(ΔT - ΔS)*ΔS),
+    ]
+end

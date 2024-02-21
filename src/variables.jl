@@ -12,6 +12,7 @@ const PREDEFINED_EBM_VARIABLES = @variables begin
     (α_ice(t) = 0.05),   [bounds = (0.0, 1.0), description = "albedo of ice, unitless"]
     (α_cloud(t) = 0.1),  [bounds = (0.0, 1.0), description = "albedo of clouds, unitless"]
     (ΔT(t) = 17.0),      [bounds = (0.0, 60.0), description = "equator to pole temperature difference, in Kelvin"]
+    (ΔS(t) = 5.0),       [bounds = (0.0, 10.0), description = "equator to pole salinity difference, in psu"]
     (ε(t) = 0.5),        [bounds = (0.0, 1.0), description = "planetary effective emissivity, unitless"]
     (C(t) = 0.6744),     [bounds = (0.0, 1.0), description = "cloud fraction, unitless"]
     (ℓ(t) = 0.8),        [bounds = (0.0, 1.0), description = "sine of latitude of ice-line"]
@@ -21,7 +22,7 @@ const PREDEFINED_EBM_VARIABLES = @variables begin
     (ASR(t)), [description = "absorved shortwave radiation"]
 end
 
-export T, S, f, α, α_ice, α_cloud, ΔT, ε, ℓ, C, CO2, OLR, ASR
+export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR
 
 # This function is only meaningful for dynamic variables!
 """
