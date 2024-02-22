@@ -5,7 +5,7 @@ export EmissivityFeedbackTanh, EmissivitySellers1969, SoedergrenClearSkyEmissivi
 
 Create an equation that assigns emissivity `ε` to hyperbolic tangent of temperature `T`.
 This is an ad-hoc feedback  that was used in [Bastiaansen2023](@cite),
-similar to [`EmissivitySellsers1969`](@ref).
+similar to [`EmissivitySellers1969`](@ref).
 In essence this is a [`TanhProcess`](@ref) with the given keywords as parameters.
 """
 function EmissivityFeedbackTanh(; left = 0.5, right = 0.4, rate = 0.5, Tref = 288.0)

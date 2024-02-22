@@ -1,6 +1,5 @@
 # TODO: Rename to sigmoid
 # TODO: Logistic function is faster in Julia on windows 10
-# TODO: Move to ConceptualClimateModels
 export TanhProcess
 
 """

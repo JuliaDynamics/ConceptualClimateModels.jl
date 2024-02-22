@@ -1,5 +1,9 @@
 # ConceptualClimateModels.jl
 
+```@docs
+ConceptualClimateModels
+```
+
 ## [Premade symbolic variable instances](@id global_vars)
 
 For convenience, ConceptualClimateModels.jl defines and exports some symbolic variables
@@ -31,7 +35,7 @@ useful for integrating with the rest of the functionality of the library.
 
 ```@example MAIN
 using ConceptualClimateModels
-PREDEFINED_EBM_VARIABLES
+PREDEFINED_CCM_VARIABLES
 ```
 
 ## Default values, limits, etc.

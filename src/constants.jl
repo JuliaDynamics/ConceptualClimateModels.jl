@@ -1,11 +1,11 @@
 const p_reference = 100000.0  # reference pressure in Pa
-const TzeroC = 273.16         # zero °C, triple point (K)
+const triple_point = 273.16   # triple point (K)
 const e0 = 610.78             # reference water vapor partial pressure (Pa = J/m^3)
 const L0 = 2.5e6              # latent heat of vaporization (J/kg)
 const Rv = 461.0              # gas constant water vapor (J/K/kg)
 const Rd = 287.0              # gas constant dry air (J/K/kg)
 const g = 9.8                 # gravity (m/s^2)
-const cₚ = 1004.0         # heat capacity at constant pressure (J/K/kg)
+const cₚ = 1004.0              # heat capacity at constant pressure (J/K/kg)
 const sec_in_day = 60*60*24.0
 const C_to_K = 273.15 # absolute zero temperature, add to Kelvin to make C
 
