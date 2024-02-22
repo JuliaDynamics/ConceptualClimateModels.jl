@@ -79,6 +79,6 @@ TanhProcess
 The list of default processes that are used by default in [`processes_to_coupledodes`](@ref) if one does not explicitly provide a list of default processes are:
 
 ```@example MAIN
-DEFAULT_CCM_PROCESSES
+DEFAULT_PROCESSES
 ```
 

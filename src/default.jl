@@ -6,7 +6,7 @@ for (root, dirs, files) in walkdir(joinpath(@__DIR__, "processes"))
 end
 
 # This depends on the `variables.jl` file!
-DEFAULT_CCM_PROCESSES = [
+DEFAULT_PROCESSES = [
     BasicRadiationBalance(),
     ASR ~ S*(1 - α)*solar_constant,
     LinearOLR(),
@@ -17,4 +17,4 @@ DEFAULT_CCM_PROCESSES = [
     DirectAlbedoAddition(),
 ]
 
-export DEFAULT_CCM_PROCESSES
+export DEFAULT_PROCESSES
