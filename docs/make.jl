@@ -11,7 +11,9 @@ include("build_docs_with_style.jl")
 
 pages =  [
     "Introduction" => "index.md",
+    "Tutorial" => "tutorial.md",
     "Predefined processes" => "processes.md",
+    "Examples" => "examples.md",
     "References" => "references.md",
 ]
 

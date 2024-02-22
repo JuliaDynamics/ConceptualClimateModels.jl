@@ -277,12 +277,28 @@ useful for integrating with the rest of the functionality of the library.
 
 ### [List of premade variables](@id list_vars)
 
-All premade variables have a default value, a description, and plausible physical bounds
-for integration with DynamicalSystems.jl.
+
 
 ```@example MAIN
 using ConceptualClimateModels
 PREDEFINED_CCM_VARIABLES
+```
+
+### Default values, limits, etc.
+
+All premade variables have a default value, a description, and plausible physical bounds.
+
+To obtain the default value, use `default_value(x)`. For the description,
+use `getdescription(x)`. For the bounds, use:
+
+```@docs
+physically_plausible_limits(::Any)
+```
+
+e.g.,
+
+```@example MAIN
+physically_plausible_limits(T)
 ```
 
 ## Automatically named parameters
@@ -323,6 +339,20 @@ equations(mtk)
 
 ```@example MAIN
 parameters(mtk)
+```
+
+
+## Integration with DynamicalSystems.jl
+
+ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) by providing initial condition
+sampling to use when e.g., finding attractors and their basin fractions with
+`DynamicalSystems.basins_fractions`.
+
+
+```@docs
+physically_plausible_limits(::DynamicalSystem)
+physically_plausible_ic_sampler
+physically_plausible_grid
 ```
 
 
