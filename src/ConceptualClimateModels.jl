@@ -10,7 +10,7 @@ end ConceptualClimateModels
 using Reexport
 @reexport using ProcessBasedModelling # exports `t` as time
 @reexport using DynamicalSystemsBase
-export construct_dynamical_system
+export processes_to_dynsys
 
 include("constants.jl")
 include("variables.jl")
@@ -21,9 +21,11 @@ include("processes_advanced.jl")
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
 # TODO: Make in-place depend on state space dimension
-function construct_dynamical_system(proc, default = DEFAULT_PROCESSES; diffeq = DEFAULT_DIFFEQ, inplace::Bool = true, kwargs...)
+function processes_to_dynsys(proc, default = DEFAULT_PROCESSES;
+        diffeq = DEFAULT_DIFFEQ, inplace::Bool = true, split::Bool = false, kwargs...
+    )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
-    ssys = structural_simplify(sys)
+    ssys = structural_simplify(sys; split)
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value
     if inplace
