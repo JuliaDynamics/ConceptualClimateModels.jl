@@ -26,6 +26,9 @@ This linear approximation is quite accurate for temporally averaged data
 ``T \\in (220, 280)`` however drops drastically in accuracy after that
 due to the nonlinear effects of clouds (as evident by observational data).
 
+[Koll2018](@cite) provide a "proof" of the linearity of the clear sky OLR due
+to spectral properties of water vapor.
+
 We note a big difference between current CERES data and the values reported
 in [North1981](@cite): here `A=214.67` (assuming ``T`` in Celcius) and `B=1.8`
 versus the values `A=203.3` and `B=2.09` in [North1981](@cite).

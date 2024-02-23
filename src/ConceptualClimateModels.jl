@@ -14,7 +14,20 @@ using Reexport
 include("constants.jl")
 include("variables.jl")
 include("statespace.jl")
+
+# include all processes first
+for (root, dirs, files) in walkdir(joinpath(@__DIR__, "processes"))
+    for file in files
+        include(joinpath(root, file))
+    end
+end
+
 include("default.jl")
+export DEFAULT_CCM_PROCESSES
+
 include("processes_advanced.jl")
+include("dynamicalsystems.jl")
+
+export DEFAULT_PROCESSES
 
 end # module

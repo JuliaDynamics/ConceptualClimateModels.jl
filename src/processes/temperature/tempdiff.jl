@@ -1,4 +1,4 @@
-export ΔTLinearRelaxation
+export ΔTLinearRelaxation, ΔTStommelModel
 
 # Equation (2) from
 # The latitudinal temperature gradient and its climate dependence as inferred from foraminiferal δ18O over the past 95 million years

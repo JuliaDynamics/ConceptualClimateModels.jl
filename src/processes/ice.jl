@@ -17,7 +17,7 @@ In essence this is a [`TanhProcess`](@ref) with the given keywords as parameters
 with reference temperature `Tref = Tfreeze - scale/2`.
 
 This albedo is the most common used large-scale feedback in energy balance models, e.g.,
-[Ghil1981](@ref), although it is typically taken as a piece-wise linear function.
+[Ghil1981](@cite), although it is typically taken as a piece-wise linear function.
 There is little change with using a hyperbolic tangent instead, while the `tanh`
 offers a differentiable flow.
 

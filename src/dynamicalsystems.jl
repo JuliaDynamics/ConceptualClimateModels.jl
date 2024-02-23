@@ -10,9 +10,9 @@ Convert a given `Vector` of processes to a `DynamicalSystem`, in particular `Cou
 All processes represent symbolic equations managed by ModelingToolkit.jl.
 `default` is a vector for default processes that "process-less" variables
 introduced in `processes` will obtain.
-Use [`process_to_mtkmodel`](@ref) to obtain the MTK model before it is structurally
+Use [`processes_to_mtkmodel`](@ref) to obtain the MTK model before it is structurally
 simplified and converted to a `DynamicalSystem`.
-See also [`process_to_mtkmodel`](@ref) for more details on what `processes` is,
+See also [`processes_to_mtkmodel`](@ref) for more details on what `processes` is,
 or see the online [Tutorial](@ref).
 
 ## Keyword arguments
@@ -24,9 +24,9 @@ or see the online [Tutorial](@ref).
 - `split = false`: whether to split parameters as per ModelingToolkit.jl.
   Note the default is not ModelingToolkit's default, i.e., no splitting occurs.
   This accelerates parameter access, assuming all parameters are of the same type.
-- `kw...`: all other keywords are propagated to `process_to_mtkmodel`.
+- `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
-function processes_to_coupledodes(proc, default = DEFAULT_PROCESSES;
+function processes_to_coupledodes(proc, default = DEFAULT_CCM_PROCESSES;
         diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false, kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)

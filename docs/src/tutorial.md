@@ -1,8 +1,9 @@
 # Tutorial
 
 With ConceptualClimateModels.jl one makes differential equation systems from _processes_.
-A _process_ is simply a particular equation defining a climate variable.
-A vector of processes is composed by the user, and given to the main function [`processes_to_coupledodes`](@ref) which bundles them into a system of equations.
+A _process_ is simply a particular equation defining the dynamics of a climate variable.
+A vector of processes is composed by the user, and given to the main function [`processes_to_coupledodes`](@ref) which bundles them into a system of equations
+that creates a dynamical system.
 
 !!! note "Familiarity with DynamicalSystems.jl and ModelingToolkit.jl"
     ConceptualClimateModels.jl builds on [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model, and it builds on [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to analyze the models. Familiarity with either package is good to have, and will allow you to faster and better understand the concepts discussed here. Nevertheless familiarity is actually optional as the steps required to use ConceptualClimateModels.jl are all explained in this tutorial.
@@ -11,21 +12,21 @@ A vector of processes is composed by the user, and given to the main function [`
 ## Introductory example
 
 Let's say that we want to create the most basic energy balance model,
-$$
+```math
 c_T \frac{dT}{dt} = ASR - OLR + f
-$$
-where $ASR$ is the absorbed solar radiation given by
-$$
+```
+where ``ASR`` is the absorbed solar radiation given by
+```math
 ASR = S (1-\alpha)
-$$
-with $\alpha$ the planetary albedo, $OLR$ is the outgoing longwave radiation given by the linearized expression
-$$
+```
+with ``\alpha`` the planetary albedo, ``OLR`` is the outgoing longwave radiation given by the linearized expression
+```math
 OLR = A + BT
-$$
-and $f$ some radiative forcing at the top of the atmosphere, that is based on CO2 concentrations and given by
-$$
+```
+and ``f`` some radiative forcing at the top of the atmosphere, that is based on CO2 concentrations and given by
+```math
 f = 3.7\log_2\left(\frac{CO_2}{400}\right)
-$$
+```
 with CO2 concentrations in ppm.
 
 To create this model with ConceptualClimateModels.jl while providing the least information possible we can do:
@@ -36,13 +37,15 @@ using ConceptualClimateModels
 processes = [
     BasicRadiationBalance(),
     LinearOLR(),
-    CO2Forcing(), # note that for default CO2 values this is zero forcing
+    ParameterProcess(α),
+    CO2Forcing(), # note that for default CO2 value this is zero forcing
 ]
 
 ds = processes_to_coupledodes(processes)
+println(dynamical_system_summary(ds))
 ```
 
-This is a dynamical system from [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/stable/) that is generated via symbolic expressions based on [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/), utilizing the process-based approach of [ProcessBasedModelling.jl](https://juliadynamics.github.io/ProcessBasedModelling.jl/stable/).
+The output is a dynamical system from [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/stable/) that is generated via symbolic expressions based on [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/), utilizing the process-based approach of [ProcessBasedModelling.jl](https://juliadynamics.github.io/ProcessBasedModelling.jl/stable/).
 
 As the dynamical system is made by symbolic expressions, these can be
 obtained back at any time:
@@ -120,19 +123,21 @@ Hold on a minute though, because in the original processes we provided,
 processes = [
     BasicRadiationBalance(),
     LinearOLR(),
+    ParameterProcess(α),
     CO2Forcing(),
 ]
 ```
 there was no process that defined the absorbed solar radiation ``ASR``!
 
-Well, ConceptualClimateModels.jl has a list of [default processes](@ref default_processes) that are automatically included in every call to [`processes_to_coupledodes`](@ref).
+Well, ConceptualClimateModels.jl has a list of [predefined processes](@ref predefined_processes) that are automatically included in every call to [`processes_to_coupledodes`](@ref).
 The default processes for the ASR is $ASR = S(1-\alpha)$ with $S$ the solar constant.
 The function [`processes_to_coupledodes`](@ref) goes through all processes the user provided and identifies variables that themselves do not have a process.
 It then checks the list of default processes and attempt to assign one to these variables.
 
 If there are no default processes, it makes the variables themselves parameters with the same name but with a subscript 0.
 
-For example, let's assume that we completely remove default processes like so:
+For example, let's assume that we completely remove default processes and we don't specify
+a process for the albedo ``α``:
 
 ```@example MAIN
 processes = [
@@ -143,14 +148,14 @@ processes = [
 ]
 
 # note the empty list as 2nd argument, which is otherwise
-# the default processes
+# the default processes. Notice also that we make an MTK model
+# (which is the step _before_ converting to a dynamical system)
 mtk = processes_to_mtkmodel(processes, [])
-
+# we access the equations directly from the model
 equations(mtk)
 ```
 
-You will notice that here there is no equation $\alpha = \alpha_bg + \alpha_ice + \alpha_clouds$, which is the default processes assigned to variable $\alpha$.
-Instead, the process that was just created for it was $\alpha = \alpha_0$,
+You will notice the equation ``α = α_0``
 where $\alpha_0$ is now a _parameter_ of the system (i.e., it can be altered after creating
 the system). The value of $\alpha_0$ is the default value of $\alpha$:
 ```@example MAIN
@@ -216,7 +221,7 @@ For example:
 
 ```@example MAIN
 @variables x(t) = 0.5 # all variables must be functions of (t)
-x_process = x ~ 0.5*T^2 # x is just a function of temperatur
+x_process = x ~ 0.5*T^2 # x is just a function of temperature
 ```
 
 A more re-usable approach however is to create a function that generates a process
@@ -229,9 +234,19 @@ or when we wrote `x ~ 0.5 * T^2`, where did the variable bindings `ASR, S, α` c
 For convenience, ConceptualClimateModels.jl defines and exports some symbolic variables
 for typical climate quantities that have default processes. We list all of these
 [below](@ref list_vars). These default bindings are used throughout the library as the
-default variables in [predefined processes](@id predefined_processes).
+default variables in [predefined processes](@ref predefined_processes).
+When going through documentation strings of [predefined processes](@ref predefined_processes),
+such as [`BasicRadiationBalance`](@ref),
+you will notice that the function call signatures are like:
 
-Crucially, these default bindings are _symbolic variables_. They are defined as
+```julia
+BasicRadiationBalance(; T, f, kwargs...)
+```
+There are keywords that do not have an assignment. These always represent climate
+variables, never parameters, and for the variables they use the [existing predefined
+climate variables](@ref list_vars).
+
+Crucially, these default variables are _symbolic variables_. They are defined as
 ```julia
 @variables begin
     T(t) = 0.5 # ...
@@ -252,28 +267,26 @@ OLR2 = A2 + B2*T2
 ```
 This `OLR2` is _not_ a symbolic expression and _cannot_ be used to represent a process.
 
-When going through documentation strings of [predefined processes](@ref predefined_processes),
-such as [`BasicRadiationBalance`](@ref),
-you will notice that the function call signatures are like:
-
-```julia
-BasicRadiationBalance(; T=T, kwargs...)
-```
-
-This `T=T` means that the keyword argument `T`, which represents the
-"temperature variable", takes the value of `ConceptualClimateModels.T`,
-which itself is a premade _symbolic_ variable instance that is exported by
-ConceptualClimateModels.jl. You can pass in your own variables instead, by doing
-```julia
+You can use your own variables for any of the [predefined processes](@ref predefined_processes)
+You can define them by doing
+```@example MAIN
 @variables begin
     (T1_tropics(t) = 290.0), [bounds = (200.0, 350.0), description = "temperature in tropical box 1, in Kelvin"]
 end
-process = BasicRadiationBalance(; T=T1_tropics, kwargs...)
 ```
-_(you would also need to give `T1_tropics` to all other processes that utilize temperature)_
+and then assign them to the corresponding keyword argument
+```@example MAIN
+process = BasicRadiationBalance(T=T1_tropics)
+```
 
 Defining variables with the extra `bounds, description` annotations is
 useful for integrating with the rest of the functionality of the library.
+
+!!! warn "Custom variables need to be assigned everywhere!"
+    Above we assigned `T1_tropics` as the temperature variable.
+    This means we also need to assign the same variable as the one setting the
+    `OLR` variable by also providing the processes
+    `LinearOLR(T = T1_tropics)` (for example).
 
 ### [List of premade variables](@id list_vars)
 
@@ -378,3 +391,8 @@ To make a new processes you can:
    it leads to much better printing/display of the list of processes.
    For an example of this, see the source code of [`IceAlbedoFeedback`](@ref).
    To create a new `Process` see the [API of ProcessBasedModelling.jl](https://juliadynamics.github.io/ProcessBasedModelling.jl/stable/#Process-API)
+   or read the documentation string of [`Process`](@ref) below.
+
+```@docs
+Process
+```

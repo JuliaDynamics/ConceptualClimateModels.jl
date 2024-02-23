@@ -42,6 +42,12 @@ SeparatedClearAllSkyAlbedo
 IceAlbedoFeedback
 ```
 
+## Water vapor
+
+```@docs
+saturation_vapor_pressure
+```
+
 ## Insolation
 
 ```@docs
@@ -74,11 +80,19 @@ ExpRelaxation
 TanhProcess
 ```
 
-## Default processes
+## [Default processes](@id default_processes)
 
 The list of default processes that are used by default in [`processes_to_coupledodes`](@ref) if one does not explicitly provide a list of default processes are:
 
-```@example MAIN
-DEFAULT_PROCESSES
+```@setup MAIN
+using ConceptualClimateModels
+struct ShowFile
+    file::String
+end
+function Base.show(io::IO, ::MIME"text/plain", f::ShowFile)
+    write(io, read(f.file))
+end
 ```
-
+```@example MAIN
+ShowFile(joinpath(dirname(pathof(ConceptualClimateModels)), "default.jl")) # hide
+```

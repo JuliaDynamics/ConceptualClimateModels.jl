@@ -17,5 +17,5 @@ function BudykoOLR(; OLR=OLR, T=T, C=C,
         BudykoOLR_Ac = -377.22741, BudykoOLR_Bc = 1.536171
     )
     @convert_to_parameters BudykoOLR_A BudykoOLR_B BudykoOLR_Ac BudykoOLR_Bc
-    return OLR ~ Budyko_A + Budyko_B*T - C*(Budyko_Ac + Budyko_Bc*T)
+    return OLR ~ BudykoOLR_A + BudykoOLR_B*T - C*(BudykoOLR_Ac + BudykoOLR_Bc*T)
 end

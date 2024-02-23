@@ -8,20 +8,28 @@ or other packages to analyse conceptual climate models.
 
 The origins of energy balance models ([Sellers1969, Budyko1969, Ghil1981, North1981](@cite))
 examined the impact of variations in insolation on the global climate.
-In particular, they studied how a global-mean temperature energy balance model
-yielded bi-stable hysterisis between a cold "snowball" state and a warm Earth,
-as the solar constant was varied.
+In particular, they studied how simple energy balance models with only ice-albedo and water vapor feedbacks yielded bi-stable hysteresis between a cold "snowball" state and
+a warm Earth, as the solar constant was varied.
 
-We can easily replicate this behaviour and create the same model as [Budyko1969](@cite),
-by combining the processes:
+We can easily replicate this behaviour by creating a
+global-mean temperature model, by combining the processes:
 
 ```@example MAIN
+using ConceptualClimateModels
+
 budyko_processes = [
     BasicRadiationBalance(),
-    IceAlbedoFeedback(),
-    BudykoOLR(),
-    C ~ default_value(C), # make cloud fraction a fixed constant
+    LinearOLR(),
+    IceAlbedoFeedback(; min = 0.3, max = 0.7),
+    α ~ α_ice,
+    ParameterProcess(S), # insolation is a parameter
+    f ~ 0, # no external forcing
+    # absorbed solar radiation has a default process
 ]
 
-budyko = model
+budyko = processes_to_coupledodes(budyko_processes)
+dynamical_system_summary(budyko)
 ```
+
+The water vapor feedback is encapsulated in the form of the OLR, which is linear
+due to water vapor [Koll2018](@cite).
