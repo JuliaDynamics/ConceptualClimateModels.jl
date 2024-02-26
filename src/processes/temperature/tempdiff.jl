@@ -50,6 +50,7 @@ to the density of water
 for some reference values.
 """
 function ΔTStommelModel(; ΔT=ΔT, ΔS=ΔS, η1 = 2, η2 = 1, η3 = 0.3)
+    η1, η2, η3 = new_derived_named_parameter.(:η, (η1, η2, η3), ("1", "2", "3"); prefix = false, connector = "")
     return [
         TimeDerivative(ΔT, η1 - ΔT - abs(ΔT - ΔS)*ΔT),
         TimeDerivative(ΔS, η2 - η3*ΔS - abs(ΔT - ΔS)*ΔS),

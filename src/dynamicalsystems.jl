@@ -33,7 +33,7 @@ function processes_to_coupledodes(proc, default = DEFAULT_CCM_PROCESSES;
     ssys = structural_simplify(sys; split)
     if isnothing(inplace)
         D = length(unknowns(ssys))
-        inplace = D < 6
+        inplace = D > 5
     end
 
     # The usage of `nothing` for the initial state assumes all state variables
