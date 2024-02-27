@@ -1,3 +1,5 @@
+# module CCMV
+
 # These are quantities that change with time. Hence, they are either state variables
 # or observables of the state variables. They have given names and are utilized
 # in the rest of the files to make the equations that compose the dynamical system.
@@ -24,25 +26,7 @@ const PREDEFINED_CCM_VARIABLES = @variables begin
 end
 
 export PREDEFINED_CCM_VARIABLES
-export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR
-
-# This function is only meaningful for dynamic variables!
-"""
-    physically_plausible_limits(x)
-
-Return a tuple (min, max) of plausible limiting values for the variable `x`.
-If the variable does not have defined `bounds` metadata, then the default value ± 20% is used.
-If there is no default value, a heuristic is tried, and an error is thrown if it fails.
-"""
-function physically_plausible_limits(var)
-    if ModelingToolkit.hasbounds(var)
-        return getbounds(var)
-    elseif !isnothing(default_value(var))
-        return (0.8default_value(var), 1.2default_value(var))
-    else
-        return physically_plausible_limits(string(ModelingToolkit.getname(var)))
-    end
-end
+export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR, q
 
 function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
     if var[1] == 'T'
@@ -56,3 +40,5 @@ function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
         """)
     end
 end
+
+# end

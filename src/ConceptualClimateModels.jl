@@ -14,7 +14,10 @@ using Reexport
 import NaNMath # so we can use them for sqrt, log, etc. in MTK
 
 include("constants.jl")
+
 include("variables.jl")
+# using .CCMV # TODO: Decide whether we make variables a module or not
+
 include("statespace.jl")
 
 # include all processes first
