@@ -26,7 +26,8 @@ ds = processes_to_coupledodes(p1)
 mtk = referrenced_sciml_model(ds)
 eqs = all_equations(mtk)
 
-for var in (T, ε, ε1, ε2, ε3, ε4)
+# This also tests a bunch of default processes
+for var in (T, ε, ε1, ε2, ε3, ε4, q, :α_bg)
     @test has_symbolic_var(eqs, var)
 end
 @test has_symbolic_var(eqs, ε)
@@ -34,12 +35,14 @@ end
 @test has_symbolic_var(eqs, mtk.ε_0)
 @test !has_symbolic_var(equations(mtk), α)
 
-
 @variables begin
     OLR1(t) = 10.0
     OLR2(t) = 10.0
     OLR3(t) = 10.0
     a1(t) = 0.1
+    a2(t) = 0.1
+    a3(t) = 0.1
+    a4(t) = 0.1
 end
 
 p2 = [
@@ -49,10 +52,13 @@ p2 = [
     CloudAlbedoExponential(),
     CloudAlbedoLinear(; α_cloud = a1),
     BudykoOLR(OLR = OLR3),
+    DirectAlbedoAddition(α = a4),
+    CoAlbedoProduct(α = a2),
+    SeparatedClearAllSkyAlbedo(α = a3),
 ]
 
 ds = processes_to_coupledodes(p2)
 mtk = referrenced_sciml_model(ds)
-for var in (T, C, OLR1, OLR2, OLR3, a1)
+for var in (T, C, OLR1, OLR2, OLR3, a1, q, a2, a3, a4)
     @test has_symbolic_var(mtk, var)
 end
