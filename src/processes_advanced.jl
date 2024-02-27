@@ -19,6 +19,7 @@ over a range of `scale` being centered at `reference`.
 If the values given to the parameters of the expression are real numbers, they become
 named parameters prefixed with the name of `variable`, then the name of the `driver`,
 and then `_tanh_left`, `_tanh_right`, `_tanh_rate` and `_tanh_ref` respectively.
+Use `LiteralParameter` for parameters you do not wish to rename.
 """
 struct TanhProcess <: Process
     variable
@@ -39,7 +40,7 @@ function ProcessBasedModelling.rhs(p::TanhProcess)
     values = left, right, scale, reference
     xname = string(ModelingToolkit.getname(x))
     suffixes = (xname*"_") .* ["tanh_left", "tanh_right", "tanh_scale", "tanh_ref"]
-    mtk_vars = map((val, s) -> new_derived_named_parameter(y, val, s, true), values, suffixes)
+    mtk_vars = map((val, s) -> new_derived_named_parameter(y, val, s; prefix = false), values, suffixes)
     # pass them to the regular tanh Julia function
     return tanh_expression(x, mtk_vars...)
 end

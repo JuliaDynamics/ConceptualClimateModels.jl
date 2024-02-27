@@ -1,5 +1,6 @@
 export processes_to_coupledodes
 export dynamical_system_summary
+export all_equations
 
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
@@ -64,8 +65,10 @@ function dynamical_system_summary(ebm::DynamicalSystem)
     # Else, use symbolic stuff
     summary = keepfirstlines(sprint(show, MIME"text/plain"(), ebm), 4)*"\n"
     model = referrenced_sciml_model(ebm)
-    summary *= "\nwith dynamic equations:\n"*skipfirstline(sprint(show, MIME"text/plain"(), equations(model)))
-    summary *= "\n\nwith observed variables:\n"*skipfirstline(sprint(show, MIME"text/plain"(), observed(model)))
+    summary *= "\nwith equations:\n"*skipfirstline(sprint(show, MIME"text/plain"(), all_equations(model)))
+    # TODO: here add dump metadata
+#     See also: [`ModelingToolkit.dump_variable_metadata`](@ref), [`ModelingToolkit.dump_parameters`](@ref),
+# [`ModelingToolkit.dump_unknowns`](@ref).
     summary *= "\n\nand parameter values:\n"*skipfirstline(sprint(show, MIME"text/plain"(), named_current_parameters(ebm)))
     return summary
 end

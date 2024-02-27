@@ -2,7 +2,7 @@ export EmissivityStefanBoltzmanOLR
 export LinearOLR, LinearClearSkyOLR
 
 """
-    EmissivityStefanBoltzmanOLR(; ε = ε, T = T)
+    EmissivityStefanBoltzmanOLR(; ε, T)
 
 Create the equation `OLR ~ ε*σ*T^4` where `σ` is the Stefan Boltzmann constant
 and `ε` the effective emissivity, also known as the "grayness" of the system,
@@ -14,7 +14,7 @@ function EmissivityStefanBoltzmanOLR(; ε = ε, T = T)
 end
 
 """
-    LinearOLR(; T = T, A = -277.0, B = 1.8)
+    LinearOLR(; OLR, T, A = -277.0, B = 1.8)
 
 Create the equation `OLR ~ A + B*T`.
 This is a linearized outgoing longwave radiation (OLR), and is the
@@ -38,17 +38,17 @@ If instead of all sky, if we fit the clear sky CERES data, we get
 Interestingly, coefficient `B` here is the same as that reported by [North1981](@cite),
 but `A=244.88` (assuming `T` in Celcius) is not.
 """
-function LinearOLR(; T = T, A = -277.0, B = 1.8)
+function LinearOLR(; OLR = OLR, T = T, A = -277.0, B = 1.8)
     return OLR ~ A + B*T
 end
 
 
 """
-    LinearClearSkyOLR(; T = T)
+    LinearClearSkyOLR(; kw...)
 
-Equivalent with `LinearOLR(; T, A = A = -326.0, B = 2.09)` and provided
+Equivalent with `LinearOLR(; A = A = -326.0, B = 2.09, kw...)` and provided
 as a convenience for the clear sky fit to CERES data.
 """
-function LinearClearSkyOLR(; T = T)
-    return LinearOLR(; T, A = -326.0, B = -2.09)
+function LinearClearSkyOLR(; kw...)
+    return LinearOLR(; A = -326.0, B = -2.09, kw...)
 end

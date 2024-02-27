@@ -11,6 +11,8 @@ using Reexport
 @reexport using ProcessBasedModelling # exports `t` as time
 @reexport using DynamicalSystemsBase
 
+import NaNMath # so we can use them for sqrt, log, etc. in MTK
+
 include("constants.jl")
 include("variables.jl")
 include("statespace.jl")

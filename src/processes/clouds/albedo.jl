@@ -2,7 +2,7 @@ export CloudAlbedoExponential, CloudAlbedoLinear
 
 """
     CloudAlbedoExponential(
-        α_cloud = α_cloud, C = C, a = 2.499219232848238, b = 17.596369331717433
+        α_cloud, C, a = 2.499219232848238, b = 17.596369331717433
     )
 
 Create the equation `α_cloud ~ sinh(a*C)/b` relating cloud albedo
@@ -25,7 +25,7 @@ function CloudAlbedoExponential(;
 end
 
 """
-    CloudAlbedoLinear(; α_cloud = α_cloud, C = C, a = 0.2252861764703435)
+    CloudAlbedoLinear(; α_cloud, C, a = 0.2252861764703435)
 
 Same as in [`CloudAlbedoExponential`](@ref), but now the linear form `α_cloud ~ a*C`
 is returned, with `a` fitted from CERES data in the same way.

@@ -1,4 +1,5 @@
 export EmissivityFeedbackTanh, EmissivitySellers1969, SoedergrenClearSkyEmissivity
+export EmissivityLogConcentration
 
 """
     EmissivityFeedbackTanh(; ε, Τ, left = 0.5, right = 0.4, rate = 0.5, Tref = 288.0)
@@ -8,7 +9,7 @@ This is an ad-hoc feedback  that was used in [Bastiaansen2023](@cite),
 similar to [`EmissivitySellers1969`](@ref).
 In essence this is a [`TanhProcess`](@ref) with the given keywords as parameters.
 """
-function EmissivityFeedbackTanh(; left = 0.5, right = 0.4, rate = 0.5, Tref = 288.0)
+function EmissivityFeedbackTanh(; ε=ε, T=T, left = 0.5, right = 0.4, rate = 0.5, Tref = 288.0)
     return TanhProcess(ε, T, left, right, rate, Tref)
 end
 
@@ -47,7 +48,6 @@ function EmissivitySellers1969(; ε = ε, T = T, m = 0.5)
     return ε ~ 1 - m*tanh(19*T^6*1e-16)
 end
 
-export EmissivityLogConcentration, BudykoOLR
 
 """
     EmissivityLogConcentration(; ε, T, CO2, q,

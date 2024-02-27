@@ -11,9 +11,7 @@ const C_to_K = 273.15 # absolute zero temperature, add to Kelvin to make C
 const mass_vapor = 18.016 # water vapor specific mass
 const R_ideal_gas = 8.31436 # Pa m³ / K / mole
 const σ_Stefan_Boltzman = 5.670374419e-8    # stefan boltzman constant
-const σ_Stefan_Boltzman_4root = 0.015431060170831203    # to the fourth root (for numerical stability)
 const solar_constant = 340.25 # W/m^2, already divided by 4
-const normalized_stefan_boltzmann_4root = (σ_Stefan_Boltzman/solar_constant)^0.25
 const sec_in_year = 365*24*60*60.0
 
 export sec_in_year, sec_in_day, C_to_K
