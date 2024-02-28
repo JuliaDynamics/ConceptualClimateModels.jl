@@ -118,7 +118,9 @@ estimate its bifurcation diagram using the same steps as the above example.
 using DynamicalSystems
 
 grid = physically_plausible_grid(stommel)
-mapper = AttractorsViaRecurrences(stommel, grid)
+mapper = AttractorsViaRecurrences(stommel, grid;
+    consecutive_recurrences = 1000, attractor_locate_steps = 10,
+)
 rfam = RecurrencesFindAndMatch(mapper)
 sampler = physically_plausible_ic_sampler(stommel)
 

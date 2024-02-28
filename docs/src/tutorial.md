@@ -33,6 +33,7 @@ To create this model with ConceptualClimateModels.jl while providing the least i
 
 ```@example MAIN
 using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
 
 processes = [
     BasicRadiationBalance(),
@@ -97,6 +98,7 @@ T_process = BasicRadiationBalance()
 ```
 is the process defining the variable ``T``, representing temperature. We can learn this by either reading the documentation string of [`BasicRadiationBalance`](@ref), or querying it directly:
 ```@example MAIN
+using ProcessBasedModelling: lhs, rhs
 # This is the equation created by the process
 lhs(T_process) ~ rhs(T_process)
 ```
@@ -206,7 +208,7 @@ They tell us exactly which variable does not have a process, and exactly which o
 This makes the modelling experience stress-free, especially when large and complex
 models are being created.
 
-## Adding more processes
+## Adding your own processes
 
 ConceptualClimateModels.jl provides an increasing list of
 [predefined processes](@ref predefined_processes) that you can use out of
@@ -232,8 +234,14 @@ or create a new process type as we describe in [making new processes](@ref new_p
 You might be wondering, when we wrote the equation `ASR ~ S*(1-α)` for the $ASR$ process,
 or when we wrote `x ~ 0.5 * T^2`, where did the variable bindings `ASR, S, α` come from?
 For convenience, ConceptualClimateModels.jl defines some symbolic variables
-for typical climate quantities and assigns default processes to them. We list all of these
-[below](@ref list_vars). These default bindings are used throughout the library as the
+for typical climate quantities and assigns default processes to them.
+we brought all of these into scope when we did
+```julia
+using ConceptualClimateModels.CCMV
+```
+where `CCMV` (standing for ConceptualClimateModels Variables) is a submodule
+that defines and exports the variables. We list all of these
+[below](@ref list_vars). These default variables are used throughout the library as the
 default variables in [predefined processes](@ref predefined_processes).
 When going through documentation strings of [predefined processes](@ref predefined_processes),
 such as [`BasicRadiationBalance`](@ref),
@@ -242,7 +250,8 @@ you will notice that the function call signatures are like:
 ```julia
 BasicRadiationBalance(; T, f, kwargs...)
 ```
-There are keywords that do not have an assignment. These always represent climate
+There are keywords that do not have an assignment like `T, f` above.
+These always represent climate
 variables, never parameters, and for the variables they use the [existing predefined
 climate variables](@ref list_vars).
 
