@@ -1,4 +1,5 @@
 using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
 using Test
 
 @variables begin
