@@ -18,6 +18,7 @@ We will combine the processes:
 
 ```@example MAIN
 using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
 
 budyko_processes = [
     BasicRadiationBalance(),
@@ -95,6 +96,7 @@ dependent variable instead, like so:
 
 ```@example MAIN
 using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
 
 @variables η1(t)
 @parameters η1_0 = 2.0 # starting value for η1 parameter
@@ -145,14 +147,17 @@ and due to the nice integration between DynamicalSystems.jl and ModelingToolkit.
 use any "observable" of the system for the trajectory output.
 
 ```@example MAIN
-r1, r2 = 0.02, 0.12
-u0 = [1.0, 2.0] # always start from same state
+r1, r2 = 0.02, 0.2
+u0 = [1.61334  1.85301] # always start from same state
+set_parameter!(stommel, η1_0, 2.0) # set it to initial value
 
 for (j, r) in enumerate((r1, r2))
     # update the named parameter `r_η` to the numeric value `r`
     set_parameter!(stommel, r_η, r)
+    # simulate until η1 becomes 4
+    tfinal = (4.0 - default_value(η1_0))/r
     # trajectory: first column = ΔΤ, second column = η1
-    X, tvec = trajectory(stommel, 1000.0, u0; save_idxs = [ΔT, η1])
+    X, tvec = trajectory(stommel, tfinal, u0; save_idxs = [ΔT, η1])
     lines!(ax, X[:, 2], X[:, 1]; color = Cycled(j+2), label = "r_η = $(r)")
 end
 axislegend(ax; unique = true, position = :lt)
