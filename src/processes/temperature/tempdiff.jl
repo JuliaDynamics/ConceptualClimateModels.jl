@@ -28,7 +28,7 @@ Here `ΔT` is defined as the temperature difference between average temperatures
 and (60, 90) latitudes. The timescale is taken as 2 months, although if
 `τ = 0` is given, the equation ``\\Delta T ~ \\Delta T_{ref}(T)`` is created instead.
 """
-function ΔTLinearRelaxation(; ΔT, τ = 5e6, A = 36.53, B = 0.658)
+function ΔTLinearRelaxation(; ΔT=ΔT, τ = 5e6, A = 36.53, B = 0.658)
     ExpRelaxation(ΔT,  -B*(T - C_to_K) + A, τ)
 end
 
