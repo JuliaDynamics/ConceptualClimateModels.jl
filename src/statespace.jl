@@ -1,13 +1,31 @@
+# This function is only meaningful for dynamic variables!
+"""
+    physically_plausible_limits(x)
+
+Return a tuple (min, max) of plausible limiting values for the variable `x`.
+If the variable does not have defined `bounds` metadata, then the default value ± 20% is used.
+If there is no default value, a heuristic is tried, and an error is thrown if it fails.
+"""
+function physically_plausible_limits(var)
+    if ModelingToolkit.hasbounds(var)
+        return getbounds(var)
+    elseif !isnothing(default_value(var))
+        return (0.8default_value(var), 1.2default_value(var))
+    else
+        return CCMV.physically_plausible_limits(string(ModelingToolkit.getname(var)))
+    end
+end
+
 """
     physically_plausible_limits(ds::DynamicalSystem)
 
-Return a vector of limits (min, max) for each state variable in `ds`.
-The states need to be named as the limits are deduced from the function
-`physically_plausible_limits(varname::String)`.
+Return a vector of limits (min, max) for each dynamic state variable in `ds`,
+assumming `ds` has been made using variables with bounds
+(all default symbolic variables of ConceptualClimateModels.jl satisfy this).
 """
 function physically_plausible_limits(ds::DynamicalSystem)
     model = referrenced_sciml_model(ds)
-    vars = ModelingToolkit.states(model)
+    vars = ModelingToolkit.unknowns(model)
     minmax = physically_plausible_limits.(vars)
     return minmax
 end

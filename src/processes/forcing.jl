@@ -11,7 +11,7 @@ which is the default for OLR expressions provided by ConceptualClimateModels.jl.
 The default value of ``f`` comes from Eq. (3.2) of [Bastiaansen2023](@cite) which cites IPCC-5,
 while [Etminan2016](@cite) report practically the same value assuming a constant
 ``f`` (note here the log is base 2). In reality ``f`` depends on ``CO2`` and other
-greenhouse gases concentrations due to spectral overlaps, see [Etminan2016](@ref) Sec. 4.
+greenhouse gases concentrations due to spectral overlaps, see [Etminan2016](@cite) Sec. 4.
 """
 Base.@kwdef struct CO2Forcing <: Process
     f = f

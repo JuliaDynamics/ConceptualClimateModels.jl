@@ -11,7 +11,9 @@ include("build_docs_with_style.jl")
 
 pages =  [
     "Introduction" => "index.md",
+    "Tutorial" => "tutorial.md",
     "Predefined processes" => "processes.md",
+    "Examples" => "examples.md",
     "References" => "references.md",
 ]
 
@@ -22,11 +24,8 @@ bib = CitationBibliography(
     style=:authoryear
 )
 
-build_docs_with_style(pages, ConceptualClimateModels;
+build_docs_with_style(pages, ConceptualClimateModels, ProcessBasedModelling;
     authors = "George Datseris <datseris.george@gmail.com>",
-    bib,
-    # We need to remove the cross references because we don't list here
-    # the whole `DynamicalSystem` API...
-    warnonly = [:doctest, :missing_docs, :cross_references],
+    bib, warnonly = [:doctest, :missing_docs, :cross_references],
     repo = Remotes.GitHub("JuliaDynamics", "ConceptualClimateModels.jl")
 )

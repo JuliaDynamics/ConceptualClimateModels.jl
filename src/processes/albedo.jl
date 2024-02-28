@@ -2,16 +2,17 @@ abstract type AlbedoProcess <: Process end
 
 export DirectAlbedoAddition, CoAlbedoProduct, SeparatedClearAllSkyAlbedo
 
-ProcessBasedModelling.lhs_variable(::AlbedoProcess) = α
+ProcessBasedModelling.lhs_variable(p::AlbedoProcess) = p.α
 
 """
-    DirectAlbedoAddition(; α_bg = 0.1, other_albedo_variables = (α_ice, α_clouds))
+    DirectAlbedoAddition(; α, α_bg = 0.1, other_albedo_variables = (α_ice, α_clouds))
 
 Create the equation `α ~ α_bg + other_albedo_variables...`, meaning that
 planetary albedo `α` is a direct sum of all specified albedos.
 """
 Base.@kwdef struct DirectAlbedoAddition <: AlbedoProcess
-    α_bg::Real = 0.1
+    α = α
+    α_bg = 0.1
     other_albedo_variables = (α_ice, α_cloud)
 end
 function ProcessBasedModelling.rhs(p::DirectAlbedoAddition)
@@ -21,15 +22,16 @@ function ProcessBasedModelling.rhs(p::DirectAlbedoAddition)
 end
 
 """
-    CoAlbedoProduct(albedo_variables = (α_ice, α_cloud))
+    CoAlbedoProduct(; α, albedo_variables = (α_ice, α_cloud))
 
 Create the equation `1 - α ~ prod(a -> (1 - a), albedo_variables)`
-meaning that the planetary co-albedo is the product of the co-albedos of all
-albedo variables. This would be the planetary albedo
+meaning that the co-albedo is the product of the co-albedos of all
+albedo variables. This would be e.g., the planetary albedo
 if all components were uniform layers, while the bottom-most layer (surface)
 had perfect absorption and all other layers had 0 absorption and finite reflection.
 """
 Base.@kwdef struct CoAlbedoProduct <: AlbedoProcess
+    α = α
     albedo_variables = (α_ice, α_cloud)
 end
 function ProcessBasedModelling.rhs(p::CoAlbedoProduct)
@@ -38,7 +40,7 @@ function ProcessBasedModelling.rhs(p::CoAlbedoProduct)
 end
 
 """
-    SeparatedClearAllSkyAlbedo(; α_cloud = α_cloud, C = C, α_clr = 0.15)
+    SeparatedClearAllSkyAlbedo(; α, α_cloud, C, α_clr = 0.15)
 
 Create the equation `α ~ α_cloud*C + α_clr*(1 - C)`.
 
@@ -46,7 +48,9 @@ Create the equation `α ~ α_cloud*C + α_clr*(1 - C)`.
 and cloud albedo, so that `α = α_cloud*C + α_clr*(1 - C)` with `C` the cloud fraction
 and `α_clr` the clear sky albedo. They further cite [Cess1976](@cite) to facilitate the claim
 Additionally, Eq. (20) of [Barker1999](@cite) provides an identical expression.
+
+In most cases you want to provide a variable with its own process for `α_clr`.
 """
-function SeparatedClearAllSkyAlbedo(; α_cloud = α_cloud, C = C, α_clr = 0.15)
+function SeparatedClearAllSkyAlbedo(; α=α, α_cloud = α_cloud, C = C, α_clr = 0.15)
     return α ~ α_cloud*C + α_clr*(1 - C)
 end

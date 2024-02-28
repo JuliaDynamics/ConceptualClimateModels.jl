@@ -17,7 +17,7 @@ In essence this is a [`TanhProcess`](@ref) with the given keywords as parameters
 with reference temperature `Tref = Tfreeze - scale/2`.
 
 This albedo is the most common used large-scale feedback in energy balance models, e.g.,
-[Ghil1981](@ref), although it is typically taken as a piece-wise linear function.
+[Ghil1981](@cite), although it is typically taken as a piece-wise linear function.
 There is little change with using a hyperbolic tangent instead, while the `tanh`
 offers a differentiable flow.
 
@@ -43,7 +43,8 @@ function ProcessBasedModelling.rhs(a::IceAlbedoFeedback)
     values = (a.max, a.min, a.Tscale, a.Tfreeze)
     mtk_pars = map((val, s) -> new_derived_named_parameter(y, val, s), values, suffixes)
     Tref = mtk_pars[4] - mtk_pars[3]/2
-    iproc = ExpRelaxation(TanhProcess(y, a.T, mtk_pars[1:3]..., Tref), a.τ)
-    return rhs(iproc)
+    # don't use `TanhProcess`, use the function instead
+    iproc = ExpRelaxation(y, tanh_expression(a.T, mtk_pars[1:3]..., Tref), a.τ)
+    return ProcessBasedModelling.rhs(iproc)
 end
 # we don't need to extend `lhs`, `ProcessBasedModelling` takes care of that.

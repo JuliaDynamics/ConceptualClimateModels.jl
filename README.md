@@ -6,8 +6,8 @@
 [![codecov](https://codecov.io/gh/JuliaDynamics/ConceptualClimateModels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaDynamics/ConceptualClimateModels.jl)
 [![Package Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/ProcessBasedModelling)](https://pkgs.genieframework.com?packages=ProcessBasedModelling)
 
-ConceptualClimateModels.jl is a Julia package for creating and analyzing conceptual
-models of climate, such as energy balance models or climate tipping models.
+ConceptualClimateModels.jl is a Julia package for creating and analysing conceptual
+models of climate, such as energy balance models, glaciation cycle models, or climate tipping models.
 Such conceptual models are simplified representation of basic climate components,
 and the processes that connect them, such as flows of energy or mass.
 Within this context such models are typically coupled ordinary differential
@@ -29,8 +29,15 @@ with such models by:
 - Integrating with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/)
   to automate the start-up phase of typical nonlinear dynamics based workflows.
 
+with other features coming soon, such as:
+
+- Support for latitudinal models (where each variable is vector-valued over latitude circles)
+- Support for stochastic ordinary differential equations
+
 To install it, run `import Pkg; Pkg.add("ConceptualClimateModels")`.
 
 All further information is provided in the documentation, which you can either find
 [online](https://juliadynamics.github.io/ConceptualClimateModels.jl/stable/) or build
 locally by running the `docs/make.jl` file.
+
+ConceptualClimateModels.jl development is funded by UKRI's Engineering and Physical Sciences Research Council, grant no. EP/Y01653X/1 (grant agreement for a EU Marie Sklodowska-Curie Postdoctoral Fellowship).

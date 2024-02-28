@@ -10,29 +10,30 @@ end ConceptualClimateModels
 using Reexport
 @reexport using ProcessBasedModelling # exports `t` as time
 @reexport using DynamicalSystemsBase
-export construct_dynamical_system
+using ProcessBasedModelling: rhs, lhs_variable, lhs
+
+import NaNMath # so we can use them for sqrt, log, etc. in MTK
 
 include("constants.jl")
+
 include("variables.jl")
+using .CCMV
+
 include("statespace.jl")
-include("default.jl")
-include("processes_advanced.jl")
 
-DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
-
-# TODO: Make in-place depend on state space dimension
-function construct_dynamical_system(proc, default = DEFAULT_PROCESSES; diffeq = DEFAULT_DIFFEQ, inplace::Bool = true, kwargs...)
-    sys = processes_to_mtkmodel(proc, default; kwargs...)
-    ssys = structural_simplify(sys)
-    # The usage of `nothing` for the initial state assumes all state variables
-    # and all parameters have been defined with a default value
-    if inplace
-        prob = ODEProblem(ssys, nothing, (0.0, Inf))
-    else
-        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...))
+# include all processes first
+for (root, dirs, files) in walkdir(joinpath(@__DIR__, "processes"))
+    for file in files
+        include(joinpath(root, file))
     end
-    ds = CoupledODEs(prob, diffeq)
-    return ds
 end
+
+include("default.jl")
+export DEFAULT_CCM_PROCESSES
+
+include("processes_advanced.jl")
+include("dynamicalsystems.jl")
+
+export DEFAULT_PROCESSES
 
 end # module

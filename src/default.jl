@@ -1,23 +1,18 @@
-# include all processes first
-for (root, dirs, files) in walkdir(joinpath(@__DIR__, "processes"))
-    for file in files
-        include(joinpath(root, file))
-    end
-end
-
-# This depends on the `variables.jl` file!
-DEFAULT_PROCESSES = [
+# note; all variables that do not have a process here
+# become parameters via `ParameterProcess` by default.
+DEFAULT_CCM_PROCESSES = [
     BasicRadiationBalance(),
+    # shortwave
     ASR ~ S*(1 - α)*solar_constant,
-    LinearOLR(),
-    ParameterProcess(CO2),
-    f ~ 0, # could be CO2Forcing() instead
+    IceAlbedoFeedback(),
+    DirectAlbedoAddition(), # Albedo uses fact that cloud albedo is defined as additive
     S ~ 1, # don't make insolation a parameter by default
-    # Albedo
-    DirectAlbedoAddition(),
-    # Default C and BudykoOLR() give same OLR balance as current CERES data
-    C ~ default_value(C), # don't make clouds parameter by default
+    # longwave
+    BudykoOLR(),
+    CO2Forcing(), # for default CO2 values this is zero forcing
+    ParameterProcess(CO2),
+    AbsoluteHumidityIGLCRH(),
+    # misc
+    C ~ default_value(C),
+    ΔTLinearRelaxation(),
 ]
-
-export DEFAULT_PROCESSES
-# ProcessBasedModelling.default_processes() = DEFAULT_PROCESSES

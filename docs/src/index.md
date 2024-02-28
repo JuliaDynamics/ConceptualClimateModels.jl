@@ -1,70 +1,33 @@
 # ConceptualClimateModels.jl
 
-
-
-## [Premade symbolic variable instances](@id global_vars)
-
-For convenience, ConceptualClimateModels.jl defines and exports some symbolic variables
-that we [list below](@ref list_vars). These are used throughout the library as the
-default variables in [implemented processes](@id processes).
-When going through documentation strings of processes, such as [`BasicRadiationBalance`](@ref),
-you will notice that the function call signature is like:
-
-```julia
-BasicRadiationBalance(; T=T, kwargs...)
-```
-
-This `T=T` means that the keyword argument `T`, which represents the
-"temperature variable", takes the value of `ConceptualClimateModels.T`,
-which itself is a premade symbolic variable instance that is exported by
-ConceptualClimateModels.jl. You can pass in your own variables instead, by doing
-```julia
-@variables begin
-    (T1_tropics(t) = 290.0), [bounds = (200.0, 350.0), description = "temperature in tropical box 1, in Kelvin"]
-end
-BasicRadiationBalance(; T=T1_tropics, kwargs...)
-```
-_(you would also need to give `T1_tropics` to all other processes that utilize temperature)_
-
-Defining variables with the extra `bounds, description` annotations is
-useful for integrating with the rest of the functionality of the library.
-
-### [List of premade variables](@id list_vars)
-
-```@example MAIN
-using ConceptualClimateModels
-PREDEFINED_EBM_VARIABLES
-```
-
-## Default values, limits, etc.
-
-All [exported symbolic variable instances](@ref) are defiled with a default value and have plausible physical limits that can be obtained with the following function:
-
 ```@docs
-physically_plausible_limits(::Any)
+ConceptualClimateModels
 ```
 
-e.g.,
+To get started with ConceptualClimateModels.jl see the [Tutorial](@ref).
+Predefined processes that can be part of a model are in the
+[predefined processes](@ref predefined_processes) page.
+See the [examples](@id examples) for a couple of applications.
 
-```@example MAIN
-physically_plausible_limits(T)
-```
+## [Asking questions](@id ask_questions)
 
+There are three options for asking questions:
 
-## Integration with DynamicalSystems.jl
+1. As a new post in the official [Julia discourse](https://discourse.julialang.org/) and ask a question under the category Specific Domains > Modelling & Simulations, also using `dynamical-systems` as a tag.
+2. As a message in our channel `#dynamics-bridged` in the [Julia Slack](https://julialang.org/slack/) workplace.
+3. By opening an issue directly on the GitHub page of DynamicalSystems.jl while providing a Minimal Working Example. This is the most useful approach when you encounter unexpected behaviour.
 
-ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) in many ways.
+## Contributing
 
+There are many ways to contribute to ConceptualClimateModels.jl:
 
-```@docs
-physically_plausible_limits(::DynamicalSystem)
-physically_plausible_ic_sampler
-physically_plausible_grid
-```
+1. Just *use it*! Share it with your colleagues if it was useful for you, and report
+   unexpected behaviour if you find any.
+2. Suggest processes that you think should be included in our library. This should be
+   done by opening a new GitHub issue that describes the process and gives references to papers using the method.
+3. Contribute code by adding new documentation examples.
+4. Contribute code by implementing new processes! That is by far the most impactful
+   way to contribute to the library.
 
-# ## Utilities
-
-```@docs
-TanhProcess
-```
-
+Contributed code must be documented per the standards of
+[DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/contributors_guide/#Documentation-string-style).
