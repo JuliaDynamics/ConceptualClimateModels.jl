@@ -6,7 +6,7 @@ ConceptualClimateModels
 
 To get started with ConceptualClimateModels.jl see the [Tutorial](@ref).
 Predefined processes that can be part of a model are in the
-[Predefined processes](@ref predefined_processes) page.
+[predefined processes](@ref predefined_processes) page.
 See the [examples](@id examples) for a couple of applications.
 
 ## [Asking questions](@id ask_questions)
@@ -28,3 +28,7 @@ There are many ways to contribute to ConceptualClimateModels.jl:
 3. Contribute code by adding new documentation examples.
 4. Contribute code by implementing new processes! That is by far the most impactful
    way to contribute to the library.
+
+When contributing code good practices in scientific code apply.
+We recommend the [Good Scientific Code Workshop](https://youtu.be/x3swaMSCcYk?t=11087)
+to learn such practices.
