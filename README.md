@@ -29,8 +29,15 @@ with such models by:
 - Integrating with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/)
   to automate the start-up phase of typical nonlinear dynamics based workflows.
 
+with other features coming soon, such as:
+
+- Support for latitudinal models (where each variable is vector-valued over latitude circles)
+- Support for stochastic ordinary differential equations
+
 To install it, run `import Pkg; Pkg.add("ConceptualClimateModels")`.
 
 All further information is provided in the documentation, which you can either find
 [online](https://juliadynamics.github.io/ConceptualClimateModels.jl/stable/) or build
 locally by running the `docs/make.jl` file.
+
+ConceptualClimateModels.jl development is funded by UKRI's Engineering and Physical Sciences Research Council, grant no. EP/Y01653X/1 (grant agreement for a EU Marie Sklodowska-Curie Postdoctoral Fellowship).
