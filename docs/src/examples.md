@@ -13,7 +13,8 @@ a warm Earth, as the solar constant was varied.
 The same kind of behaviour is also used in [Datseris2022; Ch. 2](@cite) as an introductory example to dynamical systems.
 
 We can easily replicate such a model by creating a
-global-mean temperature model using combining the processes:
+global-mean temperature model without even having the water vapor feedback.
+We will combine the processes:
 
 ```@example MAIN
 using ConceptualClimateModels
@@ -169,3 +170,7 @@ DifferentialEquations.jl (to allow passing `ODEProblem` which is created by `Dyn
 It also does not allow indexing parameters by their symbolic bindings.
 Lastly, it does not work with models generated with ModelingToolkit.jl so we would
 have to re-write all the equations that the chosen `processes` made for us.
+
+## Glacial oscillations
+
+Coming soon!

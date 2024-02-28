@@ -42,7 +42,6 @@ function LinearOLR(; OLR = OLR, T = T, A = -277.0, B = 1.8)
     return OLR ~ A + B*T
 end
 
-
 """
     LinearClearSkyOLR(; kw...)
 

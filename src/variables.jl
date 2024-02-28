@@ -1,5 +1,6 @@
-# module CCMV
+module CCMV
 
+using ConceptualClimateModels
 # These are quantities that change with time. Hence, they are either state variables
 # or observables of the state variables. They have given names and are utilized
 # in the rest of the files to make the equations that compose the dynamical system.
@@ -28,7 +29,7 @@ end
 export PREDEFINED_CCM_VARIABLES
 export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR, q
 
-function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
+function ConceptualClimateModels.physically_plausible_limits(var::String)::Tuple{Float64, Float64}
     if var[1] == 'T'
         return (200, 350)
     elseif var[1] == 'α' || var[1] == 'ε' || var[1] == 'C'
@@ -41,4 +42,4 @@ function physically_plausible_limits(var::String)::Tuple{Float64, Float64}
     end
 end
 
-# end
+end

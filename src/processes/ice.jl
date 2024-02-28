@@ -45,6 +45,6 @@ function ProcessBasedModelling.rhs(a::IceAlbedoFeedback)
     Tref = mtk_pars[4] - mtk_pars[3]/2
     # don't use `TanhProcess`, use the function instead
     iproc = ExpRelaxation(y, tanh_expression(a.T, mtk_pars[1:3]..., Tref), a.τ)
-    return rhs(iproc)
+    return ProcessBasedModelling.rhs(iproc)
 end
 # we don't need to extend `lhs`, `ProcessBasedModelling` takes care of that.

@@ -231,8 +231,8 @@ or create a new process type as we describe in [making new processes](@ref new_p
 
 You might be wondering, when we wrote the equation `ASR ~ S*(1-α)` for the $ASR$ process,
 or when we wrote `x ~ 0.5 * T^2`, where did the variable bindings `ASR, S, α` come from?
-For convenience, ConceptualClimateModels.jl defines and exports some symbolic variables
-for typical climate quantities that have default processes. We list all of these
+For convenience, ConceptualClimateModels.jl defines some symbolic variables
+for typical climate quantities and assigns default processes to them. We list all of these
 [below](@ref list_vars). These default bindings are used throughout the library as the
 default variables in [predefined processes](@ref predefined_processes).
 When going through documentation strings of [predefined processes](@ref predefined_processes),
@@ -276,7 +276,7 @@ end
 ```
 and then assign them to the corresponding keyword argument
 ```@example MAIN
-process = BasicRadiationBalance(T=T1_tropics)
+process = BasicRadiationBalance(T = T1_tropics)
 ```
 
 Defining variables with the extra `bounds, description` annotations is
@@ -290,10 +290,20 @@ useful for integrating with the rest of the functionality of the library.
 
 ### [List of premade variables](@id list_vars)
 
-
+The premade variables are not exported by default.
+To bring them into global scope you have to do:
 
 ```@example MAIN
 using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
+```
+and then use them,
+```@example MAIN
+T, q, OLR
+```
+
+All the premade variables are:
+```@example MAIN
 PREDEFINED_CCM_VARIABLES
 ```
 
@@ -343,7 +353,9 @@ to one of the keywords of the process, or wrapping a value around
 ```@example MAIN
 @parameters myfreeze = 260.0
 ice_process = IceAlbedoFeedback(;
-    α_ice = my_ice_α, Tfreeze = myfreeze, max = LiteralParameter(0.9)
+    α_ice = my_ice_α,
+    Tfreeze = myfreeze, # my custom parameter
+    max = LiteralParameter(0.9) # don't make a parameter
 )
 
 mtk = processes_to_mtkmodel([ice_process])
@@ -353,7 +365,6 @@ equations(mtk)
 ```@example MAIN
 parameters(mtk)
 ```
-
 
 ## Integration with DynamicalSystems.jl
 
