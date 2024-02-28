@@ -29,6 +29,5 @@ There are many ways to contribute to ConceptualClimateModels.jl:
 4. Contribute code by implementing new processes! That is by far the most impactful
    way to contribute to the library.
 
-When contributing code good practices in scientific code apply.
-We recommend the [Good Scientific Code Workshop](https://youtu.be/x3swaMSCcYk?t=11087)
-to learn such practices.
+Contributed code must be documented per the standards of
+[DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/contributors_guide/#Documentation-string-style).
