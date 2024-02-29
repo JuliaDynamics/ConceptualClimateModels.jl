@@ -67,3 +67,35 @@ for var in (T, C, OLR1, OLR2, :α_bg, a1, a2, a3, a4)
         error("var $var doesn't exist")
     end
 end
+
+
+@testset "dynamical systems integration" begin
+    using DynamicalSystems
+    using ConceptualClimateModels
+    using ConceptualClimateModels.CCMV
+
+    budyko_processes = [
+        BasicRadiationBalance(),
+        EmissivityStefanBoltzmanOLR(),
+        IceAlbedoFeedback(; min = 0.3, max = 0.7),
+        α ~ α_ice,
+        ParameterProcess(ε), # emissivity is a parameter
+        f ~ 0, # no external forcing
+        # absorbed solar radiation has a default process
+    ]
+
+    budyko = processes_to_coupledodes(budyko_processes)
+
+    grid = physically_plausible_grid(budyko)
+    mapper = AttractorsViaRecurrences(budyko, grid)
+    rfam = RecurrencesFindAndMatch(mapper)
+    sampler = physically_plausible_ic_sampler(budyko)
+
+    set_parameter!(budyko, :ε_0, 0.5)
+
+    fracs = basins_fractions(mapper, sampler)
+    attractors = extract_attractors(mapper)
+
+    @test length(attractors) == 2
+
+end
