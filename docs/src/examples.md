@@ -52,19 +52,8 @@ sampler() # randomly sample initial conditions
 ```
 
 Now, to obtain the _symbolic parameter index_ corresponding to the insolation parameter,
-there are several ways. One, is to make a parameter from scratch that has the same name:
-```@example MAIN
-index = first(@parameters ε_0)
-```
-
-Second, to retrieve the ModelingToolkit.jl model and access its `ε_0` parameter:
-```@example MAIN
-mtkmodel = referrenced_sciml_model(budyko)
-index = mtkmodel.ε_0
-```
-
-Third, to use a `Symbol` corresponding to the variable name.
-This is typically the simplest way.
+there are several ways as described in the main [tutorial](@ref).
+The simplest way is
 ```@example
 index = :ε_0
 ```
