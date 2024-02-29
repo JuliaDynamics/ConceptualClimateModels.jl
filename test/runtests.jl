@@ -70,7 +70,7 @@ p2 = [
 
 ds = processes_to_coupledodes(p2)
 mtk = referrenced_sciml_model(ds)
-for var in (T, C, OLR1, OLR2, :α_bg, a1, a2, a3, a4, ΔS, ΔT1)
+for var in (T, C, OLR1, OLR2, :α_bg, a1, a2, a3, a4, ΔS1, ΔT)
     if has_symbolic_var(mtk, var)
         @test true
     else
