@@ -1,4 +1,4 @@
-# Tutorial
+# [Tutorial](@id tutorial)
 
 With ConceptualClimateModels.jl one makes differential equation systems from _processes_.
 A _process_ is simply a particular equation defining the dynamics of a climate variable.
@@ -89,7 +89,7 @@ index = mtk.CO2_0
 
 Third, we can use a `Symbol` corresponding to the variable name.
 This is typically the simplest way.
-```@example
+```@example MAIN
 index = :CO2_0
 ```
 

@@ -52,9 +52,9 @@ sampler() # randomly sample initial conditions
 ```
 
 Now, to obtain the _symbolic parameter index_ corresponding to the insolation parameter,
-there are several ways as described in the main [tutorial](@ref).
+there are several ways as described in the main [tutorial](@ref tutorial).
 The simplest way is
-```@example
+```@example MAIN
 index = :ε_0
 ```
 

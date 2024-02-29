@@ -4,7 +4,7 @@
 ConceptualClimateModels
 ```
 
-To get started with ConceptualClimateModels.jl see the [Tutorial](@ref).
+To get started with ConceptualClimateModels.jl see the [tutorial](@ref tutorial).
 Predefined processes that can be part of a model are in the
 [predefined processes](@ref predefined_processes) page.
 See the [examples](@id examples) for a couple of applications.
