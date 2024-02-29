@@ -1,10 +1,10 @@
 # ConceptualClimateModels.jl
 
-[![docsdev](https://img.shields.io/badge/docs-dev-lightblue.svg)](https://juliadynamics.github.io/ProcessBasedModelling,jl/dev/)
+[![docsdev](https://img.shields.io/badge/docs-dev-lightblue.svg)](https://juliadynamics.github.io/ConceptualClimateModels.jl/dev/)
 [![docsstable](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliadynamics.github.io/ConceptualClimateModels.jl/stable/)
 [![CI](https://github.com/JuliaDynamics/ConceptualClimateModels.jl/workflows/CI/badge.svg)](https://github.com/JuliaDynamics/ConceptualClimateModels.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/JuliaDynamics/ConceptualClimateModels.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaDynamics/ConceptualClimateModels.jl)
-[![Package Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/ProcessBasedModelling)](https://pkgs.genieframework.com?packages=ProcessBasedModelling)
+[![Package Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/ConceptualClimateModels)](https://pkgs.genieframework.com?packages=ConceptualClimateModels)
 
 ConceptualClimateModels.jl is a Julia package for creating and analysing conceptual
 models of climate, such as energy balance models, glaciation cycle models, or climate tipping models.
