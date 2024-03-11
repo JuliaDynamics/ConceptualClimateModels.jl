@@ -1,4 +1,4 @@
-# Tutorial
+# [Tutorial](@id tutorial)
 
 With ConceptualClimateModels.jl one makes differential equation systems from _processes_.
 A _process_ is simply a particular equation defining the dynamics of a climate variable.
@@ -70,19 +70,54 @@ observed(mtk)
 parameters(mtk)
 ```
 
-The symbolic variables can also be used to query or alter the dynamical system,
+The symbolic variables and parameters can also be used to query or alter the
+dynamical system. For example, we can obtain, or alter, any parameter by providing the
+symbolic parameter index.
+There are multiple ways to obtain the symbolic index provided we know its name.
+First, we can re-create the symbolic parameter:
 
 ```@example MAIN
-observe_state(ds, T)
+index = first(@parameters CO2_0)
 ```
+
+Second, we can use the retrieved MTK model and access its `CO2_0` parameter:
+
+
+```@example MAIN
+index = mtk.CO2_0
+```
+
+Third, we can use a `Symbol` corresponding to the variable name.
+This is typically the simplest way.
+```@example MAIN
+index = :CO2_0
+```
+
+we can query the value of this named parameter in the system,
+
+```@example MAIN
+current_parameter(ds, index)
+```
+
+or alter it:
 
 ```@example MAIN
 # access symbolic parameter CO2_0 from the tracked symbolic list of the model
-set_parameter!(ds, mtk.CO2_0, 800)
+set_parameter!(ds, index, 800)
 ```
 
+Similarly, we can obtain or alter values corresponding to the dynamic variables,
+or observed functions of the state of the system, using their symbolic indices.
+For example we can obtain the value corresponding to symbolic variable ``T`` by:
+
 ```@example MAIN
-current_parameter(ds, mtk.CO2_0)
+observe_state(ds, T) # binding `T` already exists in scope
+```
+
+or obtain the ``OLR`` (outgoing longwave radiation)
+
+```@example MAIN
+observe_state(ds, :OLR)
 ```
 
 Let's unpack the steps that led to this level of automation.

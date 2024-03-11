@@ -8,7 +8,6 @@ export ΔTLinearRelaxation, ΔTStommelModel
 # does not matter for linearity, only for coefficients.
 reference_equator_to_pole(T, A = 36.53, B = 0.658) = -B*(T - C_to_K) + A # convert to celcius
 
-
 """
     ΔTLinearRelaxation(; ΔT, T, τ = 5e6, A = 36.53, B = 0.658)
 
@@ -28,8 +27,9 @@ Here `ΔT` is defined as the temperature difference between average temperatures
 and (60, 90) latitudes. The timescale is taken as 2 months, although if
 `τ = 0` is given, the equation ``\\Delta T ~ \\Delta T_{ref}(T)`` is created instead.
 """
-function ΔTLinearRelaxation(; ΔT=ΔT, τ = 5e6, A = 36.53, B = 0.658)
-    ExpRelaxation(ΔT,  -B*(T - C_to_K) + A, τ)
+function ΔTLinearRelaxation(; ΔT=ΔT, T=T, τ = 5e6, A = 36.53, B = 0.658)
+    A, B = new_derived_named_parameter.(ΔT, (A, B), ("A", "B"); prefix = false)
+    ExpRelaxation(ΔT,  reference_equator_to_pole(T, A, B), τ)
 end
 
 """

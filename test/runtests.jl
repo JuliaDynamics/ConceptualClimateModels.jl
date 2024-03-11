@@ -2,6 +2,15 @@ using ConceptualClimateModels
 using ConceptualClimateModels.CCMV
 using Test
 
+@testset "all processes" begin
+function test_symbolic_var(mtk, var)
+    if has_symbolic_var(mtk, var)
+        @test true
+    else
+        error("var $var doesn't exist")
+    end
+end
+
 @variables begin
     ε1(t) = 0.1
     ε2(t) = 0.1
@@ -28,13 +37,10 @@ mtk = referrenced_sciml_model(ds)
 eqs = all_equations(mtk)
 
 # This also tests a bunch of default processes
-for var in (T, ε, ε1, ε2, ε3, ε4, q)
-    @test has_symbolic_var(eqs, var)
+for var in (T, ε, ε1, ε2, ε3, ε4, q, :ε1_T_tanh_ref, mtk.ε_0)
+    test_symbolic_var(eqs, var)
 end
-@test has_symbolic_var(eqs, ε)
-@test has_symbolic_var(eqs, :ε1_T_tanh_ref)
-@test has_symbolic_var(eqs, mtk.ε_0)
-@test !has_symbolic_var(equations(mtk), α)
+
 
 @variables begin
     OLR1(t) = 10.0
@@ -44,6 +50,8 @@ end
     a2(t) = 0.1
     a3(t) = 0.1
     a4(t) = 0.1
+    ΔS1(t) = 0.0
+    ΔT1(t) = 0.0
 end
 
 p2 = [
@@ -56,14 +64,52 @@ p2 = [
     CoAlbedoProduct(α = a2),
     SeparatedClearAllSkyAlbedo(α = a3),
     C ~ 0.6,
+    ΔTLinearRelaxation(),
+    ΔTStommelModel(ΔT = ΔT1, ΔS = ΔS1),
 ]
 
 ds = processes_to_coupledodes(p2)
 mtk = referrenced_sciml_model(ds)
-for var in (T, C, OLR1, OLR2, :α_bg, a1, a2, a3, a4)
+for var in (T, C, OLR1, OLR2, :α_bg, a1, a2, a3, a4, ΔS1, ΔT)
     if has_symbolic_var(mtk, var)
         @test true
     else
         error("var $var doesn't exist")
     end
+end
+
+
+
+end
+
+
+@testset "dynamical systems integration" begin
+    using DynamicalSystems
+    using ConceptualClimateModels
+    using ConceptualClimateModels.CCMV
+
+    budyko_processes = [
+        BasicRadiationBalance(),
+        EmissivityStefanBoltzmanOLR(),
+        IceAlbedoFeedback(; min = 0.3, max = 0.7),
+        α ~ α_ice,
+        ParameterProcess(ε), # emissivity is a parameter
+        f ~ 0, # no external forcing
+        # absorbed solar radiation has a default process
+    ]
+
+    budyko = processes_to_coupledodes(budyko_processes)
+
+    grid = physically_plausible_grid(budyko)
+    mapper = AttractorsViaRecurrences(budyko, grid)
+    rfam = RecurrencesFindAndMatch(mapper)
+    sampler = physically_plausible_ic_sampler(budyko)
+
+    set_parameter!(budyko, :ε_0, 0.5)
+
+    fracs = basins_fractions(mapper, sampler)
+    attractors = extract_attractors(mapper)
+
+    @test length(attractors) == 2
+
 end
