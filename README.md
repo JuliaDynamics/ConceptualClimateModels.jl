@@ -23,6 +23,7 @@ with such models by:
   hypotheses regarding how climate variables couple to each
   other, or how climate processes are represented by equations.
 - Offering many predefined processes from current literature and ongoing research.
+  All predefined processes cite the literature rigorously using BiBTeX.
 - Being easy to extend with more climate variables or physical processes.
 - Allowing the straightforward coupling of different conceptual models with each other.
 - Automating the naming of custom parameters relating to existing climate processes.
