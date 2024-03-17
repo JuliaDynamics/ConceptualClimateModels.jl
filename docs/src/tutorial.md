@@ -1,12 +1,19 @@
 # [Tutorial](@id tutorial)
 
-With ConceptualClimateModels.jl one makes differential equation systems from _processes_.
-A _process_ is simply a particular equation defining the dynamics of a climate variable.
+With ConceptualClimateModels.jl follows a process-based modelling approach
+to make differential equation systems from _processes_.
+A _process_ is simply a particular equation defining the dynamics of a climate variable. Note the distinction: a _process_ is _not_ the climate variable
+(such as "clouds" or  "insolation"); rather it is the _exact equation_ that
+defines the behavior of the climate variable, and could itself utilize
+many other already existing climate variables.
+In terminology of climate science a _process_ is a generalization
+of the term "parameterization".
+
 A vector of processes is composed by the user, and given to the main function [`processes_to_coupledodes`](@ref) which bundles them into a system of equations
 that creates a dynamical system.
 
 !!! note "Familiarity with DynamicalSystems.jl and ModelingToolkit.jl"
-    ConceptualClimateModels.jl builds on [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model, and it builds on [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to analyze the models. Familiarity with either package is good to have, and will allow you to faster and better understand the concepts discussed here. Nevertheless familiarity is actually optional as the steps required to use ConceptualClimateModels.jl are all explained in this tutorial.
+    ConceptualClimateModels.jl builds on [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model, and it builds on [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to further analyze the models. Familiarity with either package is good to have, and will allow you to faster and better understand the concepts discussed here. Nevertheless familiarity is actually optional as the steps required to use ConceptualClimateModels.jl are all explained in this tutorial.
 
 
 ## Introductory example
