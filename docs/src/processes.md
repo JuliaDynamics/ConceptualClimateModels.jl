@@ -77,6 +77,7 @@ a simple way to create new processes for a given climate variable:
 ParameterProcess
 TimeDerivative
 ExpRelaxation
+AdditionProcess
 TanhProcess
 ```
 
