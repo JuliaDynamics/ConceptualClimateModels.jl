@@ -81,3 +81,8 @@ function named_current_parameters(ebm)
     pnames = parameters(referrenced_sciml_model(ebm))
     return [pn ~ p for (p, pn) in zip(cp, pnames)]
 end
+
+function ProcessBasedModelling.all_equations(ds::DynamicalSystem)
+    model = referrenced_sciml_model(ds)
+    return all_equations(model)
+end
