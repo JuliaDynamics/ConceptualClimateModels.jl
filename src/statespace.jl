@@ -29,8 +29,10 @@ function physically_plausible_limits(ds::DynamicalSystem, idxs = nothing)
     if idxs isa Nothing
         vars = ModelingToolkit.unknowns(model)
     elseif idxs isa Vector{Symbol}
-        vars = ModelingToolkit.unknowns(model)
-        vars = filter!(v -> ModelingToolkit.getname(v) ∈ idxs, vars)
+        allvars = ModelingToolkit.unknowns(model)
+        allnames = ModelingToolkit.getname.(allvars)
+        j = [findfirst(isequal(i), allnames) for i in idxs]
+        vars = allvars[j]
     else
         vars = idxs
     end
