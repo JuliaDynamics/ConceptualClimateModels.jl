@@ -17,15 +17,23 @@ function physically_plausible_limits(var)
 end
 
 """
-    physically_plausible_limits(ds::DynamicalSystem)
+    physically_plausible_limits(ds::DynamicalSystem [, idxs])
 
-Return a vector of limits (min, max) for each dynamic state variable in `ds`,
-assumming `ds` has been made using variables with bounds
-(all default symbolic variables of ConceptualClimateModels.jl satisfy this).
+Return a vector of limits (min, max) for each dynamic state variable in `ds`.
+Optionally provide the `idxs` of the variables to use as a vector of `Symbol`s
+or a vector of symbolic variables present in the referrenced MTK model of `ds`.
 """
-function physically_plausible_limits(ds::DynamicalSystem)
+function physically_plausible_limits(ds::DynamicalSystem, idxs = nothing)
     model = referrenced_sciml_model(ds)
     vars = ModelingToolkit.unknowns(model)
+    if idxs isa Nothing
+        vars = ModelingToolkit.unknowns(model)
+    elseif idxs isa Vector{Symbol}
+        vars = ModelingToolkit.unknowns(model)
+        vars = filter!(v -> ModelingToolkit.getname(v) ∈ idxs, vars)
+    else
+        vars = idxs
+    end
     minmax = physically_plausible_limits.(vars)
     return minmax
 end
