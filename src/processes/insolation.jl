@@ -101,3 +101,11 @@ const ORBITAL_FORCING_COMPONENTS = begin
     sorted[:, 1] .*= 1000sec_in_year
     return sorted
 end
+
+# formula from North 1975 theory of energy balance models
+function insolation_at_latitude(lat) # lat in degrees
+    x = sind(lat)
+    p2(x) = (3x^2 - 1)/2
+    s = 1 -0.482p2(x)
+    return s*solar_constant
+end
