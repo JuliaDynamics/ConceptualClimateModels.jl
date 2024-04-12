@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · ConceptualClimateModels.jl</title><meta name="title" content="Examples · ConceptualClimateModels.jl"/><meta property="og:title" content="Examples · ConceptualClimateModels.jl"/><meta property="twitter:title" content="Examples · ConceptualClimateModels.jl"/><meta name="description" content="Documentation for ConceptualClimateModels.jl."/><meta property="og:description" content="Documentation for ConceptualClimateModels.jl."/><meta property="twitter:description" content="Documentation for ConceptualClimateModels.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&amp;display=swap" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">ConceptualClimateModels.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../tutorial/">Tutorial</a></li><li><a class="tocitem" href="../processes/">Predefined processes</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Classic-Snowball-Earth-hysteresis"><span>Classic Snowball Earth hysteresis</span></a></li><li><a class="tocitem" href="#Rate-dependent-tipping-in-the-Stommel-model"><span>Rate dependent tipping in the Stommel model</span></a></li><li><a class="tocitem" href="#Glacial-oscillations"><span>Glacial oscillations</span></a></li></ul></li><li><a class="tocitem" href="../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaDynamics/ConceptualClimateModels.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaDynamics/ConceptualClimateModels.jl/blob/main/docs/src/examples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="examples"><a class="docs-heading-anchor" href="#examples">Examples</a><a id="examples-1"></a><a class="docs-heading-anchor-permalink" href="#examples" title="Permalink"></a></h1><p>In this page we go through various examples of combining processes to make models that have been already used in the literature, or using DynamicalSystems.jl or other packages to analyse conceptual climate models.</p><h2 id="Classic-Snowball-Earth-hysteresis"><a class="docs-heading-anchor" href="#Classic-Snowball-Earth-hysteresis">Classic Snowball Earth hysteresis</a><a id="Classic-Snowball-Earth-hysteresis-1"></a><a class="docs-heading-anchor-permalink" href="#Classic-Snowball-Earth-hysteresis" title="Permalink"></a></h2><p>The origins of energy balance models ((<a href="../references/#Sellers1969">Sellers, 1969</a>; <a href="../references/#Budyko1969">Budyko, 1969</a>; <a href="../references/#Ghil1981">Ghil, 1981</a>; <a href="../references/#North1981">North <em>et al.</em>, 1981</a>)) examined the impact of variations in insolation on the global climate. In particular, they studied how simple energy balance models with only ice-albedo and water vapor feedbacks yielded bi-stable hysteresis between a cold &quot;snowball&quot; state and a warm Earth, as the solar constant was varied. The same kind of behaviour is also used in (<a href="../references/#Datseris2022">Datseris and Parlitz, 2022</a>; Ch. 2) as an introductory example to dynamical systems.</p><p>We can easily replicate such a model by creating a global-mean temperature model without even having the water vapor feedback. We will combine the processes:</p><pre><code class="language-julia hljs">using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
+
+budyko_processes = [
+    BasicRadiationBalance(),
+    EmissivityStefanBoltzmanOLR(),
+    IceAlbedoFeedback(; min = 0.3, max = 0.7),
+    α ~ α_ice,
+    ParameterProcess(ε), # emissivity is a parameter
+    f ~ 0, # no external forcing
+    # absorbed solar radiation has a default process
+]
+
+budyko = processes_to_coupledodes(budyko_processes)
+println(dynamical_system_summary(budyko))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-dimensional CoupledODEs
+ deterministic: true
+ discrete time: false
+ in-place:      false
+
+with equations:
+ Differential(t)(T(t)) ~ (-0.0029390154298310064(ASR(t) + f(t) - OLR(t))) / (-τ_T)
+ ε(t) ~ ε_0
+ f(t) ~ 0.0
+ S(t) ~ 1.0
+ α_ice(t) ~ max_α_ice + 0.5(-max_α_ice + min_α_ice)*(1 + tanh((2(-Tfreeze_α_ice + (1//2)*Tscale_α_ice + T(t))) / Tscale_α_ice))
+ OLR(t) ~ 5.670374419e-8ε(t)*(T(t)^4)
+ α(t) ~ α_ice(t)
+ ASR(t) ~ 340.25S(t)*(1 - α(t))
+
+and parameter values:
+ τ_T ~ 1.4695077149155033e6
+ Tfreeze_α_ice ~ 273.15
+ min_α_ice ~ 0.3
+ max_α_ice ~ 0.7
+ Tscale_α_ice ~ 10.0
+ ε_0 ~ 0.5</code></pre><p>We can perform a typical hysteresis loop analysis straightforwardly by doing a <em>continuation</em> analysis with the <a href="https://juliadynamics.github.io/DynamicalSystemsDocs.jl/attractors/stable/">Attractors.jl</a> subpackage of DynamicalSystems.jl.</p><p>For setting up the continuation we leverage the integration with DynamicalSystems.jl:</p><pre><code class="language-julia hljs">using DynamicalSystems
+
+grid = physically_plausible_grid(budyko)
+mapper = AttractorsViaRecurrences(budyko, grid)
+rfam = RecurrencesFindAndMatch(mapper)
+sampler = physically_plausible_ic_sampler(budyko)
+sampler() # randomly sample initial conditions</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{Float64}:
+ 295.57915724019756</code></pre><p>Now, to obtain the <em>symbolic parameter index</em> corresponding to the insolation parameter, there are several ways as described in the main <a href="../tutorial/#tutorial">tutorial</a>. The simplest way is</p><pre><code class="language-julia hljs">index = :ε_0</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">:ε_0</code></pre><p>Now we perform the continuation versus the effective emissivity, to approximate increasing or decreasing the strength of the greenhouse effect:</p><pre><code class="language-julia hljs">εrange = 0.3:0.01:0.8
+fractions_curves, attractors_info = continuation(
+    rfam, εrange, index, sampler;
+    samples_per_parameter = 1000,
+    show_progress = false,
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">([Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0)  …  Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0)], Dict{Int64, StateSpaceSet{1, Float64}}[Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points)  …  Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 1-dimensional StateSpaceSet{Float64} with 1 points)])</code></pre><p>and visualize it</p><pre><code class="language-julia hljs">using CairoMakie
+a2r = A -&gt; first(first(A)) # plot attractor: extract first point and first dimension of point
+plot_basins_attractors_curves(fractions_curves, attractors_info, a2r, εrange)</code></pre><img src="e365e7ba.png" alt="Example block output"/><p>we see there are two attractors at low and high temperatures and that they have approximately the same basin fractions of 50% each.</p><h2 id="Rate-dependent-tipping-in-the-Stommel-model"><a class="docs-heading-anchor" href="#Rate-dependent-tipping-in-the-Stommel-model">Rate dependent tipping in the Stommel model</a><a id="Rate-dependent-tipping-in-the-Stommel-model-1"></a><a class="docs-heading-anchor-permalink" href="#Rate-dependent-tipping-in-the-Stommel-model" title="Permalink"></a></h2><p>The Stommel model is a good example for rate dependent tipping (<a href="../references/#Lohmann2021">Lohmann <em>et al.</em>, 2021</a>). We can modify the process <a href="../processes/#ConceptualClimateModels.ΔTStommelModel"><code>ΔTStommelModel</code></a> and make its parameter <code>η3</code> be a time- dependent variable instead, like so:</p><pre><code class="language-julia hljs">using ConceptualClimateModels
+using ConceptualClimateModels.CCMV
+
+@variables η1(t)
+@parameters η1_0 = 2.0 # starting value for η1 parameter
+@parameters r_η = 0.0  # the rate that η1 changes
+
+processes = [
+    ΔTStommelModel(; η1 = η1), # replace keyword with a symbolic variable
+    η1 ~ η1_0 + r_η*t, # this symbolic variable has its own equation!
+]
+
+stommel = processes_to_coupledodes(processes)
+println(dynamical_system_summary(stommel))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-dimensional CoupledODEs
+ deterministic: true
+ discrete time: false
+ in-place:      false
+
+with equations:
+ Differential(t)(ΔT(t)) ~ η1(t) - ΔT(t) - ΔT(t)*abs(-ΔS(t) + ΔT(t))
+ Differential(t)(ΔS(t)) ~ η2 - ΔS(t)*abs(-ΔS(t) + ΔT(t)) - ΔS(t)*η3
+ η1(t) ~ η1_0 + r_η*t
+
+and parameter values:
+ r_η ~ 0.0
+ η1_0 ~ 2.0
+ η2 ~ 1.0
+ η3 ~ 0.3</code></pre><p>At the moment <code>r_η = 0</code> and the system is autonomous. Hence, we can easily estimate its bifurcation diagram using the same steps as the above example.</p><pre><code class="language-julia hljs">using DynamicalSystems
+
+grid = physically_plausible_grid(stommel)
+mapper = AttractorsViaRecurrences(stommel, grid;
+    consecutive_recurrences = 1000, attractor_locate_steps = 10,
+)
+rfam = RecurrencesFindAndMatch(mapper)
+sampler = physically_plausible_ic_sampler(stommel)
+
+ηrange = 2.0:0.01:4.0
+fractions_curves, attractors_info = continuation(
+    rfam, ηrange, η1_0, sampler;
+    samples_per_parameter = 1000,
+    show_progress = false,
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">([Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0), Dict(1 =&gt; 1.0)  …  Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0), Dict(2 =&gt; 1.0)], Dict{Int64, StateSpaceSet{2, Float64}}[Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(1 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points)  …  Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points), Dict(2 =&gt; 2-dimensional StateSpaceSet{Float64} with 1 points)])</code></pre><p>and visualize it</p><pre><code class="language-julia hljs">using CairoMakie
+a2r = A -&gt; first(first(A)) # plot attractor: extract first point and first dimension of point
+fig = plot_attractors_curves(attractors_info, a2r, ηrange)
+ax = content(fig[1,1])
+ax.ylabel = &quot;ΔT - fixed points&quot;
+ax.xlabel = &quot;parameter η1&quot;
+fig</code></pre><img src="0a7c8c0f.png" alt="Example block output"/><p>Alright, now we can perform simple simulations where we evolve the system forwards in time while <code>η_1</code> increases at different rates. We can use the <code>trajectory</code> function to evolve it and due to the nice integration between DynamicalSystems.jl and ModelingToolkit.jl we can use any &quot;observable&quot; of the system for the trajectory output.</p><pre><code class="language-julia hljs">r1, r2 = 0.02, 0.2
+u0 = [1.61334  1.85301] # always start from same state
+set_parameter!(stommel, η1_0, 2.0) # set it to initial value
+
+for (j, r) in enumerate((r1, r2))
+    # update the named parameter `r_η` to the numeric value `r`
+    set_parameter!(stommel, r_η, r)
+    # simulate until η1 becomes 4
+    tfinal = (4.0 - default_value(η1_0))/r
+    # trajectory: first column = ΔΤ, second column = η1
+    X, tvec = trajectory(stommel, tfinal, u0; save_idxs = [ΔT, η1])
+    lines!(ax, X[:, 2], X[:, 1]; color = Cycled(j+2), label = &quot;r_η = $(r)&quot;)
+end
+axislegend(ax; unique = true, position = :lt)
+ylims!(ax, 1, 4)
+fig</code></pre><img src="36201678.png" alt="Example block output"/><p>As you can see from the figure, depending on the rate the system either &quot;tracks&quot; the fixed point of high ΔΤ or it collapses down to the small ΔT branch. This happens because the system crosses the unstable manifold of the lower branch (<a href="../references/#Datseris2022">Datseris and Parlitz, 2022</a>; Chap. 12). To visualize the unstable manifold we could use BifurcationKit.jl, however, it is very inconvenient to do so, because BifurcationKit.jl does not provide most of the conveniences that DynamicalSystems.jl does. For example, it does not integrate well enough with DifferentialEquations.jl (to allow passing <code>ODEProblem</code> which is created by <code>DynamicalSystem</code>). It also does not allow indexing parameters by their symbolic bindings. Lastly, it does not work with models generated with ModelingToolkit.jl so we would have to re-write all the equations that the chosen <code>processes</code> made for us.</p><h2 id="Glacial-oscillations"><a class="docs-heading-anchor" href="#Glacial-oscillations">Glacial oscillations</a><a id="Glacial-oscillations-1"></a><a class="docs-heading-anchor-permalink" href="#Glacial-oscillations" title="Permalink"></a></h2><p>Coming soon!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../processes/">« Predefined processes</a><a class="docs-footer-nextpage" href="../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Sunday 17 March 2024 12:02">Sunday 17 March 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
