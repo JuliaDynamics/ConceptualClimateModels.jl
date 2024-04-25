@@ -26,14 +26,14 @@ The equation assumes CO2 concentration is in ppm and vapor pressure in kPa
 hence the conversion factors 0.1 and 1e-6.
 
 !!! warn "Atmospheric, not effective emissivity!"
-    Be advised: "effective emissivity" is a number multuplying surface outgoing
-    radiation in models with only one layer, the surface: ε*σ*Τ^4. Here this
-    atmospheric emissivity is actual, not effective. It is supposed to be included
+    Be advised: "effective emissivity" is a number multiplying surface outgoing
+    radiation in models with only one layer, the surface: ε*σ*Τ^4. That is what
+    other emissivity processes like [`EmissivitySellers1969`](@ref) represent.
+    Here this atmospheric emissivity is actual, not effective. It is supposed to be included
     in two layer models with one layer being atmosphere and one being surface.
     That is why this ε here _increases_ with CO2/H2O concentrations.
     In contrast, the _effective_ emissivity of a surface-only model would
-    decrease with CO2/H2O concentrations (which is what happens in most other
-    emissivities offered as predefined processes).
+    decrease with CO2/H2O concentrations.
 """
 function SoedergrenClearSkyEmissivity(; ε = ε, T = T, CO2 = CO2, RH = 0.8, H_H2O = 2.0)
     e_s = saturation_vapor_pressure(T)
