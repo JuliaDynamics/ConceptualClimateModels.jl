@@ -1,5 +1,3 @@
-function physically_plausible_limits end
-
 module CCMV
 
 using ConceptualClimateModels
@@ -30,18 +28,5 @@ end
 
 export PREDEFINED_CCM_VARIABLES
 export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR, q
-
-function ConceptualClimateModels.physically_plausible_limits(var::String)::Tuple{Float64, Float64}
-    if var[1] == 'T'
-        return (200, 350)
-    elseif var[1] == 'α' || var[1] == 'ε' || var[1] == 'C'
-        return (0, 1)
-    else
-        error("""
-        Unpsecified plausible physical limits for $(var): it has no defined bounds or
-        a default variable. You need to redefine the variable to have either of the two.
-        """)
-    end
-end
 
 end

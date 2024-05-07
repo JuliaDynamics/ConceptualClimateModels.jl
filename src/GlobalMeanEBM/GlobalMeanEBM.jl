@@ -1,6 +1,19 @@
+module GlobalMeanEBM
+using ConceptualClimateModels
+
+# include all processes first
+for (root, dirs, files) in walkdir(joinpath(@__DIR__))
+    file == "GlobalMeanEBM.jl" && continue
+    for file in files
+        include(joinpath(root, file))
+    end
+end
+
+# Default processes:
 # note; all variables that do not have a process here
 # become parameters via `ParameterProcess` by default.
-DEFAULT_CCM_PROCESSES = [
+register_default_process!.(
+[
     BasicRadiationBalance(),
     # shortwave
     ASR ~ S*(1 - α)*solar_constant,
@@ -15,4 +28,8 @@ DEFAULT_CCM_PROCESSES = [
     # misc
     C ~ default_value(C),
     ΔTLinearRelaxation(),
-]
+],
+Ref(GlobalMeanEBM)
+)
+
+end # module
