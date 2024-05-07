@@ -44,10 +44,10 @@ For setting up the continuation we leverage the integration with DynamicalSystem
 ```@example MAIN
 using DynamicalSystems
 
-grid = physically_plausible_grid(budyko)
+grid = plausible_grid(budyko)
 mapper = AttractorsViaRecurrences(budyko, grid)
 rfam = RecurrencesFindAndMatch(mapper)
-sampler = physically_plausible_ic_sampler(budyko)
+sampler = plausible_ic_sampler(budyko)
 sampler() # randomly sample initial conditions
 ```
 
@@ -106,12 +106,12 @@ estimate its bifurcation diagram using the same steps as the above example.
 ```@example MAIN
 using DynamicalSystems
 
-grid = physically_plausible_grid(stommel)
+grid = plausible_grid(stommel)
 mapper = AttractorsViaRecurrences(stommel, grid;
     consecutive_recurrences = 1000, attractor_locate_steps = 10,
 )
 rfam = RecurrencesFindAndMatch(mapper)
-sampler = physically_plausible_ic_sampler(stommel)
+sampler = plausible_ic_sampler(stommel)
 
 ηrange = 2.0:0.01:4.0
 fractions_curves, attractors_info = continuation(

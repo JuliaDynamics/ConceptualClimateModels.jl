@@ -100,10 +100,10 @@ end
 
     budyko = processes_to_coupledodes(budyko_processes)
 
-    grid = physically_plausible_grid(budyko)
+    grid = plausible_grid(budyko)
     mapper = AttractorsViaRecurrences(budyko, grid)
     rfam = RecurrencesFindAndMatch(mapper)
-    sampler = physically_plausible_ic_sampler(budyko)
+    sampler = plausible_ic_sampler(budyko)
 
     set_parameter!(budyko, :ε_0, 0.5)
 

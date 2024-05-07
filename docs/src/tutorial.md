@@ -437,7 +437,7 @@ or to access or set the parameters of the system.
 ```@docs
 physically_plausible_limits(::DynamicalSystem)
 physically_plausible_ic_sampler
-physically_plausible_grid
+plausible_grid
 dynamical_system_summary
 ```
 
