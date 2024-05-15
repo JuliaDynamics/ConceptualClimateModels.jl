@@ -1,5 +1,7 @@
 # [Tutorial](@id tutorial)
 
+## Terminology
+
 ConceptualClimateModels.jl follows a process-based modelling approach
 to make differential equation systems from _processes_.
 A _process_ is simply a particular _equation_ defining the dynamics of a climate
@@ -12,7 +14,7 @@ behavior, and many more aspects, via the DynamicalSystems.jl library (see the ex
 Note the distinction: a _process_ is _not_ the climate variable
 (such as "clouds" or  "insolation"); rather it is the _exact equation_ that
 defines the behavior of the climate variable, and could itself utilize
-many other already existing climate variables.
+many other already existing climate variables, or introduce new ones.
 In terminology of climate science a _process_ is a generalization
 of the term "parameterization".
 Many different processes may _describe_ the behavior of a particular variable and
@@ -48,7 +50,7 @@ To create this model with ConceptualClimateModels.jl while providing the least i
 
 ```@example MAIN
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM # bring names into scope
 
 processes = [
     BasicRadiationBalance(),
@@ -57,7 +59,7 @@ processes = [
     CO2Forcing(), # note that for default CO2 value this is zero forcing
 ]
 
-ds = processes_to_coupledodes(processes)
+ds = processes_to_coupledodes(processes, GlobalMeanEBM)
 println(dynamical_system_summary(ds))
 ```
 
@@ -167,6 +169,8 @@ OLR_process = EmissivityStefanBoltzmanOLR()
 lhs(OLR_process) ~ rhs(OLR_process)
 ```
 then we would have used a Stefan-Boltzmann grey-atmosphere representation for the outgoing longwave radiation.
+
+# TODO:: Submodules
 
 ## Default processes
 

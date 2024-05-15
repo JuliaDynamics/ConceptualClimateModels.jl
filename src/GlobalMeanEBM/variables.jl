@@ -1,6 +1,3 @@
-module CCMV
-
-using ConceptualClimateModels
 # These are quantities that change with time. Hence, they are either state variables
 # or observables of the state variables. They have given names and are utilized
 # in the rest of the files to make the equations that compose the dynamical system.
@@ -28,5 +25,3 @@ end
 
 export PREDEFINED_CCM_VARIABLES
 export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR, q
-
-end
