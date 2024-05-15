@@ -170,9 +170,7 @@ lhs(OLR_process) ~ rhs(OLR_process)
 ```
 then we would have used a Stefan-Boltzmann grey-atmosphere representation for the outgoing longwave radiation.
 
-# TODO:: Submodules
-
-## Default processes
+# Default processes
 
 Hold on a minute though, because in the original processes we provided,
 ```julia
@@ -183,14 +181,26 @@ processes = [
     CO2Forcing(),
 ]
 ```
-there was no process that defined the absorbed solar radiation ``ASR``!
+there was no process that defined for example the absorbed solar radiation ``ASR``!
 
-Well, ConceptualClimateModels.jl has a list of [predefined processes](@ref predefined_processes) that are automatically included in every call to [`processes_to_coupledodes`](@ref).
-The default processes for the ASR is $ASR = S(1-\alpha)$ with $S$ the solar constant.
+Well, ConceptualClimateModels.jl allows the concept of "default processes".
+The package exports some **submodules**, and each submodule targets a particular application of conceptual climate models. In this Tutorial we are using the [`GlobalMeanEBM`](@ref) submodule, which provides functionality to model global mean energy balance models.
+
+Each submodule defines and exports its own **list of predefined symbolic variables**.
+When we wrote
+```julia
+using ConceptualClimateModels.GlobalMeanEBM
+```
+we brought into scope all the variables that this (sub)module defines and exports, such as `T, α, OLR`.
+
+Each (sub)module and provides a list of **predefined processes for its predefined symbolic variables**.
+These predefined default processes are loaded automatically when we provide the (sub)module as a second argument to `processes_to_coupledodes`, which we did above.
+In this (sub)module, the default process for the $ASR$ is $ASR = S(1-\alpha)$ with $S$ the solar constant.
+
 The function [`processes_to_coupledodes`](@ref) goes through all processes the user provided and identifies variables that themselves do not have a process.
-It then checks the list of default processes and attempt to assign one to these variables.
-
-If there are no default processes, it makes the variables themselves parameters with the same name but with a subscript 0.
+It then checks the list of default processes and attempts to assign one to these variables.
+If there are no default processes for some variables, it makes the variables themselves parameters with the same name but with a subscript 0 if the variables
+have a default value.
 
 For example, let's assume that we completely remove default processes and we don't specify
 a process for the albedo ``α``:
@@ -230,15 +240,14 @@ When this automation occurs a warning is thrown:
 │ However, a process for α was not provided,
 │ and there is no default process for it either.
 │ Since it has a default value, we make it a parameter by adding a process:
-│ `ParameterProcess(α)`.
-└ @ ProcessBasedModelling ...\ProcessBasedModelling\src\make.jl:65
+└ `ParameterProcess(α)`.
 ```
 
 [`ParameterProcess`](@ref) is the most trivial process: it simply means that the corresponding variable does not have any physical process and rather it is a system
 parameter.
 
 This automation does not occur if there is no default value.
-For example, variables that can never be dynamic state variables, such as $ASR$, do not have a default value. If we have not assigned a process for $ASR$, the system construction would error instead:
+For example, the $ASR$ variable does not have a default value. If we have not assigned a process for $ASR$, the system construction would error instead:
 
 ```julia
 processes = [
@@ -251,21 +260,21 @@ mtk = processes_to_mtkmodel(processes, [])
 ```
 
 ```
-ERROR: ArgumentError: Variable ASR was introduced in process of
-variable T(t). However, a process for ASR was not provided,
-there is no default process for ASR, and ASR doesn't have a default value.
-Please provide a process for variable ASR.
+ERROR: ArgumentError: Variable ASR(t) was introduced in process of
+variable T(t). However, a process for ASR(t) was not provided,
+there is no default process for ASR(t), and ASR(t) doesn't have a default value.
+Please provide a process for variable ASR(t).
 ```
 
-These warnings and errors are always perfectly informative.
+These warnings and errors are always "perfectly" informative.
 They tell us exactly which variable does not have a process, and exactly which other process introduced the process-less variable first.
 This makes the modelling experience stress-free, especially when large and complex
 models are being created.
 
 ## Adding your own processes
 
-ConceptualClimateModels.jl provides an increasing list of
-[predefined processes](@ref predefined_processes) that you can use out of
+Each of the submodules of ConceptualClimateModels.jl provides an increasing list of
+predefined processes that you can use out of
 the box to compose climate models. The predefined processes all come from existing
 literature and cite their source via BiBTeX.
 
@@ -283,31 +292,20 @@ x_process = x ~ 0.5*T^2 # x is just a function of temperature
 A more re-usable approach however is to create a function that generates a process
 or create a new process type as we describe in [making new processes](@ref new_processes).
 
-## [Premade symbolic variable instances](@id global_vars)
+## A note on symbolic variable instances
 
-You might be wondering, when we wrote the equation `ASR ~ S*(1-α)` for the $ASR$ process,
-or when we wrote `x ~ 0.5 * T^2`, where did the variable bindings `ASR, S, α` come from?
-For convenience, ConceptualClimateModels.jl defines some symbolic variables
-for typical climate quantities and assigns default processes to them.
-we brought all of these into scope when we did
+Recall that when we wrote
 ```julia
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 ```
-where `CCMV` (standing for ConceptualClimateModels Variables) is a submodule
-that defines and exports the variables. We list all of these
-[below](@ref list_vars). These default variables are used throughout the library as the
-default variables in [predefined processes](@ref predefined_processes).
-When going through documentation strings of [predefined processes](@ref predefined_processes),
-such as [`BasicRadiationBalance`](@ref),
-you will notice that the function call signatures are like:
+at the start of this tutorial, we brought into scope variables that this (sub)module defines and exports, such as `T, α, OLR`. They are listed on the (sub)module's documentation page, and are used in that module's default processes.
 
+In the (sub)module predefined processes you will notice call signatures like
 ```julia
 BasicRadiationBalance(; T, f, kwargs...)
 ```
 There are keywords that do not have an assignment like `T, f` above.
-These always represent climate
-variables, never parameters, and for the variables they use the [existing predefined
-climate variables](@ref list_vars).
+They use the [(sub)module's predefiend variables.
 
 Crucially, these default variables are _symbolic variables_. They are defined as
 ```julia
@@ -317,6 +315,7 @@ Crucially, these default variables are _symbolic variables_. They are defined as
 end
 ```
 which means that expressions that involve them result in symbolic expressions,
+for example
 ```@example MAIN
 A2 = 0.5
 B2 = 0.5
@@ -330,7 +329,7 @@ OLR2 = A2 + B2*T2
 ```
 This `OLR2` is _not_ a symbolic expression and _cannot_ be used to represent a process.
 
-You can use your own variables for any of the [predefined processes](@ref predefined_processes)
+You can use your own variables in any predefined processes.
 You can define them by doing
 ```@example MAIN
 @variables begin
@@ -343,7 +342,8 @@ process = BasicRadiationBalance(T = T1_tropics)
 ```
 
 Defining variables with the extra `bounds, description` annotations is
-useful for integrating with the rest of the functionality of the library.
+useful for integrating with the rest of the functionality of the library,
+and therefore it is strongly recommended.
 
 !!! warn "Custom variables need to be assigned everywhere!"
     Above we assigned `T1_tropics` as the temperature variable.
@@ -351,28 +351,10 @@ useful for integrating with the rest of the functionality of the library.
     `OLR` variable by also providing the processes
     `LinearOLR(T = T1_tropics)` (for example).
 
-### [List of premade variables](@id list_vars)
 
-The premade variables are not exported by default.
-To bring them into global scope you have to do:
+## Default values, limits, etc.
 
-```@example MAIN
-using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
-```
-and then use them,
-```@example MAIN
-T, q, OLR
-```
-
-All the premade variables are:
-```@example MAIN
-PREDEFINED_CCM_VARIABLES
-```
-
-### Default values, limits, etc.
-
-All premade variables have a default value, a description, and plausible physical bounds.
+All predefined variables that could be dynamic variables (i.e., could have a time derivative applied to them) have a default value, a description, and plausible physical bounds.
 
 To obtain the default value, use `default_value(x)`. For the description,
 use `getdescription(x)`. For the bounds, use:
@@ -389,7 +371,7 @@ physically_plausible_limits(T)
 
 ## Automatically named parameters
 
-The majority of [predefined processes](@ref predefined_processes) create symbolic
+The majority of predefined processes create symbolic
 parameters that are automatically named based on the variables governing the processes.
 This default behaviour can be altered in two ways.
 

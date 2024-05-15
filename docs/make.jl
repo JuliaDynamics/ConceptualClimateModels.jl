@@ -13,7 +13,7 @@ pages =  [
     "Introduction" => "index.md",
     "Tutorial" => "tutorial.md",
     "Submodules" => [
-        "Global mean EBM" => "globalmeanebm.md",
+        "Global mean EBM" => "submodules/globalmeanebm.md",
     ],
     "Examples" => "examples.md",
     "References" => "references.md",
