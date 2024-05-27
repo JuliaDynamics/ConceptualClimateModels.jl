@@ -1,10 +1,11 @@
 # TODO: Rename to sigmoid
-# TODO: Logistic function is faster in Julia on windows 10
+# TODO: Logistic function is faster than tanh in Julia on windows 10
 export TanhProcess
 
 """
     TanhProcess(variable, driver, left, right, scale, reference) <: Process
     TanhProcess(variable, driver; left, right, scale, reference) <: Process
+    TanhProcess(variable, driver; left, right, scale, start) <: Process
 
 A common process for when a `variable` has a tanh-dependence on a `driver` variable.
 The rest of the input arguments should be real numbers or `@parameter` named parameters.
@@ -15,6 +16,8 @@ variable ~ left + (right - left)*(1 + tanh(2(driver - reference)/scale))*0.5
 ```
 i.e., a tanh formula that goes from value `left` to value `right` as a function of `driver`
 over a range of `scale` being centered at `reference`.
+Alternatively, you can provide `start` instead of reference,
+which creates the reference value as `reference = start - scale/2`.
 
 If the values given to the parameters of the expression are real numbers, they become
 named parameters prefixed with the name of `variable`, then the name of the `driver`,
@@ -29,8 +32,16 @@ struct TanhProcess <: Process
     scale
     reference
 end
-TanhProcess(variable, driver; left=0, right=1, scale=1, reference=0) =
-TanhProcess(variable, driver, left, right, scale, reference)
+
+function TanhProcess(variable, driver; left=0, right=1, scale=1, reference=nothing, start=nothing)
+    if !isnothing(reference) && !isnothing(start)
+        error("Only one of `reference, start` can be given!")
+    end
+    if isnothing(reference)
+        reference = start - scale/2
+    end
+    return TanhProcess(variable, driver, left, right, scale, reference)
+end
 
 function ProcessBasedModelling.rhs(p::TanhProcess)
     y = p.variable
