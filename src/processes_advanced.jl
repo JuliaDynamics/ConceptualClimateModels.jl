@@ -3,9 +3,9 @@
 export TanhProcess
 
 """
-    TanhProcess(variable, driver, left, right, scale, reference) <: Process
-    TanhProcess(variable, driver; left, right, scale, reference) <: Process
-    TanhProcess(variable, driver; left, right, scale, start) <: Process
+    TanhProcess <: Process
+    TanhProcess(variable, driver; left, right, scale, reference)
+    TanhProcess(variable, driver; left, right, scale, start)
 
 A common process for when a `variable` has a tanh-dependence on a `driver` variable.
 The rest of the input arguments should be real numbers or `@parameter` named parameters.
