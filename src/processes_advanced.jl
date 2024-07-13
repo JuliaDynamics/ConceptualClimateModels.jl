@@ -36,9 +36,9 @@ function SigmoidProcess(variable, driver; left=0, right=1, scale=1,
     if count(!isnothing, (reference, start, finish)) > 1
         error("Exactly one of `reference, start, finish` must be given!")
     end
-    if isnothing(reference)
+    if !isnothing(start)
         reference = start + scale/2
-    elseif isnothing(finish)
+    elseif !isnothing(finish)
         reference = finish - scale/2
     end
     return SigmoidProcess(variable, driver, left, right, scale, reference)
