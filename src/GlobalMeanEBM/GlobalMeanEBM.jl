@@ -6,8 +6,7 @@ include("variables.jl")
 # include all processes first
 for (root, dirs, files) in walkdir(joinpath(@__DIR__))
     for file in files
-        file == "jl" && continue
-        file == "variables.jl" && continue
+        file in ("variables.jl", "GlobalMeanEBM.jl") && continue
         include(joinpath(root, file))
     end
 end
@@ -45,3 +44,4 @@ end
 
 end # Module
 
+export GlobalMeanEBM
