@@ -56,7 +56,7 @@ processes = [
     BasicRadiationBalance(),
     LinearOLR(),
     ParameterProcess(α),
-    CO2Forcing(), # note that for default CO2 value this is zero forcing
+    CO2Forcing(), # for default CO2 valu this is zero forcing
 ]
 
 ds = processes_to_coupledodes(processes, GlobalMeanEBM)
@@ -188,7 +188,7 @@ processes = [
 ```
 there was no process that defined for example the absorbed solar radiation ``ASR``!
 
-Well, ConceptualClimateModels.jl allows the concept of "default processes".
+Well, ConceptualClimateModels.jl allows the concept of **default processes**.
 The package exports some **submodules**, and each submodule targets a particular application of conceptual climate models. In this Tutorial we are using the [`GlobalMeanEBM`](@ref) submodule, which provides functionality to model global mean energy balance models.
 
 Each submodule defines and exports its own **list of predefined symbolic variables**.
@@ -214,14 +214,16 @@ a process for the albedo ``α``:
 processes = [
     BasicRadiationBalance(),
     LinearOLR(),
-    CO2Forcing(), # note that for default CO2 values this is zero forcing
+    CO2Forcing(), # for default CO2 value this is zero forcing
     ASR ~ S*(1-α), # add the processes for ASR, but not for S or α
 ]
+```
 
-# note the empty list as 2nd argument, which is otherwise
-# the default processes. Notice also that we make an MTK model
-# (which is the step _before_ converting to a dynamical system)
-mtk = processes_to_mtkmodel(processes, [])
+which we'll give to `processes_to_mtkmodel`. Notice how there is no second argument given, which would normally be the (sub)module to obtain default processes from.
+
+_side note: we use `process_to_mtkmodel` here, as we don't care yet for making a `DynamicalSystem`; just the symbolic model representation_
+```@example MAIN
+mtk = processes_to_mtkmodel(processes)
 # we access the equations directly from the model
 equations(mtk)
 ```
@@ -241,15 +243,14 @@ default_value(mtk.α_0)
 When this automation occurs a warning is thrown:
 
 ```
-┌ Warning: Variable α was introduced in process of variable ASR(t).
-│ However, a process for α was not provided,
+┌ Warning: Variable α(t) was introduced in process of variable ASR(t).
+│ However, a process for α(t) was not provided,
 │ and there is no default process for it either.
 │ Since it has a default value, we make it a parameter by adding a process:
 └ `ParameterProcess(α)`.
 ```
 
-[`ParameterProcess`](@ref) is the most trivial process: it simply means that the corresponding variable does not have any physical process and rather it is a system
-parameter.
+[`ParameterProcess`](@ref) is the most trivial process: it simply means that the corresponding variable does not have any actual process describing it and rather it is a system parameter.
 
 This automation does not occur if there is no default value.
 For example, the $ASR$ variable does not have a default value. If we have not assigned a process for $ASR$, the system construction would error instead:
@@ -261,7 +262,7 @@ processes = [
     CO2Forcing(),
 ]
 
-mtk = processes_to_mtkmodel(processes, [])
+mtk = processes_to_mtkmodel(processes)
 ```
 
 ```
@@ -273,7 +274,7 @@ Please provide a process for variable ASR(t).
 
 These warnings and errors are always "perfectly" informative.
 They tell us exactly which variable does not have a process, and exactly which other process introduced the process-less variable first.
-This makes the modelling experience stress-free, especially when large and complex
+This drastically improves the modelling experience, especially when large and complex
 models are being created.
 
 ## Adding your own processes
@@ -305,12 +306,12 @@ using ConceptualClimateModels.GlobalMeanEBM
 ```
 at the start of this tutorial, we brought into scope variables that this (sub)module defines and exports, such as `T, α, OLR`. They are listed on the (sub)module's documentation page, and are used in that module's default processes.
 
-In the (sub)module predefined processes you will notice call signatures like
+In some predefined processes documentation you will notice call signatures like
 ```julia
 BasicRadiationBalance(; T, f, kwargs...)
 ```
 There are keywords that do not have an assignment like `T, f` above.
-They use the (sub)module's predefined variables.
+This means that use the (sub)module's predefined variables.
 
 Crucially, these default variables are _symbolic variables_. They are defined as
 ```julia
@@ -329,10 +330,10 @@ OLR2 = A2 + B2*T
 
 In contrast, if we did instead
 ```@example MAIN
-T2 = 0.5 # _not_ symbolic!
-OLR2 = A2 + B2*T2
+T3 = 0.5 # _not_ symbolic!
+OLR3 = A2 + B2*T2
 ```
-This `OLR2` is _not_ a symbolic expression and _cannot_ be used to represent a process.
+This `OLR3` is _not_ a symbolic expression and _cannot_ be used to represent a process.
 
 You can use your own variables in any predefined processes.
 You can define them by doing
@@ -418,16 +419,16 @@ parameters(mtk)
 
 ## Integration with DynamicalSystems.jl
 
-ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) by providing initial condition
+ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/). It provides a summary function  [`dynamical_system_summary`](@ref), and also provides initial condition
 sampling to use when e.g., finding attractors and their basin fractions with
-`DynamicalSystems.basins_fractions`, and with the function [`dynamical_system_summary`](@ref).
+`DynamicalSystems.basins_fractions`, via the function [`plausible_limits`](@ref).
 Moreover, since all dynamical systems generated by ConceptualClimateModels.jl have
 symbolic bindings, one can use the symbolic variables in e.g., [interactive GUI exploration](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/visualizations/#Interactive-or-animated-trajectory-evolution)
 or to access or set the parameters of the system.
 
 ```@docs
-physically_plausible_limits(::DynamicalSystem)
-physically_plausible_ic_sampler
+plausible_limits(::DynamicalSystem)
+plausible_ic_sampler
 plausible_grid
 dynamical_system_summary
 ```

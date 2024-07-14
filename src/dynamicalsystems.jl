@@ -55,20 +55,20 @@ end
 Return a printable/writable string containing a summary of `ds`,
 which outlines its current status and lists all symbolic
 equations and parameters that constitute the system, if a referrence to a
-ModelingToolkit.jl exists in `ds`.
+ModelingToolkit.jl model exists in `ds`.
 """
 function dynamical_system_summary(ebm::DynamicalSystem)
     if !DynamicalSystemsBase.has_referrenced_model(ebm)
         summary = sprint(show, MIME"text/plain"(), ebm)
         return summary
     end
-    # Else, use symbolic stuff
+    # Else, use symbolic stuff; first print the first 4 lines
     summary = keepfirstlines(sprint(show, MIME"text/plain"(), ebm), 4)*"\n"
     model = referrenced_sciml_model(ebm)
     summary *= "\nwith equations:\n"*skipfirstline(sprint(show, MIME"text/plain"(), all_equations(model)))
-    # TODO: here add dump metadata
-#     See also: [`ModelingToolkit.dump_variable_metadata`](@ref), [`ModelingToolkit.dump_parameters`](@ref),
-# [`ModelingToolkit.dump_unknowns`](@ref).
+    # We can use
+    # [`ModelingToolkit.dump_variable_metadata`](@ref), [`ModelingToolkit.dump_parameters`](@ref),
+    # [`ModelingToolkit.dump_unknowns`](@ref), as well; but this works fine.
     summary *= "\n\nand parameter values:\n"*skipfirstline(sprint(show, MIME"text/plain"(), named_current_parameters(ebm)))
     return summary
 end
