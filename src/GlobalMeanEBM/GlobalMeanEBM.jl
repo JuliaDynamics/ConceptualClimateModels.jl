@@ -1,9 +1,17 @@
+"""
+    GlobalMeanEBM
+
+Submodule of `ConceptualClimateModels` which provides processes
+useful in creating global mean energy balance models.
+It is inspired by Budyko-Sellers-Ghil type models (without the latitudinal dependence).
+The mean does not have to be global, it can be hemispheric, or for other smaller regions.
+"""
 module GlobalMeanEBM
 using ConceptualClimateModels
 
 include("variables.jl")
 
-# include all processes first
+# include all processes
 for (root, dirs, files) in walkdir(joinpath(@__DIR__))
     for file in files
         file in ("variables.jl", "GlobalMeanEBM.jl") && continue
@@ -11,18 +19,9 @@ for (root, dirs, files) in walkdir(joinpath(@__DIR__))
     end
 end
 
-
-# Default processes: we need to do this outsime module scope.
-# I don't really understand why, but if this code is within the
-# module, the processes are not actually registered. :S
-
-# note; all variables that do not have a process here
-# become parameters via `ParameterProcess` by default.
-
-# import .GlobalMeanEBM
-
 function __init__()
-
+    # note; all variables that do not have a process here
+    # become parameters via `ParameterProcess` by default.
     register_default_process!.(
         [
             BasicRadiationBalance(),
