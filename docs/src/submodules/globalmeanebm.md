@@ -4,6 +4,13 @@
 GlobalMeanEBM
 ```
 
+## Default variables
+
+```@example MAIN
+using ConceptualClimateModels
+GlobalMeanEBM.globalmeanebm_variables
+```
+
 ## Temperature
 
 ```@docs

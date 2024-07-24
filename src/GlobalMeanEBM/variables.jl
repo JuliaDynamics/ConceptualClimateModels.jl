@@ -4,7 +4,7 @@
 # In the final generated energy balance model it is not necessary that all of these
 # will exist in the equations.
 
-const PREDEFINED_CCM_VARIABLES = @variables begin
+globalmeanebm_variables = @variables begin
     (T(t) = 290.0),      [bounds = (200.0, 350.0), description = "temperature, in Kelvin"]
     (S(t) = 1.0),        [bounds = (0.8, 1.2), description = "insolation, normalized to units of the solar constant"]
     (f(t) = 0.0),        [bounds = (-0.1, 0.1), description = "external forcing, in W/m²"]
@@ -23,5 +23,4 @@ const PREDEFINED_CCM_VARIABLES = @variables begin
     (ASR(t)), [description = "absorved shortwave radiation, in W/m²"]
 end
 
-export PREDEFINED_CCM_VARIABLES
 export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR, q
