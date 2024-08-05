@@ -18,7 +18,7 @@ We will combine the processes:
 
 ```@example MAIN
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 
 budyko_processes = [
     BasicRadiationBalance(),
@@ -30,7 +30,7 @@ budyko_processes = [
     # absorbed solar radiation has a default process
 ]
 
-budyko = processes_to_coupledodes(budyko_processes)
+budyko = processes_to_coupledodes(budyko_processes, GlobalMeanEBM)
 println(dynamical_system_summary(budyko))
 ```
 
@@ -85,7 +85,7 @@ dependent variable instead, like so:
 
 ```@example MAIN
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 
 @variables η1(t)
 @parameters η1_0 = 2.0 # starting value for η1 parameter
@@ -96,7 +96,7 @@ processes = [
     η1 ~ η1_0 + r_η*t, # this symbolic variable has its own equation!
 ]
 
-stommel = processes_to_coupledodes(processes)
+stommel = processes_to_coupledodes(processes, GlobalMeanEBM)
 println(dynamical_system_summary(stommel))
 ```
 
@@ -166,7 +166,3 @@ DifferentialEquations.jl (to allow passing `ODEProblem` which is created by `Dyn
 It also does not allow indexing parameters by their symbolic bindings.
 Lastly, it does not work with models generated with ModelingToolkit.jl so we would
 have to re-write all the equations that the chosen `processes` made for us.
-
-## Glacial oscillations
-
-Coming soon!

@@ -23,7 +23,7 @@ process.
 
 
 !!! note "Familiarity with DynamicalSystems.jl and ModelingToolkit.jl"
-    ConceptualClimateModels.jl uses [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model via **symbolic expressions**. It then on [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to further analyze the models. Familiarity with either package is good to have (but not mandatory), and will allow you to faster and better understand the concepts discussed here.
+    ConceptualClimateModels.jl uses [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model via **symbolic expressions**. It then uses [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to further analyze the models. Familiarity with either package is good to have (but not mandatory), and will allow you to faster and better understand the concepts discussed here.
 
 
 ## Introductory example
