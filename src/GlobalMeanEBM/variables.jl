@@ -1,15 +1,10 @@
-function physically_plausible_limits end
-
-module CCMV
-
-using ConceptualClimateModels
 # These are quantities that change with time. Hence, they are either state variables
 # or observables of the state variables. They have given names and are utilized
 # in the rest of the files to make the equations that compose the dynamical system.
 # In the final generated energy balance model it is not necessary that all of these
 # will exist in the equations.
 
-const PREDEFINED_CCM_VARIABLES = @variables begin
+globalmeanebm_variables = @variables begin
     (T(t) = 290.0),      [bounds = (200.0, 350.0), description = "temperature, in Kelvin"]
     (S(t) = 1.0),        [bounds = (0.8, 1.2), description = "insolation, normalized to units of the solar constant"]
     (f(t) = 0.0),        [bounds = (-0.1, 0.1), description = "external forcing, in W/m²"]
@@ -28,20 +23,4 @@ const PREDEFINED_CCM_VARIABLES = @variables begin
     (ASR(t)), [description = "absorved shortwave radiation, in W/m²"]
 end
 
-export PREDEFINED_CCM_VARIABLES
 export T, S, f, α, α_ice, α_cloud, ΔT, ΔS, ε, ℓ, C, CO2, OLR, ASR, q
-
-function ConceptualClimateModels.physically_plausible_limits(var::String)::Tuple{Float64, Float64}
-    if var[1] == 'T'
-        return (200, 350)
-    elseif var[1] == 'α' || var[1] == 'ε' || var[1] == 'C'
-        return (0, 1)
-    else
-        error("""
-        Unpsecified plausible physical limits for $(var): it has no defined bounds or
-        a default variable. You need to redefine the variable to have either of the two.
-        """)
-    end
-end
-
-end

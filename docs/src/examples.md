@@ -18,7 +18,7 @@ We will combine the processes:
 
 ```@example MAIN
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 
 budyko_processes = [
     BasicRadiationBalance(),
@@ -30,7 +30,7 @@ budyko_processes = [
     # absorbed solar radiation has a default process
 ]
 
-budyko = processes_to_coupledodes(budyko_processes)
+budyko = processes_to_coupledodes(budyko_processes, GlobalMeanEBM)
 println(dynamical_system_summary(budyko))
 ```
 
@@ -44,10 +44,10 @@ For setting up the continuation we leverage the integration with DynamicalSystem
 ```@example MAIN
 using DynamicalSystems
 
-grid = physically_plausible_grid(budyko)
+grid = plausible_grid(budyko)
 mapper = AttractorsViaRecurrences(budyko, grid)
 rfam = RecurrencesFindAndMatch(mapper)
-sampler = physically_plausible_ic_sampler(budyko)
+sampler = plausible_ic_sampler(budyko)
 sampler() # randomly sample initial conditions
 ```
 
@@ -61,7 +61,7 @@ index = :ε_0
 Now we perform the continuation versus the effective emissivity, to approximate increasing or decreasing the strength of the greenhouse effect:
 ```@example MAIN
 εrange = 0.3:0.01:0.8
-fractions_curves, attractors_info = continuation(
+fractions_curves, attractors_info = global_continuation(
     rfam, εrange, index, sampler;
     samples_per_parameter = 1000,
     show_progress = false,
@@ -85,7 +85,7 @@ dependent variable instead, like so:
 
 ```@example MAIN
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 
 @variables η1(t)
 @parameters η1_0 = 2.0 # starting value for η1 parameter
@@ -96,7 +96,7 @@ processes = [
     η1 ~ η1_0 + r_η*t, # this symbolic variable has its own equation!
 ]
 
-stommel = processes_to_coupledodes(processes)
+stommel = processes_to_coupledodes(processes, GlobalMeanEBM)
 println(dynamical_system_summary(stommel))
 ```
 
@@ -106,15 +106,15 @@ estimate its bifurcation diagram using the same steps as the above example.
 ```@example MAIN
 using DynamicalSystems
 
-grid = physically_plausible_grid(stommel)
+grid = plausible_grid(stommel)
 mapper = AttractorsViaRecurrences(stommel, grid;
     consecutive_recurrences = 1000, attractor_locate_steps = 10,
 )
 rfam = RecurrencesFindAndMatch(mapper)
-sampler = physically_plausible_ic_sampler(stommel)
+sampler = plausible_ic_sampler(stommel)
 
 ηrange = 2.0:0.01:4.0
-fractions_curves, attractors_info = continuation(
+fractions_curves, attractors_info = global_continuation(
     rfam, ηrange, η1_0, sampler;
     samples_per_parameter = 1000,
     show_progress = false,
@@ -159,14 +159,3 @@ fig
 As you can see from the figure, depending on the rate the system either "tracks"
 the fixed point of high ΔΤ or it collapses down to the small ΔT branch.
 This happens because the system crosses the unstable manifold of the lower branch [Datseris2022; Chap. 12](@cite).
-To visualize the unstable manifold we could use BifurcationKit.jl, however,
-it is very inconvenient to do so, because BifurcationKit.jl does not provide most of the conveniences
-that DynamicalSystems.jl does. For example, it does not integrate well enough with
-DifferentialEquations.jl (to allow passing `ODEProblem` which is created by `DynamicalSystem`).
-It also does not allow indexing parameters by their symbolic bindings.
-Lastly, it does not work with models generated with ModelingToolkit.jl so we would
-have to re-write all the equations that the chosen `processes` made for us.
-
-## Glacial oscillations
-
-Coming soon!

@@ -10,7 +10,7 @@ similar to [`EmissivitySellers1969`](@ref).
 In essence this is a [`TanhProcess`](@ref) with the given keywords as parameters.
 """
 function EmissivityFeedbackTanh(; ε=ε, T=T, left = 0.5, right = 0.4, rate = 0.5, Tref = 288.0)
-    return TanhProcess(ε, T, left, right, rate, Tref)
+    return SigmoidProcess(ε, T, left, right, rate, Tref)
 end
 
 """

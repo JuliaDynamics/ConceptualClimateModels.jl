@@ -1,5 +1,7 @@
 # [Tutorial](@id tutorial)
 
+## Terminology
+
 ConceptualClimateModels.jl follows a process-based modelling approach
 to make differential equation systems from _processes_.
 A _process_ is simply a particular _equation_ defining the dynamics of a climate
@@ -7,12 +9,12 @@ variable, while also explicitly defining _which_ variable the equation defines.
 A vector of processes is composed by the user, and given to the main function [`processes_to_coupledodes`](@ref) which bundles them into a system of equations
 that creates a dynamical system. The dynamical system can then be further analyzed
 in terms of stability properties, multistability, tipping, periodic (or not)
-behavior, and many more aspects, via the DynamicalSystems.jl library (see the examples).
+behavior, chaos, and many more aspects, via the DynamicalSystems.jl library (see the examples).
 
 Note the distinction: a _process_ is _not_ the climate variable
 (such as "clouds" or  "insolation"); rather it is the _exact equation_ that
 defines the behavior of the climate variable, and could itself utilize
-many other already existing climate variables.
+many other already existing climate variables, or introduce new ones.
 In terminology of climate science a _process_ is a generalization
 of the term "parameterization".
 Many different processes may _describe_ the behavior of a particular variable and
@@ -21,7 +23,7 @@ process.
 
 
 !!! note "Familiarity with DynamicalSystems.jl and ModelingToolkit.jl"
-    ConceptualClimateModels.jl builds on [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model, and it builds on [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to further analyze the models. Familiarity with either package is good to have, and will allow you to faster and better understand the concepts discussed here. Nevertheless familiarity is actually optional as the steps required to use ConceptualClimateModels.jl are all explained in this tutorial.
+    ConceptualClimateModels.jl uses [ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) for building the equations representing the climate model via **symbolic expressions**. It then uses [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) to further analyze the models. Familiarity with either package is good to have (but not mandatory), and will allow you to faster and better understand the concepts discussed here.
 
 
 ## Introductory example
@@ -48,16 +50,16 @@ To create this model with ConceptualClimateModels.jl while providing the least i
 
 ```@example MAIN
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM # submodule for global mean models
 
 processes = [
     BasicRadiationBalance(),
     LinearOLR(),
     ParameterProcess(α),
-    CO2Forcing(), # note that for default CO2 value this is zero forcing
+    CO2Forcing(), # for default CO2 valu this is zero forcing
 ]
 
-ds = processes_to_coupledodes(processes)
+ds = processes_to_coupledodes(processes, GlobalMeanEBM)
 println(dynamical_system_summary(ds))
 ```
 
@@ -86,17 +88,15 @@ parameters(mtk)
 ```
 
 The symbolic variables and parameters can also be used to query or alter the
-dynamical system. For example, we can obtain, or alter, any parameter by providing the
-symbolic parameter index.
-There are multiple ways to obtain the symbolic index provided we know its name.
+dynamical system. In the equations above we say that the symbolic variable `CO2` was equated to the parameter `CO2_0`.
+There are multiple ways to obtain a symbolic index provided we know its name.
 First, we can re-create the symbolic parameter:
 
 ```@example MAIN
-index = first(@parameters CO2_0)
+index = only(@parameters CO2_0)
 ```
 
-Second, we can use the retrieved MTK model and access its `CO2_0` parameter:
-
+Second, we can use the retrieved MTK model and access its `CO2_0` field, which will return the symbolic variable:
 
 ```@example MAIN
 index = mtk.CO2_0
@@ -123,16 +123,23 @@ set_parameter!(ds, index, 800)
 
 Similarly, we can obtain or alter values corresponding to the dynamic variables,
 or observed functions of the state of the system, using their symbolic indices.
-For example we can obtain the value corresponding to symbolic variable ``T`` by:
+For example we can obtain the value corresponding to symbolic variable ``T`` at the current state of the dynamical system with:
 
 ```@example MAIN
 observe_state(ds, T) # binding `T` already exists in scope
 ```
 
-or obtain the ``OLR`` (outgoing longwave radiation)
+We didn't have to create `T` because when we did `using ConceptualClimateModels.GlobalMeanEBM`, `T` was brought into scope.
+Similarly, we can obtain the ``OLR`` (outgoing longwave radiation), using the `Symbol` representation of the symbolic variable:
 
 ```@example MAIN
 observe_state(ds, :OLR)
+```
+
+The advantage of using the symbolic variable `OLR` itself instead of its `Symbol` representation, is that symbolic variables can do arbitrary symbolic computations. For example let's say that when we created the equations of the system we didn't have defined a variable representing the expression ``T^2/OLR``. That's not a problem, we can query the expression nevertheless:
+
+```@example MAIN
+observe_state(ds, T^2/OLR) # symbolic expression
 ```
 
 Let's unpack the steps that led to this level of automation.
@@ -140,7 +147,7 @@ Let's unpack the steps that led to this level of automation.
 ## Processes
 
 A process is conceptually an _equation the defines a climate variable or observable_.
-All processes that composed the system are then composed into a set of differential equations via [`processes_to_coupledodes`](@ref) (or [`processes_to_mtkmodel`](@ref)) that represent the climate model.
+All processes that define the system are then composed into a set of differential equations via [`processes_to_coupledodes`](@ref) (or [`processes_to_mtkmodel`](@ref)) that represent the climate model.
 
 For example, the process
 ```@example MAIN
@@ -166,7 +173,7 @@ This allows very easily exchanging the way processes are represented by equation
 OLR_process = EmissivityStefanBoltzmanOLR()
 lhs(OLR_process) ~ rhs(OLR_process)
 ```
-then we would have used a Stefan-Boltzmann grey-atmosphere representation for the outgoing longwave radiation.
+then we would have used a Stefan-Boltzmann grey-atmosphere representation for the outgoing longwave radiation. Notice how this introduced an additional variable ``\varepsilon``.
 
 ## Default processes
 
@@ -179,14 +186,26 @@ processes = [
     CO2Forcing(),
 ]
 ```
-there was no process that defined the absorbed solar radiation ``ASR``!
+there was no process that defined for example the absorbed solar radiation ``ASR``!
 
-Well, ConceptualClimateModels.jl has a list of [predefined processes](@ref predefined_processes) that are automatically included in every call to [`processes_to_coupledodes`](@ref).
-The default processes for the ASR is $ASR = S(1-\alpha)$ with $S$ the solar constant.
+Well, ConceptualClimateModels.jl allows the concept of **default processes**.
+The package exports some **submodules**, and each submodule targets a particular application of conceptual climate models. In this Tutorial we are using the [`GlobalMeanEBM`](@ref) submodule, which provides functionality to model global mean energy balance models.
+
+Each submodule defines and exports its own **list of predefined symbolic variables**.
+When we wrote
+```julia
+using ConceptualClimateModels.GlobalMeanEBM
+```
+we brought into scope all the variables that this (sub)module defines and exports, such as `T, α, OLR`.
+
+Each (sub)module and provides a list of **predefined processes for its predefined symbolic variables**.
+These predefined default processes are loaded automatically when we provide the (sub)module as a second argument to `processes_to_coupledodes`, which we did above.
+In this (sub)module, the default process for the $ASR$ is $ASR = S(1-\alpha)$ with $S$ the solar constant.
+
 The function [`processes_to_coupledodes`](@ref) goes through all processes the user provided and identifies variables that themselves do not have a process.
-It then checks the list of default processes and attempt to assign one to these variables.
-
-If there are no default processes, it makes the variables themselves parameters with the same name but with a subscript 0.
+It then checks the list of default processes and attempts to assign one to these variables.
+If there are no default processes for some variables, it makes the variables themselves parameters with the same name but with a subscript 0 if the variables
+have a default value.
 
 For example, let's assume that we completely remove default processes and we don't specify
 a process for the albedo ``α``:
@@ -195,14 +214,16 @@ a process for the albedo ``α``:
 processes = [
     BasicRadiationBalance(),
     LinearOLR(),
-    CO2Forcing(), # note that for default CO2 values this is zero forcing
+    CO2Forcing(), # for default CO2 value this is zero forcing
     ASR ~ S*(1-α), # add the processes for ASR, but not for S or α
 ]
+```
 
-# note the empty list as 2nd argument, which is otherwise
-# the default processes. Notice also that we make an MTK model
-# (which is the step _before_ converting to a dynamical system)
-mtk = processes_to_mtkmodel(processes, [])
+which we'll give to `processes_to_mtkmodel`. Notice how there is no second argument given, which would normally be the (sub)module to obtain default processes from.
+
+_side note: we use `process_to_mtkmodel` here, as we don't care yet for making a `DynamicalSystem`; just the symbolic model representation_
+```@example MAIN
+mtk = processes_to_mtkmodel(processes)
 # we access the equations directly from the model
 equations(mtk)
 ```
@@ -222,19 +243,17 @@ default_value(mtk.α_0)
 When this automation occurs a warning is thrown:
 
 ```
-┌ Warning: Variable α was introduced in process of variable ASR(t).
-│ However, a process for α was not provided,
+┌ Warning: Variable α(t) was introduced in process of variable ASR(t).
+│ However, a process for α(t) was not provided,
 │ and there is no default process for it either.
 │ Since it has a default value, we make it a parameter by adding a process:
-│ `ParameterProcess(α)`.
-└ @ ProcessBasedModelling ...\ProcessBasedModelling\src\make.jl:65
+└ `ParameterProcess(α)`.
 ```
 
-[`ParameterProcess`](@ref) is the most trivial process: it simply means that the corresponding variable does not have any physical process and rather it is a system
-parameter.
+[`ParameterProcess`](@ref) is the most trivial process: it simply means that the corresponding variable does not have any actual process describing it and rather it is a system parameter.
 
 This automation does not occur if there is no default value.
-For example, variables that can never be dynamic state variables, such as $ASR$, do not have a default value. If we have not assigned a process for $ASR$, the system construction would error instead:
+For example, the $ASR$ variable does not have a default value. If we have not assigned a process for $ASR$, the system construction would error instead:
 
 ```julia
 processes = [
@@ -243,25 +262,25 @@ processes = [
     CO2Forcing(),
 ]
 
-mtk = processes_to_mtkmodel(processes, [])
+mtk = processes_to_mtkmodel(processes)
 ```
 
 ```
-ERROR: ArgumentError: Variable ASR was introduced in process of
-variable T(t). However, a process for ASR was not provided,
-there is no default process for ASR, and ASR doesn't have a default value.
-Please provide a process for variable ASR.
+ERROR: ArgumentError: Variable ASR(t) was introduced in process of
+variable T(t). However, a process for ASR(t) was not provided,
+there is no default process for ASR(t), and ASR(t) doesn't have a default value.
+Please provide a process for variable ASR(t).
 ```
 
-These warnings and errors are always perfectly informative.
+These warnings and errors are always "perfectly" informative.
 They tell us exactly which variable does not have a process, and exactly which other process introduced the process-less variable first.
-This makes the modelling experience stress-free, especially when large and complex
+This drastically improves the modelling experience, especially when large and complex
 models are being created.
 
 ## Adding your own processes
 
-ConceptualClimateModels.jl provides an increasing list of
-[predefined processes](@ref predefined_processes) that you can use out of
+Each of the submodules of ConceptualClimateModels.jl provides an increasing list of
+predefined processes that you can use out of
 the box to compose climate models. The predefined processes all come from existing
 literature and cite their source via BiBTeX.
 
@@ -279,31 +298,20 @@ x_process = x ~ 0.5*T^2 # x is just a function of temperature
 A more re-usable approach however is to create a function that generates a process
 or create a new process type as we describe in [making new processes](@ref new_processes).
 
-## [Premade symbolic variable instances](@id global_vars)
+## A note on symbolic variable instances
 
-You might be wondering, when we wrote the equation `ASR ~ S*(1-α)` for the $ASR$ process,
-or when we wrote `x ~ 0.5 * T^2`, where did the variable bindings `ASR, S, α` come from?
-For convenience, ConceptualClimateModels.jl defines some symbolic variables
-for typical climate quantities and assigns default processes to them.
-we brought all of these into scope when we did
+Recall that when we wrote
 ```julia
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 ```
-where `CCMV` (standing for ConceptualClimateModels Variables) is a submodule
-that defines and exports the variables. We list all of these
-[below](@ref list_vars). These default variables are used throughout the library as the
-default variables in [predefined processes](@ref predefined_processes).
-When going through documentation strings of [predefined processes](@ref predefined_processes),
-such as [`BasicRadiationBalance`](@ref),
-you will notice that the function call signatures are like:
+at the start of this tutorial, we brought into scope variables that this (sub)module defines and exports, such as `T, α, OLR`. They are listed on the (sub)module's documentation page, and are used in that module's default processes.
 
+In some predefined processes documentation you will notice call signatures like
 ```julia
 BasicRadiationBalance(; T, f, kwargs...)
 ```
 There are keywords that do not have an assignment like `T, f` above.
-These always represent climate
-variables, never parameters, and for the variables they use the [existing predefined
-climate variables](@ref list_vars).
+This means that use the (sub)module's predefined variables.
 
 Crucially, these default variables are _symbolic variables_. They are defined as
 ```julia
@@ -313,6 +321,7 @@ Crucially, these default variables are _symbolic variables_. They are defined as
 end
 ```
 which means that expressions that involve them result in symbolic expressions,
+for example
 ```@example MAIN
 A2 = 0.5
 B2 = 0.5
@@ -322,11 +331,11 @@ OLR2 = A2 + B2*T
 In contrast, if we did instead
 ```@example MAIN
 T2 = 0.5 # _not_ symbolic!
-OLR2 = A2 + B2*T2
+OLR3 = A2 + B2*T2
 ```
-This `OLR2` is _not_ a symbolic expression and _cannot_ be used to represent a process.
+This `OLR3` is _not_ a symbolic expression and _cannot_ be used to represent a process.
 
-You can use your own variables for any of the [predefined processes](@ref predefined_processes)
+You can use your own variables in any predefined processes.
 You can define them by doing
 ```@example MAIN
 @variables begin
@@ -339,7 +348,8 @@ process = BasicRadiationBalance(T = T1_tropics)
 ```
 
 Defining variables with the extra `bounds, description` annotations is
-useful for integrating with the rest of the functionality of the library.
+useful for integrating with the rest of the functionality of the library,
+and therefore it is strongly recommended.
 
 !!! warn "Custom variables need to be assigned everywhere!"
     Above we assigned `T1_tropics` as the temperature variable.
@@ -347,45 +357,17 @@ useful for integrating with the rest of the functionality of the library.
     `OLR` variable by also providing the processes
     `LinearOLR(T = T1_tropics)` (for example).
 
-### [List of premade variables](@id list_vars)
 
-The premade variables are not exported by default.
-To bring them into global scope you have to do:
+## Default values, limits, etc.
 
-```@example MAIN
-using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
-```
-and then use them,
-```@example MAIN
-T, q, OLR
-```
-
-All the premade variables are:
-```@example MAIN
-PREDEFINED_CCM_VARIABLES
-```
-
-### Default values, limits, etc.
-
-All premade variables have a default value, a description, and plausible physical bounds.
+All predefined variables that could be dynamic variables (i.e., could have a time derivative applied to them) have a default value, a description, and plausible physical bounds.
 
 To obtain the default value, use `default_value(x)`. For the description,
-use `getdescription(x)`. For the bounds, use:
-
-```@docs
-physically_plausible_limits(::Any)
-```
-
-e.g.,
-
-```@example MAIN
-physically_plausible_limits(T)
-```
+use `getdescription(x)`. For the bounds, see [`plausible_limits`](@ref).
 
 ## Automatically named parameters
 
-The majority of [predefined processes](@ref predefined_processes) create symbolic
+The majority of predefined processes create symbolic
 parameters that are automatically named based on the variables governing the processes.
 This default behaviour can be altered in two ways.
 
@@ -427,17 +409,17 @@ parameters(mtk)
 
 ## Integration with DynamicalSystems.jl
 
-ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/) by providing initial condition
+ConceptualClimateModels.jl integrates with [DynamicalSystems.jl](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/). It provides a summary function  [`dynamical_system_summary`](@ref), and also provides initial condition
 sampling to use when e.g., finding attractors and their basin fractions with
-`DynamicalSystems.basins_fractions`, and with the function [`dynamical_system_summary`](@ref).
+`DynamicalSystems.basins_fractions`, via the function [`plausible_limits`](@ref).
 Moreover, since all dynamical systems generated by ConceptualClimateModels.jl have
 symbolic bindings, one can use the symbolic variables in e.g., [interactive GUI exploration](https://juliadynamics.github.io/DynamicalSystemsDocs.jl/dynamicalsystems/dev/visualizations/#Interactive-or-animated-trajectory-evolution)
 or to access or set the parameters of the system.
 
 ```@docs
-physically_plausible_limits(::DynamicalSystem)
-physically_plausible_ic_sampler
-physically_plausible_grid
+plausible_limits
+plausible_ic_sampler
+plausible_grid
 dynamical_system_summary
 ```
 
@@ -452,8 +434,7 @@ processes_to_mtkmodel
 
 To make a new processes you can:
 
-1. Create a _function_ that given some keyword arguments (including which symbolic
-   variables to use) uses one of the existing [generic processes](@ref generic_processes)
+1. Create a _function_ that given some keyword arguments uses one of the existing [generic processes](@ref generic_processes)
    to make and return a process instance. Or, it can return an equation directly,
    provided it satisfies the format of [`processes_to_mtkmodel`](@ref).
    For an example of this, see the source code of [`SeparatedClearAllSkyAlbedo`](@ref)
@@ -466,4 +447,18 @@ To make a new processes you can:
 
 ```@docs
 Process
+register_default_process!
+```
+
+## [Generic processes](@id generic_processes)
+
+Processes that do not depend on any particular physical concept and instead provide
+a simple way to create new processes for a given climate variable:
+
+```@docs
+ParameterProcess
+TimeDerivative
+ExpRelaxation
+AdditionProcess
+SigmoidProcess
 ```

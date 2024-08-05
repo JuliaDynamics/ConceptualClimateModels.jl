@@ -37,14 +37,14 @@ end
 ProcessBasedModelling.lhs_variable(a::IceAlbedoFeedback) = a.α_ice
 ProcessBasedModelling.timescale(a::IceAlbedoFeedback) = a.τ
 
+# TODO: Re-write this now that sigmoid allows more freedom.
 function ProcessBasedModelling.rhs(a::IceAlbedoFeedback)
     y = a.α_ice
     suffixes = ["max", "min", "Tscale", "Tfreeze"]
     values = (a.max, a.min, a.Tscale, a.Tfreeze)
     mtk_pars = map((val, s) -> new_derived_named_parameter(y, val, s), values, suffixes)
     Tref = mtk_pars[4] - mtk_pars[3]/2
-    # don't use `TanhProcess`, use the function instead
-    iproc = ExpRelaxation(y, tanh_expression(a.T, mtk_pars[1:3]..., Tref), a.τ)
+    iproc = ExpRelaxation(y, ConceptualClimateModels.sigmoid_expression(a.T, mtk_pars[1:3]..., Tref), a.τ)
     return ProcessBasedModelling.rhs(iproc)
 end
 # we don't need to extend `lhs`, `ProcessBasedModelling` takes care of that.

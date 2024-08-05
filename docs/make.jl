@@ -1,6 +1,7 @@
 cd(@__DIR__)
 
 using ConceptualClimateModels
+using ConceptualClimateModels.GlobalMeanEBM
 
 import Downloads
 Downloads.download(
@@ -12,7 +13,9 @@ include("build_docs_with_style.jl")
 pages =  [
     "Introduction" => "index.md",
     "Tutorial" => "tutorial.md",
-    "Predefined processes" => "processes.md",
+    "Submodules" => [
+        "Global mean EBM" => "submodules/globalmeanebm.md",
+    ],
     "Examples" => "examples.md",
     "References" => "references.md",
 ]
@@ -24,7 +27,7 @@ bib = CitationBibliography(
     style=:authoryear
 )
 
-build_docs_with_style(pages, ConceptualClimateModels, ProcessBasedModelling;
+build_docs_with_style(pages, ConceptualClimateModels, GlobalMeanEBM, ProcessBasedModelling;
     authors = "George Datseris <datseris.george@gmail.com>",
     bib, warnonly = [:doctest, :missing_docs, :cross_references],
     repo = Remotes.GitHub("JuliaDynamics", "ConceptualClimateModels.jl")
