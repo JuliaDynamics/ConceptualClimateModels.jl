@@ -61,7 +61,7 @@ index = :ε_0
 Now we perform the continuation versus the effective emissivity, to approximate increasing or decreasing the strength of the greenhouse effect:
 ```@example MAIN
 εrange = 0.3:0.01:0.8
-fractions_curves, attractors_info = continuation(
+fractions_curves, attractors_info = global_continuation(
     rfam, εrange, index, sampler;
     samples_per_parameter = 1000,
     show_progress = false,
@@ -114,7 +114,7 @@ rfam = RecurrencesFindAndMatch(mapper)
 sampler = plausible_ic_sampler(stommel)
 
 ηrange = 2.0:0.01:4.0
-fractions_curves, attractors_info = continuation(
+fractions_curves, attractors_info = global_continuation(
     rfam, ηrange, η1_0, sampler;
     samples_per_parameter = 1000,
     show_progress = false,
@@ -159,10 +159,3 @@ fig
 As you can see from the figure, depending on the rate the system either "tracks"
 the fixed point of high ΔΤ or it collapses down to the small ΔT branch.
 This happens because the system crosses the unstable manifold of the lower branch [Datseris2022; Chap. 12](@cite).
-To visualize the unstable manifold we could use BifurcationKit.jl, however,
-it is very inconvenient to do so, because BifurcationKit.jl does not provide most of the conveniences
-that DynamicalSystems.jl does. For example, it does not integrate well enough with
-DifferentialEquations.jl (to allow passing `ODEProblem` which is created by `DynamicalSystem`).
-It also does not allow indexing parameters by their symbolic bindings.
-Lastly, it does not work with models generated with ModelingToolkit.jl so we would
-have to re-write all the equations that the chosen `processes` made for us.

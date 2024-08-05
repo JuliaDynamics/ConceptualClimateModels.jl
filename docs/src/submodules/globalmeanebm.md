@@ -75,19 +75,6 @@ CloudAlbedoLinear
 BudykoOLR
 ```
 
-## [Generic processes](@id generic_processes)
-
-Processes that do not depend on any particular physical concept and instead provide
-a simple way to create new processes for a given climate variable:
-
-```@docs
-ParameterProcess
-TimeDerivative
-ExpRelaxation
-AdditionProcess
-TanhProcess
-```
-
 ## Default processes
 
 ```@example MAIN

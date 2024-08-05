@@ -330,7 +330,7 @@ OLR2 = A2 + B2*T
 
 In contrast, if we did instead
 ```@example MAIN
-T3 = 0.5 # _not_ symbolic!
+T2 = 0.5 # _not_ symbolic!
 OLR3 = A2 + B2*T2
 ```
 This `OLR3` is _not_ a symbolic expression and _cannot_ be used to represent a process.
@@ -363,17 +363,7 @@ and therefore it is strongly recommended.
 All predefined variables that could be dynamic variables (i.e., could have a time derivative applied to them) have a default value, a description, and plausible physical bounds.
 
 To obtain the default value, use `default_value(x)`. For the description,
-use `getdescription(x)`. For the bounds, use:
-
-```@docs
-physically_plausible_limits(::Any)
-```
-
-e.g.,
-
-```@example MAIN
-physically_plausible_limits(T)
-```
+use `getdescription(x)`. For the bounds, see [`plausible_limits`](@ref).
 
 ## Automatically named parameters
 
@@ -427,7 +417,7 @@ symbolic bindings, one can use the symbolic variables in e.g., [interactive GUI 
 or to access or set the parameters of the system.
 
 ```@docs
-plausible_limits(::DynamicalSystem)
+plausible_limits
 plausible_ic_sampler
 plausible_grid
 dynamical_system_summary
@@ -457,4 +447,18 @@ To make a new processes you can:
 
 ```@docs
 Process
+register_default_process!
+```
+
+## [Generic processes](@id generic_processes)
+
+Processes that do not depend on any particular physical concept and instead provide
+a simple way to create new processes for a given climate variable:
+
+```@docs
+ParameterProcess
+TimeDerivative
+ExpRelaxation
+AdditionProcess
+SigmoidProcess
 ```
