@@ -1,5 +1,5 @@
 using ConceptualClimateModels
-using ConceptualClimateModels.CCMV
+using ConceptualClimateModels.GlobalMeanEBM
 using Test
 
 @testset "all processes" begin
@@ -32,12 +32,12 @@ p1 = [
     EmissivityLogConcentration(ε = ε4),
 ]
 
-ds = processes_to_coupledodes(p1)
+ds = processes_to_coupledodes(p1, GlobalMeanEBM)
 mtk = referrenced_sciml_model(ds)
 eqs = all_equations(mtk)
 
 # This also tests a bunch of default processes
-for var in (T, ε, ε1, ε2, ε3, ε4, q, :ε1_T_tanh_ref, mtk.ε_0)
+for var in (T, ε, ε1, ε2, ε3, ε4, q, :ε1_T_sigmoid_ref, mtk.ε_0)
     test_symbolic_var(eqs, var)
 end
 
@@ -68,7 +68,7 @@ p2 = [
     ΔTStommelModel(ΔT = ΔT1, ΔS = ΔS1),
 ]
 
-ds = processes_to_coupledodes(p2)
+ds = processes_to_coupledodes(p2, GlobalMeanEBM)
 mtk = referrenced_sciml_model(ds)
 for var in (T, C, OLR1, OLR2, :α_bg, a1, a2, a3, a4, ΔS1, ΔT)
     if has_symbolic_var(mtk, var)
@@ -85,8 +85,6 @@ end
 
 @testset "dynamical systems integration" begin
     using DynamicalSystems
-    using ConceptualClimateModels
-    using ConceptualClimateModels.CCMV
 
     budyko_processes = [
         BasicRadiationBalance(),
@@ -98,7 +96,7 @@ end
         # absorbed solar radiation has a default process
     ]
 
-    budyko = processes_to_coupledodes(budyko_processes)
+    budyko = processes_to_coupledodes(budyko_processes, GlobalMeanEBM)
 
     grid = plausible_grid(budyko)
     mapper = AttractorsViaRecurrences(budyko, grid)

@@ -9,7 +9,7 @@ Else, if there is no default value, an error is thrown.
 """
 function plausible_limits(var)
     if ModelingToolkit.hasbounds(var)
-        return getbounds(var)
+        return ModelingToolkit.getbounds(var)
     elseif !isnothing(default_value(var))
         return (0.8default_value(var), 1.2default_value(var))
     else
@@ -37,8 +37,6 @@ function plausible_limits(ds::DynamicalSystem, idxs = nothing)
         allnames = ModelingToolkit.getname.(allvars)
         j = [findfirst(isequal(i), allnames) for i in idxs]
         vars = allvars[j]
-    else
-        vars = idxs
     end
     return plausible_limits.(vars)
 end

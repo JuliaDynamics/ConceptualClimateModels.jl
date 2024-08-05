@@ -8,6 +8,7 @@ The mean does not have to be global, it can be hemispheric, or for other smaller
 """
 module GlobalMeanEBM
 using ConceptualClimateModels
+import NaNMath
 
 include("variables.jl")
 

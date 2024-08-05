@@ -5,7 +5,7 @@ export all_equations
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
 """
-    processes_to_coupledodes(processes, default = DEFAULT_PROCESSES; kw...)
+    processes_to_coupledodes(processes [, default]; kw...)
 
 Convert a given `Vector` of processes to a `DynamicalSystem`, in particular `CoupledODEs`.
 All processes represent symbolic equations managed by ModelingToolkit.jl.
@@ -27,7 +27,7 @@ or see the online [Tutorial](@ref).
   This accelerates parameter access, assuming all parameters are of the same type.
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
-function processes_to_coupledodes(proc, default = DEFAULT_CCM_PROCESSES;
+function processes_to_coupledodes(proc, default = [];
         diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false, kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
