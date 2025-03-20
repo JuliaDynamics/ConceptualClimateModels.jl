@@ -1,7 +1,7 @@
 cd(@__DIR__)
 
 using ConceptualClimateModels
-using ConceptualClimateModels.GlobalMeanEBM
+import ConceptualClimateModels.GlobalMeanEBM
 
 import Downloads
 Downloads.download(
@@ -16,7 +16,9 @@ pages =  [
     "Submodules" => [
         "Global mean EBM" => "submodules/globalmeanebm.md",
     ],
-    "Examples" => "examples.md",
+    "Examples" => [
+        "Global mean EBM" => "examples/globalmeanebm.md",
+    ],
     "References" => "references.md",
 ]
 
