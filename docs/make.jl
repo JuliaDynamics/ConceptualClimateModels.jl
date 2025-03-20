@@ -2,6 +2,7 @@ cd(@__DIR__)
 
 using ConceptualClimateModels
 import ConceptualClimateModels.GlobalMeanEBM
+import ConceptualClimateModels.CloudToppedMixedLayerModel
 
 import Downloads
 Downloads.download(
@@ -29,7 +30,7 @@ bib = CitationBibliography(
     style=:authoryear
 )
 
-build_docs_with_style(pages, ConceptualClimateModels, GlobalMeanEBM, ProcessBasedModelling;
+build_docs_with_style(pages, ConceptualClimateModels, GlobalMeanEBM, CloudToppedMixedLayerModel, ProcessBasedModelling;
     authors = "George Datseris <datseris.george@gmail.com>",
     bib, warnonly = [:doctest, :missing_docs, :cross_references],
     repo = Remotes.GitHub("JuliaDynamics", "ConceptualClimateModels.jl")

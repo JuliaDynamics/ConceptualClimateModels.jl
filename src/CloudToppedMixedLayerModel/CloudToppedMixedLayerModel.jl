@@ -161,6 +161,3 @@ for (root, dirs, files) in walkdir(joinpath(@__DIR__))
 end
 
 end
-
-using .CloudToppedMixedLayerModel
-CTBBL = CloudToppedMixedLayerModel
