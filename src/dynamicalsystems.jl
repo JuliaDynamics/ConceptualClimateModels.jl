@@ -1,6 +1,7 @@
 export processes_to_coupledodes
 export dynamical_system_summary
 export all_equations
+export named_current_parameters
 
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
@@ -28,7 +29,7 @@ or see the online [Tutorial](@ref).
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
 function processes_to_coupledodes(proc, default = [];
-        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false, kwargs...
+        diffeq = DEFAULT_DIFFEQ, inplace::Bool = false, split::Bool = false, kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
     ssys = structural_simplify(sys; split)
@@ -39,11 +40,10 @@ function processes_to_coupledodes(proc, default = [];
 
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value. This also means
-    # that we can use `default_value` to
     if inplace
-        prob = ODEProblem(ssys, nothing, (0.0, Inf))
+        prob = ODEProblem(ssys, nothing, (0.0, Inf), nothing)
     else
-        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...))
+        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf), nothing; u0_constructor = x->SVector(x...))
     end
     ds = CoupledODEs(prob, diffeq)
     return ds
@@ -76,13 +76,20 @@ end
 keepfirstlines(str, n) = join(split(str, '\n')[1:n], '\n')
 skipfirstline(str, limit = 2) = split(str, '\n'; limit)[2]
 
-function named_current_parameters(ebm)
-    cp = current_parameters(ebm)
-    pnames = parameters(referrenced_sciml_model(ebm))
-    return [pn ~ p for (p, pn) in zip(cp, pnames)]
-end
-
 function ProcessBasedModelling.all_equations(ds::DynamicalSystem)
     model = referrenced_sciml_model(ds)
     return all_equations(model)
+end
+
+"""
+    named_current_parameters(ds::DynamicalSystem)
+
+Return a dictionary mapping parameters of `ds` (as `Symbol`s) to their values.
+"""
+function named_current_parameters(ds::DynamicalSystem)
+    mtk = referrenced_sciml_model(ds)
+    params_names = Symbol.(ModelingToolkit.parameters(mtk))
+    params_values = current_parameter.(ds, params_names)
+    params = Dict(params_names .=> params_values)
+    return params
 end
