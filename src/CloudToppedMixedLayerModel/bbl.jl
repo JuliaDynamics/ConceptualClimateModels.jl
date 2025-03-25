@@ -1,5 +1,5 @@
 """
-    bbl_dynamic()
+    mlm_dynamic()
 
 Provide equations 1-3 in [Datseris2025](@cite) (or, 31-33 in [Stevens2006](@cite))
 defining the bulk boundary layer dynamics.
@@ -7,7 +7,7 @@ An additional auxilary velocity ``-w_m`` is added in the equation for ``z_b``
 and two auxilary export terms ``q_x, s_x`` are added to the equations for ``q_b, s_b``.
 All these auxilarity terms are 0 by default (otherwise, assign a process to them).
 """
-function bbl_dynamic()
+function mlm_dynamic()
     return [
         # We add two more velocities that can depend on clouds: ventillation due to cloud
         # clearing, and mass influx, again due to cloud clearing.
@@ -24,7 +24,7 @@ function bbl_dynamic()
 end
 
 "Provide equations that prescribe boundary conditions, so that when combined with
-`bbl_dynamic` we get results indentical to Sec. 4.1. of [Stevens2006](@cite)."
+`mlm_dynamic` we get results indentical to Sec. 4.1. of [Stevens2006](@cite)."
 function bbl_boundary_stevens2006()
     @parameters begin
         ΔF_fixed = 40.0 # this is W/m^2.
@@ -47,7 +47,7 @@ function bbl_boundary_stevens2006()
 end
 
 """
-    bbl_steadystate_stevens2006(fixed; z_b, q_b, s_b, CLT)
+    bbl_stevens2006_steadystate(fixed; z_b, q_b, s_b, CLT)
 
 Return the equations 35-38 in [Stevens2006](@cite)
 describing the analytically solved steady state of the MLM.
@@ -204,9 +204,9 @@ end
 # Thermodynamics
 ##########################################################################################
 """
-    q_liquid(T, q, z = 0)
+    q_liquid(T, q, z)
 
-liquid specific humidity given temperature and total water specific humidity.
+liquid specific humidity given temperature total water specific humidity and height.
 0.0 if below saturation.
 """
 q_liquid(T, q, z = 0) = max(q - q_saturation(T, z), 0)

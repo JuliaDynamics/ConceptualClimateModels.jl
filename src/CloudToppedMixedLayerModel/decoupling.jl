@@ -1,9 +1,9 @@
 """
-    decoupling_parameter(version = :Bretherton1997)
+    decoupling_variable(version = :Bretherton1997)
 
 Return an equation for ``\\mathcal{D}``, the decoupling variable.
 """
-function decoupling_parameter(version = :Bretherton1997)
+function decoupling_variable(version = :Bretherton1997)
     if version == :Bretherton1997
         return 𝒟 ~ CLT*LHF/CTRC
     elseif dversion == :Chung2012

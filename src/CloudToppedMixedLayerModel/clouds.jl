@@ -66,6 +66,7 @@ Options for `version`:
 
 - `:clt`: inspired by [RandalSuarez1984](@cite), emissivity scales with the depth
   of the cloud layer.
+- `:liquid_water_path`: Exponential of LWP.
 - `<: Number`: emissiviy is just the provided number or symbolic expression.
 
 If `fraction = true` the emissivity is further multiplied by the cloud fraction.
@@ -150,7 +151,7 @@ function cloud_layer_thickness(lcltype = :exact)
     else
         error("incorrect specification for type for the lcl")
     end
-    return clamp((z_b - z_lcl)/z_b, 0, 1)
+    return CLT ~ clamp((z_b - z_lcl)/z_b, 0, 1)
 end
 
 function cloud_base_height_exact(s, q, z)

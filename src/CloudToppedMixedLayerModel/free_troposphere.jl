@@ -35,7 +35,7 @@ end
 # coupling BBL with free troposphere
 ###########################################################################################
 """
-    bbl_s₊(
+    mlm_s₊(
         version = :difference;
         cloud_effect = false,
         CO2_effect = false,
@@ -52,7 +52,7 @@ Besides these, we can also specify whether CO2 increase also increases temperatu
 and whether decreasing ``C`` decreases temperature difference due to cloud thinning
 as in [Singer2023a](@cite).
 """
-function bbl_s₊(
+function mlm_s₊(
         inversion_fixing = :difference;
         cloud_effect = false,
         CO2_effect = false,
@@ -100,13 +100,13 @@ function bbl_s₊(
 end
 
 """
-    bbl_q₊(version = :relative)
+    mlm_q₊(version = :relative)
 
 Provide equation for ``q_+``. If `version = :relative` then
 make free tropospheric relative humidity a free parameter.
 Else if `version = :constant` then make ``q_+`` itself a parameter.
 """
-function bbl_q₊(humidity_fixing = :relative)
+function mlm_q₊(humidity_fixing = :relative)
     if humidity_fixing == :relative
         return q₊ ~ RH₊ * q_saturation(T₊)
     elseif humidity_fixing == :constant

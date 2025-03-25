@@ -2,7 +2,7 @@
     CloudToppedMixedLayerModel
 
 Submodule providing processes about cloud topped mixed layer models (MLMs).
-This combines existing equations on MLM by [Stevels2006](@cite) and [Bretherton1997](@cite),
+This combines existing equations on MLM by [Stevens2006](@cite) and [Bretherton1997](@cite),
 with surface energy balance and dynamic cloud equations.
 It is developed as part of the research article [Datseris2025](@cite).
 If you use this submodule, please cite the paper.
@@ -19,13 +19,13 @@ The organization is as follows:
   return processes (equations) utilize these global variables and global parameters.
   Many of these functions will also define local variables and parameters.
   All noteworthy processes have docstrings that are expanded in the submodule online
-  documentation. However, the overwhelming majority of docstrings do not actually list
+  documentation. However, the majority of docstrings do not actually list
   the equations themselves. Simply click the "source code" button on the bottom
   right of each docstring to go to the source code. Because this package is written
   in Julia, and because it uses symbolic expressions throughout, reading the source
   code is truly as straight forward as reading Latex-rendered equations.
-- The `default.jl` file defines default processes for many global variables
-  (go through the main tutorial of ConceptualClimateModels.jl if you don't know what this means).
+- The `default.jl` file defines default processes for many global variables.
+  These are also expanded in the docs.
 
 Throughout the submodule time is in units of days, specific humidity is in units of g/kg,
 liquid water static energy is in units of K (i.e., normalized by cₚ),

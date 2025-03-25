@@ -1,3 +1,4 @@
+"Return τSST * d(SST)/dt = ASW - Lnet - LHF - SHF + SST_X ."
 function sst_dynamic()
     TimeDerivative(SST, (ASW - Lnet - LHF - SHF + SST_X), τ_SST)
 end

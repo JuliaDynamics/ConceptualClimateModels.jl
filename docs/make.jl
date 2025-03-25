@@ -16,9 +16,11 @@ pages =  [
     "Tutorial" => "tutorial.md",
     "Submodules" => [
         "Global mean EBM" => "submodules/globalmeanebm.md",
+        "Cloud Topped Mixed Layer Model" => "submodules/ctmlm.md",
     ],
     "Examples" => [
         "Global mean EBM" => "examples/globalmeanebm.md",
+        "Cloud Topped Mixed Layer Model" => "examples/ctmlm.md",
     ],
     "References" => "references.md",
 ]

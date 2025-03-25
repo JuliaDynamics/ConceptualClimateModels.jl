@@ -53,13 +53,13 @@ function cloud_longwave_cooling(; cloud_fraction = false) # default `ε_C` has c
 end
 
 """
-    bbl_radiative_cooling(version = :three_layer)
+    mlm_radiative_cooling(version = :three_layer)
 
 Provide an equation for ``\\Delta F_s``, the radiative cooling of the boundary layer
 (assumming ``\\Delta F_q = 0``). Versions are: `:three_layer, :ctrc, :Gesso2014`
 as in [Datseris2025](@cite).
 """
-function bbl_radiative_cooling(version = :three_layer)
+function mlm_radiative_cooling(version = :three_layer)
     if version == :ctrc
         return ΔF ~ CTRC
     elseif version == :crc
@@ -134,6 +134,11 @@ end
 #########################################################################################
 # Emissivity and albedo
 #########################################################################################
+"""
+    matsunobu_emissivity(RH, T, H = 0)
+
+Return emissivity at given relative humidity and temperature as defined by [Matsunobu2024](@cite).
+"""
 function matsunobu_emissivity(RH, T, H = 0) # default H means don't use height
     p = normalized_vapor_pressure(RH, T)
     h = 0.15*(exp(-H/8504) - 1) # height correction, by default zero
