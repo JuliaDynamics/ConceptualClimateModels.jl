@@ -4,10 +4,10 @@
 ConceptualClimateModels
 ```
 
-To get started with ConceptualClimateModels.jl see the [tutorial](@ref tutorial).
-Predefined processes that can be part of a model are in individual module pages
-(see "predefined processes" on the side bar).
-See the [examples](@id examples) for a couple of applications.
+ConceptualClimateModels.jl is organized in submodules, each targeting a particular
+climate modelling scenario. Before delving into the individual submodule examples,
+it is recommended to go through the [tutorial](@ref tutorial) to familiarize
+yourself with the broader modelling infrastructure.
 
 ## [Asking questions](@id ask_questions)
 

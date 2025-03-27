@@ -1,4 +1,4 @@
-# [Examples](@id examples)
+# [GlobalMeanEBM](@id GlobalMeanEBM_examples)
 
 In this page we go through various examples of combining processes to make
 models that have been already used in the literature, or using DynamicalSystems.jl

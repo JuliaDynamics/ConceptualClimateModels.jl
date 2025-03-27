@@ -14,70 +14,70 @@ GlobalMeanEBM.globalmeanebm_variables
 ## Temperature
 
 ```@docs
-BasicRadiationBalance
+GlobalMeanEBM.BasicRadiationBalance
 ```
 
 ## Temperature difference
 
 ```@docs
-ΔTLinearRelaxation
-ΔTStommelModel
+GlobalMeanEBM.ΔTLinearRelaxation
+GlobalMeanEBM.ΔTStommelModel
 ```
 
 ## Longwave radiation
 
 ```@docs
-LinearOLR
-LinearClearSkyOLR
-EmissivityStefanBoltzmanOLR
-EmissivityFeedbackTanh
-EmissivitySellers1969
-SoedergrenClearSkyEmissivity
+GlobalMeanEBM.LinearOLR
+GlobalMeanEBM.LinearClearSkyOLR
+GlobalMeanEBM.EmissivityStefanBoltzmanOLR
+GlobalMeanEBM.EmissivityFeedbackTanh
+GlobalMeanEBM.EmissivitySellers1969
+GlobalMeanEBM.SoedergrenClearSkyEmissivity
 ```
 
 ## Shortwave radiation
 
 ```@docs
-DirectAlbedoAddition
-CoAlbedoProduct
-SeparatedClearAllSkyAlbedo
+GlobalMeanEBM.DirectAlbedoAddition
+GlobalMeanEBM.CoAlbedoProduct
+GlobalMeanEBM.SeparatedClearAllSkyAlbedo
 ```
 
 ## Ice/snow
 
 ```@docs
-IceAlbedoFeedback
+GlobalMeanEBM.IceAlbedoFeedback
 ```
 
 ## Water vapor
 
 ```@docs
-saturation_vapor_pressure
+GlobalMeanEBM.saturation_vapor_pressure
 ```
 
 ## Insolation
 
 ```@docs
-AstronomicalForcingDeSaedeleer
+GlobalMeanEBM.AstronomicalForcingDeSaedeleer
 ```
 
 ## Forcings
 
 ```@docs
-CO2Forcing
+GlobalMeanEBM.CO2Forcing
 ```
 
 ## Clouds
 
 ```@docs
-CloudAlbedoExponential
-CloudAlbedoLinear
-BudykoOLR
+GlobalMeanEBM.CloudAlbedoExponential
+GlobalMeanEBM.CloudAlbedoLinear
+GlobalMeanEBM.BudykoOLR
 ```
 
 ## Default processes
 
 ```@example MAIN
-using ConceptualClimateModels.GlobalMeanEBM
+import ConceptualClimateModels.GlobalMeanEBM
 default_processes_eqs(GlobalMeanEBM)
 ```

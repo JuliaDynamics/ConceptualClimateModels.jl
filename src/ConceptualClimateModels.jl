@@ -19,5 +19,6 @@ include("statespace.jl")
 include("dynamicalsystems.jl")
 
 include("GlobalMeanEBM/GlobalMeanEBM.jl")
+include("CloudToppedMixedLayerModel/CloudToppedMixedLayerModel.jl")
 
 end # module
