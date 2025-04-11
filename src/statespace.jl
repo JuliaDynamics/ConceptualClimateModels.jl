@@ -42,18 +42,16 @@ function plausible_limits(ds::DynamicalSystem, idxs = nothing)
 end
 
 """
-    plausible_ic_sampler(ds::DynamicalSystem)
+    plausible_ic_sampler(ds::DynamicalSystem [, seed])
 
 Return a `sampler` that can be called as a 0-argument function `sampler()`, which
 yields random initial conditions within the hyperrectangle defined by the
 [`plausible_limits`](@ref) of `ds`.
 The `sampler` is useful to give to e.g., `DynamicalSystems.basins_fractions`.
 """
-function plausible_ic_sampler(ds::DynamicalSystem)
-    minmax = plausible_limits(ds)
-    mini = getindex.(minmax, 1)
-    maxi = getindex.(minmax, 2)
-    sampler, = statespace_sampler(HRectangle(mini, maxi))
+function plausible_ic_sampler(ds::DynamicalSystem, seed = rand(1:10000))
+    grid = plausible_grid(ds)
+    sampler, = statespace_sampler(grid, seed)
     return sampler
 end
 
