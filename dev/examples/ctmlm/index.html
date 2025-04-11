@@ -27,7 +27,7 @@ eqs = [
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [0.9, 3.0e-6, 0.0012, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 1200.0, 290.0, 0.0, 0.0, 11.0, 0.0, 0.0, 0.0, 0.0]
+ parameters:    [0.9, 3.0e-6, 0.0012, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
  state:         [1200.0, 290.0, 11.0]
 </code></pre><p>We also make sure to use the same parameter values as in the paper:</p><pre><code class="language-julia hljs">set_parameter!(ds, :D, 4e-6)
@@ -40,7 +40,7 @@ set_parameter!(ds, :e_e, 1.0) # effective emissivity</code></pre><p>And that&#39
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [1.0, 4.0e-6, 0.0011, 7.2727272727272725, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 1200.0, 290.0, 0.0, 0.0, 11.0, 0.0, 0.0, 0.0, 0.0]
+ parameters:    [1.0, 4.0e-6, 0.0011, 7.2727272727272725, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          101.2313081995482
  state:         [796.8127490039881, 287.49999999999983, 9.315240240774243]
 </code></pre><p>leading to a steady state with height <span>$z_b$</span> (<span>$h_\infty$</span> in (<a href="../../references/#Stevens2006">Stevens, 2006</a>)) of about 800 meters as in the paper. Extracting the variable <span>$\sigma$</span> of Eq. 38 is also very easy:</p><pre><code class="language-julia hljs">Δs = CTMLM.s₊ - CTMLM.s₀ # symbolic variable not existing in the graph of the `ds`
@@ -90,7 +90,7 @@ ds = processes_to_coupledodes(eqs, CTMLM)</code></pre><pre class="documenter-exa
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [0.9, 3.0e-6, 1.0, 0.5, 1.0, 0.2, 2.0, 0.0012, 6.0, 0.0  …  290.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+ parameters:    [0.9, 3.0e-6, 1.0, 0.5, 1.0, 0.2, 2.0, 0.0012, 6.0, 0.0  …  0.0, 0.0, 11.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
  state:         [1200.0, 290.0, 11.0, 1.0]
 </code></pre><p>And we run the model to a steady state:</p><pre><code class="language-julia hljs">set_parameter!(ds, :D, 4e-6)
@@ -130,7 +130,7 @@ ds</code></pre><pre class="documenter-example-output"><code class="nohighlight h
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [1.0, 290.0, 4.0e-6, 1.0, 0.5, 1.0, 0.2, 2.0, 0.0009, 6.8  …  290.0, 0.0, 0.0, 0.0, 11.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+ parameters:    [1.0, 290.0, 4.0e-6, 1.0, 0.5, 1.0, 0.2, 2.0, 0.0009, 6.8  …  0.0, 0.0, 11.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
  state:         [1200.0, 290.0, 11.0, 1.0]
 </code></pre><p>To perform global continuation we need to create an attractor mapper, which we create here by tessellating the state space. Have a look at the Attractors.jl tutorial if the next few lines of code are puzzling to you</p><pre><code class="language-julia hljs">grid = (
@@ -180,4 +180,4 @@ fig = plot_basins_attractors_curves(
 )
 content(fig[2,1]).ylabel = &quot;C&quot;
 content(fig[3,1]).ylabel = &quot;z_b&quot;
-fig</code></pre><img src="48080118.png" alt="Example block output"/><p>we see for our ad hoc parameterizations, the dynamical system has no stable states for SST &gt; 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.</p><p>The model diverges due to the definition of the entrainment velocity (which is proportional to <code>ΔF/Δ₊s</code>) in combination with a fixed <code>s₊</code>: the model reaches a state where <code>Δ₊s</code> is so small that height increases unnaturally well beyond the state space tessellation we defined.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../globalmeanebm/">« Global mean EBM</a><a class="docs-footer-nextpage" href="../../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.1 on <span class="colophon-date" title="Saturday 5 April 2025 14:41">Saturday 5 April 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig</code></pre><img src="64246da0.png" alt="Example block output"/><p>we see for our ad hoc parameterizations, the dynamical system has no stable states for SST &gt; 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.</p><p>The model diverges due to the definition of the entrainment velocity (which is proportional to <code>ΔF/Δ₊s</code>) in combination with a fixed <code>s₊</code>: the model reaches a state where <code>Δ₊s</code> is so small that height increases unnaturally well beyond the state space tessellation we defined.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../globalmeanebm/">« Global mean EBM</a><a class="docs-footer-nextpage" href="../../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.1 on <span class="colophon-date" title="Friday 11 April 2025 09:50">Friday 11 April 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
