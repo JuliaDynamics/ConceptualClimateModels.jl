@@ -263,8 +263,8 @@ In the codebase we practically always approximate Tv by T.
 """
 pressure(z, T) = p₀ * exp((-g * z) / (Rd * T))
 
-function moist_air_density(z, T)
-    return pressure(z, T) / (Rd * T)
+function moist_air_density(z, T) # in same units as q!
+    return pressure(z, T) / (1e3*Rd*T)
 end
 
 """

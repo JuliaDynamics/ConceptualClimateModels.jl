@@ -80,7 +80,7 @@ function cloud_emissivity(version = 1.0; fraction = true)
         @parameters ε_c_depth = 100.0 [description = "depth above which ε_c becomes 1"]
         expr =  min(CLT/ε_c_depth, 1) # use smoothstep if you don't want clamping
     elseif version == :lwp
-        LWP = liquid_water_path_constql()
+        LWP = liquid_water_path_linear()
         expr = 1 - exp(-0.158*LWP)
     elseif version isa Number
         expr = version
@@ -93,7 +93,7 @@ function cloud_emissivity(version = 1.0; fraction = true)
     return ε_c ~ expr
 end
 
-function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b, q_b = q_b) # cloud base and top heights
+function liquid_water_path_linear(T_t = T_t, z_cb = z_lcl, z_ct = z_b, q_b = q_b) # cloud base and top heights
     if z_cb ≥ z_ct
         return 0.0
     elseif any(isnan, (z_cb, z_ct))
@@ -107,33 +107,26 @@ function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b, q_b = q_
     # we will also use the assumption that the density remains constant
     # in the height of the cloud which allows us to analytically resolve the integral
     # (otherwise it is a function of temperature and the integral cannot be resolved)
-    ρ_ref = moist_air_density(z_cb, T_t)/1e3 # correct units + use different height and temperature to get the average
+    ρ_ref = moist_air_density(z_cb, T_t) # use different height and temperature to get the average
     return 0.5*ρ_ref*q_l_top*(z_ct - z_cb)^2
 end
-@register_symbolic liquid_water_path_constql(T_t, z_cb, z_ct, q_b)
+@register_symbolic liquid_water_path_linear(T_t, z_cb, z_ct, q_b)
 
 function liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
+    # This function gives practically identical results to the linear, but it is 1000x
+    # slower, probably more. No reason to use it!!!
     z_lcl = z_b - RCT*z_b # base of cloud layer
     if z_lcl ≥ z_b
         return 0.0
     elseif any(isnan, (z_b, RCT))
         return NaN
     end
-    # normally we would use the exact temperature
-    # T(z) = temperature_exact(z, s_b, q_b)
-    # but it is safe to assume that temperature decreases linearly
-    # within the cloud layer and with constant slope. We can estimate this
-    # by obtaining the temperature at cloud top and cloud base,
-    # assuming 0 liquid water at cloud base:
-    T_b = s_b - g*z_lcl/cₚ # this is more than T_t
-    # we then define the linear interpolation
-    T(z) = Tb + (T_t - Tb)*(z - z_lcl)/(z_b - z_lcl)
-    # We do exactly the same thing for the liquid water, which also increases linearly
-    # and is zero at cloud base
+    T(z) = temperature_exact(z, s_b, q_b)
+    # For the liquid water we assume linear increase from 0 to max value at cloud top
     q_l_top = q_liquid(T_t, q_b, z_b)
-    q_l(z) = q_l_top*(z - z_lcl)/(z_b - z_lcl)
+    q_l(z) = q_l_top*(z - z_lcl)
     # We now do a discretized integral
-    dz = 10.0
+    dz = 1.0
     zs = z_lcl:dz:z_b
     LWP = 0.0
     for z in zs
