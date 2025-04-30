@@ -66,8 +66,8 @@ Options for `version`:
 
 - `:clt`: inspired by [RandalSuarez1984](@cite), emissivity scales with the depth
   of the cloud layer.
-- `:liquid_water_path`: Exponential of LWP.
-- `<: Number`: emissiviy is just the provided number or symbolic expression.
+- `:lwp`: Expression given by [Stephens1978](@cite) where emissivity is an exponential of LWP.
+- `<: Number`: emissivity is just the provided number or symbolic expression.
 
 If `fraction = true` the emissivity is further multiplied by the cloud fraction.
 """
@@ -78,10 +78,10 @@ function cloud_emissivity(version = 1.0; fraction = true)
         # inspired by Randal & Suarez 1984, emissivity depends on "depth"
         # The depth 200 is chosen to match the 10mb pressure used in Randal & Suarez
         @parameters ε_c_depth = 100.0 [description = "depth above which ε_c becomes 1"]
-        expr =  min(RCT*z_b/ε_c_depth, 1) # use smoothstep if you don't want clamping
-    elseif version == :liquid_water_path
-        LWP = liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
-        expr = 1 - exp(-(0.15*1e3)*LWP)
+        expr =  min(CLT/ε_c_depth, 1) # use smoothstep if you don't want clamping
+    elseif version == :lwp
+        LWP = liquid_water_path_constql()
+        expr = 1 - exp(-0.158*LWP)
     elseif version isa Number
         expr = version
     else
@@ -93,8 +93,8 @@ function cloud_emissivity(version = 1.0; fraction = true)
     return ε_c ~ expr
 end
 
-function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b) # cloud base and top heights
-    if z_cb >= z_ct
+function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b, q_b = q_b) # cloud base and top heights
+    if z_cb ≥ z_ct
         return 0.0
     elseif any(isnan, (z_cb, z_ct))
         return NaN
@@ -107,14 +107,14 @@ function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b) # cloud 
     # we will also use the assumption that the density remains constant
     # in the height of the cloud which allows us to analytically resolve the integral
     # (otherwise it is a function of temperature and the integral cannot be resolved)
-    ρ_ref = moist_air_density(z_cb, T_t) # use different height and temperature to get the average
+    ρ_ref = moist_air_density(z_cb, T_t)/1e3 # correct units + use different height and temperature to get the average
     return 0.5*ρ_ref*q_l_top*(z_ct - z_cb)^2
 end
-@register_symbolic liquid_water_path_constql(a, b, c)
+@register_symbolic liquid_water_path_constql(T_t, z_cb, z_ct, q_b)
 
 function liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
     z_lcl = z_b - RCT*z_b # base of cloud layer
-    if z_lcl >= z_b
+    if z_lcl ≥ z_b
         return 0.0
     elseif any(isnan, (z_b, RCT))
         return NaN
@@ -224,7 +224,7 @@ end
 
 # This gives identical results to the Bolton version
 # while being dramatically more expensive computationally.
-# We do not use it anywhere in the paper therefore.
+# We do not use it anywhere therefore.
 # (That's why `LambertW` is not installed, if you try to run it it will error)
 function cloud_base_height_romps2017(s, q)
     T = temperature_0_z(s) # equal to s.
