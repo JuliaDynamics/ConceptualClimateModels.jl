@@ -43,9 +43,10 @@ function __init__()
             albedo(),
 
             # Clouds
-            z_ct ~ z_b,
             z_cb ~ z_lcl,
-            RCT ~ clamp((z_ct - z_cb)/z_b, 0, 1),
+            z_ct ~ z_b,
+            CLT ~ max(z_ct - z_cb, 0),
+            RCT ~ min(CLT/z_b, 1), # note: not devided by cloud top but by boundary layer.
             CRC ~ CRClw - CRCsw,
             CTRC ~ CTRClw - CRCsw,
             LWP ~ liquid_water_path_constql(),

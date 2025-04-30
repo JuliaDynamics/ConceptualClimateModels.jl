@@ -107,7 +107,7 @@ function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b) # cloud 
     # we will also use the assumption that the density remains constant
     # in the height of the cloud which allows us to analytically resolve the integral
     # (otherwise it is a function of temperature and the integral cannot be resolved)
-    ρ_ref = moist_air_density(z_ct, T_t)
+    ρ_ref = moist_air_density(z_cb, T_t) # use different height and temperature to get the average
     return 0.5*ρ_ref*q_l_top*(z_ct - z_cb)^2
 end
 @register_symbolic liquid_water_path_constql(a, b, c)
@@ -150,20 +150,23 @@ end
 # Cloud base height / lifting condensation level
 ###########################################################################################
 """
-    cloud_base_height(version = :exact, z_cb = z_cb)
+    cloud_base_height(version = :exact, z_cb = z_lcl)
 
 Provide an equation for the cloud base height captured by variable `z_cb`.
 - `:exact`: exact estimation by figuring out when `q_liquid` first becomes positive.
   Computationally costly as it requires interpolations.
 - `:Bolton1980`: Well known approximate expression by Bolton, 1980.
+
+Because so far all versions calculate the lifting condensation level, `z_cb`
+defaults to `z_lcl`. (and the default process for `z_cb` is for it to be `z_lcl`).
 """
-function cloud_base_height(version = :exact, z_cb = z_cb)
+function cloud_base_height(version = :exact, z_cb = z_lcl)
     if version == :exact
-        z_lcl = cloud_base_height_exact(s_b, q_b, z_b)
+        z = cloud_base_height_exact(s_b, q_b, z_b)
     elseif version == :Zhang2006 # same as 2005 and 2009 papers and 2006 dissertation
-        z_lcl = cloud_base_height_zhang2006(s_b, q_b, z_b)
+        z = cloud_base_height_zhang2006(s_b, q_b, z_b)
     elseif version == :Bolton1980
-        z_lcl = cloud_base_height_bolton1980(s_b, q_b)
+        z = cloud_base_height_bolton1980(s_b, q_b)
     else
         error("incorrect specification for type for the lcl")
     end
