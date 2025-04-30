@@ -94,9 +94,9 @@ function cloud_emissivity(version = 1.0; fraction = true)
 end
 
 function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b) # cloud base and top heights
-    if z_lcl >= z_b
+    if z_cb >= z_ct
         return 0.0
-    elseif any(isnan, (z_b, CLT))
+    elseif any(isnan, (z_cb, z_ct))
         return NaN
     end
     # we have to do the integral of ρ*q_l over z from z_lcl to z_b.

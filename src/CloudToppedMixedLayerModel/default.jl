@@ -43,9 +43,11 @@ function __init__()
             albedo(),
 
             # Clouds
+            z_ct ~ z_b,
+            z_cb ~ z_lcl,
             CRC ~ CRClw - CRCsw,
             CTRC ~ CTRClw - CRCsw,
-            LWP ~ liquid_water_path(T_t, CLT, z_b, s_b, q_b),
+            LWP ~ liquid_water_path_constql(),
             cloud_emission_temperature(),
 
             # Decoupling
