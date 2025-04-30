@@ -47,7 +47,7 @@ function bbl_boundary_stevens2006()
 end
 
 """
-    bbl_stevens2006_steadystate(fixed; z_b, q_b, s_b, CLT)
+    bbl_stevens2006_steadystate(fixed; z_b, q_b, s_b, RCT)
 
 Return the equations 35-38 in [Stevens2006](@cite)
 describing the analytically solved steady state of the MLM.
@@ -65,7 +65,7 @@ To resolve this a `fixed` option is given, which can be any of:
 `ΔF, z_b, w_s, T_t`. This quantity is set fixed and becomes a parameter
 so that the equation for `z_b` is closed.
 """
-function bbl_stevens2006_steadystate(fixed = :ΔF; z_b=z_b, s_b=s_b, q_b=q_b, CLT=CLT) # changing the variables allows defining observables!
+function bbl_stevens2006_steadystate(fixed = :ΔF; z_b=z_b, s_b=s_b, q_b=q_b, RCT=RCT) # changing the variables allows defining observables!
     @variables σ_38(t), Δs(t), Δq(t), h⃰(t), η⃰(t), η_b(t)
     eqss = [
 
@@ -78,7 +78,7 @@ function bbl_stevens2006_steadystate(fixed = :ΔF; z_b=z_b, s_b=s_b, q_b=q_b, CL
         h⃰ ~ (ΔF/ρ₀)/(D*Δs*cₚ),   # we added the extra division with ρ₀ for correct units
         η⃰ ~ Rv*s₀^2/(ℓ_v*cₚ*g), # should be around 1500 m.
         η_b ~ -η⃰*log(1 + e_e/(1 + σ_38)*Δq/q₀) - ΔF/(V*g)*(1 - e_e),
-        CLT ~ 1 - η_b/z_b,
+        RCT ~ 1 - η_b/z_b,
         # We also need equations/values for q₊ and s₊
         # but this is done by combining these equations with `ftr_bblm_coupler`!
     ]
@@ -159,7 +159,7 @@ function entrainment_velocity(version = :Stevens2006;
         # formula of the appendix for Lewellen and Lewellen (1998).
         # The factors of the equation are the coeffients after eq. (14) which
         # are based on the beta parameters (stated as A, B after equation 9).
-        SLT = 1 - CLT # = cloud base height / inversion height
+        SLT = 1 - RCT # = cloud base height / inversion height
         # liquid water potential temperature inversion jump can be
         # estimated analytically as a function of s, q: θl = (s - g*z)/(cₚ*Π(z))
         # since the inversion jump height is approximated as 0,
@@ -195,7 +195,7 @@ function entrainment_velocity(version = :Stevens2006;
     w = x + shear
     if use_augmentation
         @parameters β₋ = 0.3
-        w = w*(1 + i_𝒟*CLT*β₋/2*V)
+        w = w*(1 + i_𝒟*RCT*β₋/2*V)
     end
     return w_e ~ w
 end

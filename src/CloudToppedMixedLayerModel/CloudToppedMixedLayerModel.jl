@@ -98,7 +98,7 @@ ctbbl_variables = @variables begin
     L_c(t), [description = "Cloud-top emitted longwave radiation, W/m²"]
     C_𝒟(t), [description = "steady-state diagnosted cloud fraction (sigmoid)"]
     𝒟(t), [description = "decoupling pamarameter: when ≥ 𝒟c, Sc decouples into Cu"]
-    CLT(t), [description = "cloud layer thickness (normalized), = (z_b - LCL)/z_b"]
+    RCT(t), [description = "cloud layer thickness (normalized), = (z_b - LCL)/z_b"]
     ΔF(t), [description = "radiative forcing of the BL, W/m²"]
     CRC(t), [description = "cloud layer total radiative cooling, W/m²"]
     CTRC(t), [description = "cloud top total radiative cooling, W/m²"]

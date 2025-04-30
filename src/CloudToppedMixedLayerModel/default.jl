@@ -16,7 +16,7 @@ function __init__()
             w_m ~ 0,
             w_v ~ 0,
             T_t ~ temperature_exact(z_b, s_b, q_b), # it isn't guaranteed that this will be used!
-            T_lcl ~ s_b - g*CLT*z_b/cₚ, # from the cloud base height exact function
+            T_lcl ~ s_b - g*RCT*z_b/cₚ, # from the cloud base height exact function
             q_x ~ 0,
             s_x ~ 0,
             bbl_emission_temperature(),
@@ -45,6 +45,7 @@ function __init__()
             # Clouds
             z_ct ~ z_b,
             z_cb ~ z_lcl,
+            RCT ~ clamp((z_ct - z_cb)/z_b, 0, 1),
             CRC ~ CRClw - CRCsw,
             CTRC ~ CTRClw - CRCsw,
             LWP ~ liquid_water_path_constql(),

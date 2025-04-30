@@ -78,9 +78,9 @@ function cloud_emissivity(version = 1.0; fraction = true)
         # inspired by Randal & Suarez 1984, emissivity depends on "depth"
         # The depth 200 is chosen to match the 10mb pressure used in Randal & Suarez
         @parameters ε_c_depth = 100.0 [description = "depth above which ε_c becomes 1"]
-        expr =  min(CLT*z_b/ε_c_depth, 1) # use smoothstep if you don't want clamping
+        expr =  min(RCT*z_b/ε_c_depth, 1) # use smoothstep if you don't want clamping
     elseif version == :liquid_water_path
-        LWP = liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
+        LWP = liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
         expr = 1 - exp(-(0.15*1e3)*LWP)
     elseif version isa Number
         expr = version
@@ -112,11 +112,11 @@ function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b) # cloud 
 end
 @register_symbolic liquid_water_path_constql(a, b, c)
 
-function liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
-    z_lcl = z_b - CLT*z_b # base of cloud layer
+function liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
+    z_lcl = z_b - RCT*z_b # base of cloud layer
     if z_lcl >= z_b
         return 0.0
-    elseif any(isnan, (z_b, CLT))
+    elseif any(isnan, (z_b, RCT))
         return NaN
     end
     # normally we would use the exact temperature
@@ -143,34 +143,31 @@ function liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
     # the resulting curve LWP(t) vs t is not smooth
     return LWP
 end
-@register_symbolic liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
+@register_symbolic liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
 
 
 ###########################################################################################
 # Cloud base height / lifting condensation level
 ###########################################################################################
 """
-    cloud_layer_thickness(version = :exact)
+    cloud_base_height(version = :exact, z_cb = z_cb)
 
-Provide an equation for the relative/normalized cloud layer thickness CLT.
-The options for version are:
+Provide an equation for the cloud base height captured by variable `z_cb`.
 - `:exact`: exact estimation by figuring out when `q_liquid` first becomes positive.
   Computationally costly as it requires interpolations.
 - `:Bolton1980`: Well known approximate expression by Bolton, 1980.
 """
-function cloud_layer_thickness(lcltype = :exact)
-    if lcltype == :exact
+function cloud_base_height(version = :exact, z_cb = z_cb)
+    if version == :exact
         z_lcl = cloud_base_height_exact(s_b, q_b, z_b)
-    elseif lcltype == :Zhang2006 # same as 2005 and 2009 papers and 2006 dissertation
+    elseif version == :Zhang2006 # same as 2005 and 2009 papers and 2006 dissertation
         z_lcl = cloud_base_height_zhang2006(s_b, q_b, z_b)
-    elseif lcltype == :Bolton1980
+    elseif version == :Bolton1980
         z_lcl = cloud_base_height_bolton1980(s_b, q_b)
-    elseif lcltype == :romps2017
-        z_lcl = cloud_base_height_romps2017(s_b, q_b)
     else
         error("incorrect specification for type for the lcl")
     end
-    return CLT ~ clamp((z_b - z_lcl)/z_b, 0, 1)
+    return z_cb ~ z
 end
 
 function cloud_base_height_exact(s, q, z)
