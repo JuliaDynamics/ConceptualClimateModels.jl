@@ -91,6 +91,7 @@ ctbbl_variables = @variables begin
     (C(t) = 1.0), [bounds = (0.0, 1.0), description = "cloud fraction"]
     i_𝒟(t), [description = "decoupling index: 0 at coupled, 1 at decoupled"]
     LWP(t), [description = "liquid water path within the cloud layer, g/m^2"]
+    z_scb(t), [description = "height of the Stratocumulus cloud base, m"]
     ε_c(t), [description = "emissivity of cloud layer"]
     T_c(t), [description = "cloud layer emission temperature, K"]
     L_c(t), [description = "Cloud-top emitted longwave radiation, W/m²"]

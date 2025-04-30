@@ -80,7 +80,7 @@ function cloud_emissivity(version = 1.0; fraction = true)
         @parameters ε_c_depth = 100.0 [description = "depth above which ε_c becomes 1"]
         expr =  min(CLT*z_b/ε_c_depth, 1) # use smoothstep if you don't want clamping
     elseif version == :liquid_water_path
-        LWP = liquid_water_path(T_t, CLT, z_b, s_b, q_b)
+        LWP = liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
         expr = 1 - exp(-(0.15*1e3)*LWP)
     elseif version isa Number
         expr = version
@@ -93,21 +93,39 @@ function cloud_emissivity(version = 1.0; fraction = true)
     return ε_c ~ expr
 end
 
-function liquid_water_path(T_t, CLT, z_b, s_b, q_b)
+function liquid_water_path_constql(T_t = T_t, z_cb = z_lcl, z_ct = z_b) # cloud base and top heights
+    if z_lcl >= z_b
+        return 0.0
+    elseif any(isnan, (z_b, CLT))
+        return NaN
+    end
+    # we have to do the integral of ρ*q_l over z from z_lcl to z_b.
+    # To do so we will use the assumption that q_l increases linearly
+    # from being 0 at the cloud base, to its max value at the cloud top.
+    # Estimating the max value is rather simple:
+    q_l_top = q_liquid(T_t, q_b, z_ct)
+    # we will also use the assumption that the density remains constant
+    # in the height of the cloud which allows us to analytically resolve the integral
+    # (otherwise it is a function of temperature and the integral cannot be resolved)
+    ρ_ref = moist_air_density(z_ct, T_t)
+    return 0.5*ρ_ref*q_l_top*(z_ct - z_cb)^2
+end
+@register_symbolic liquid_water_path_constql(a, b, c)
+
+function liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
     z_lcl = z_b - CLT*z_b # base of cloud layer
     if z_lcl >= z_b
         return 0.0
     elseif any(isnan, (z_b, CLT))
         return NaN
     end
-    # we have to do the integral of ρ*q_l over z from z_lcl to z_b
     # normally we would use the exact temperature
     # T(z) = temperature_exact(z, s_b, q_b)
     # but it is safe to assume that temperature decreases linearly
     # within the cloud layer and with constant slope. We can estimate this
     # by obtaining the temperature at cloud top and cloud base,
     # assuming 0 liquid water at cloud base:
-    Tb = s_b - g*z_lcl/cₚ # this is more than T_t
+    T_b = s_b - g*z_lcl/cₚ # this is more than T_t
     # we then define the linear interpolation
     T(z) = Tb + (T_t - Tb)*(z - z_lcl)/(z_b - z_lcl)
     # We do exactly the same thing for the liquid water, which also increases linearly
@@ -115,16 +133,17 @@ function liquid_water_path(T_t, CLT, z_b, s_b, q_b)
     q_l_top = q_liquid(T_t, q_b, z_b)
     q_l(z) = q_l_top*(z - z_lcl)/(z_b - z_lcl)
     # We now do a discretized integral
-    # TODO: Find an analytic expression this is numerically inaccurate and costy.
     dz = 10.0
     zs = z_lcl:dz:z_b
     LWP = 0.0
     for z in zs
-        LWP += rho(z, T(z)) * q_l(z) * dz
+        LWP += moist_air_density(z, T(z)) * q_l(z) * dz
     end
+    # Note that this version has convergence problems in the ODE solve
+    # the resulting curve LWP(t) vs t is not smooth
     return LWP
 end
-@register_symbolic liquid_water_path(T_t, CLT, z_b, s_b, q_b)
+@register_symbolic liquid_water_path_exact(T_t, CLT, z_b, s_b, q_b)
 
 
 ###########################################################################################

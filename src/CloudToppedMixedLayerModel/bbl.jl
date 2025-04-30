@@ -263,8 +263,7 @@ In the codebase we practically always approximate Tv by T.
 """
 pressure(z, T) = p₀ * exp((-g * z) / (Rd * T))
 
-"moist air density"
-function rho(z, T)
+function moist_air_density(z, T)
     return pressure(z, T) / (Rd * T)
 end
 
