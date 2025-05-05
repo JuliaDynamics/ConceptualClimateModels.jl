@@ -28,31 +28,16 @@ function cloud_shortwave_warming(version = :insolation; cloud_fraction = true)
     return CRCsw ~ CRCswrhs
 end
 
-# this defines both cloud top and overall cloud cooling.
-# Two versions exist because it is not conceptually clear
-# whether the cloud emissivity should be ∝ C or
-# only the cooling should be ∝ C ...
-# TODO: Remove the artifially proportional versions. Never scale them with C,
-# the emissivity should take care of this!
-
 """
     cloud_longwave_cooling()
 
-Provide an equation for CTRC_lw.
+Provide processes for `CTRClw, CRClw` based on the three-layer radiation balance.
 """
-function cloud_longwave_cooling(; cloud_fraction = false) # default `ε_C` has cloud fraction.
-    if cloud_fraction
-        eqs = [
-            CTRClw ~ C*(L_c - ε_C*L_FTR),
-            CRClw ~ CTRClw + C*(L_c - ε_C*L_b - ε_C*(1 - ε_b)*L₀),
-        ]
-    else
-        eqs = [
-            CTRClw ~ L_c - ε_C*L_FTR, # cloud top cooling
-            CRClw ~ CTRClw + L_c - ε_C*L_b - ε_C*(1 - ε_b)*L₀, # plus cloud bottom cooling
-        ]
-    end
-    return eqs
+function cloud_longwave_cooling()
+    eqs = [
+        CTRClw ~ L_c - ε_C*L_FTR, # cloud top cooling
+        CRClw ~ CTRClw + L_c - ε_C*L_b - ε_C*(1 - ε_b)*L₀, # plus cloud bottom cooling
+    ]
 end
 
 """
