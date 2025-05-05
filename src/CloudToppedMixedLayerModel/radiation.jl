@@ -8,9 +8,10 @@
 # Clouds and BBL
 #########################################################################################
 """
-    cloud_shortwave_warming()
+    cloud_shortwave_warming([version]; cloud_fraction = true)
 
-Provide an equation for CTRC_sw which by default is `0.04*C*S`.
+Provide an equation for `CRCsw` (same as `CTRCsw`) which by default is `0.04*C*S`.
+Otherwise `version` can be a `Number` specifying the RHS.
 """
 function cloud_shortwave_warming(version = :insolation; cloud_fraction = true)
     CRCswrhs = if version isa Number
@@ -29,15 +30,21 @@ function cloud_shortwave_warming(version = :insolation; cloud_fraction = true)
 end
 
 """
-    cloud_longwave_cooling()
+    cloud_longwave_cooling(cloud_fraction = false)
 
 Provide processes for `CTRClw, CRClw` based on the three-layer radiation balance.
+If `cloud_fraction == false`, the RHS are further scaled by `C`.
+By default this is not done because typically `ε_C` is scaled by `C`.
 """
-function cloud_longwave_cooling()
+function cloud_longwave_cooling(cloud_fraction = false)
     eqs = [
         CTRClw ~ L_c - ε_C*L_FTR, # cloud top cooling
         CRClw ~ CTRClw + L_c - ε_C*L_b - ε_C*(1 - ε_b)*L₀, # plus cloud bottom cooling
     ]
+    if cloud_fraction
+        eqs = map(eq -> eq.lhs ~ C*eq.rhs, eqs)
+    end
+    return eqs
 end
 
 """
