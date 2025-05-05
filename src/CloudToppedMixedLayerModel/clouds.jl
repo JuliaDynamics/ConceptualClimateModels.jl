@@ -50,21 +50,25 @@ Return a process for ``T_C``. Versions are `:top, :base, :mean`.
 """
 function cloud_emission_temperature(version = :mean)
     if version == :mean
-        return T_c ~ (T_t + T_lcl)/2
+        return T_C ~ (T_t + T_lcl)/2
     elseif version == :top
-        return T_c ~ T_t
+        return T_C ~ T_t
     elseif version == :base
-        return T_c ~ T_lcl
+        return T_C ~ T_lcl
     end
 end
 
+
+###########################################################################################
+# Emissivity and albedo
+###########################################################################################
 """
     cloud_emissivity(version = 1.0; fraction = true)
 
-Provide an equation for the effective emissivity of the cloud layer.
+Provide an equation for the effective emissivity `ε_C` of the cloud layer.
 Options for `version`:
 
-- `:clt`: inspired by [RandalSuarez1984](@cite), emissivity scales with the depth
+- `:clt`: inspired by [RandalSuarez1984](@cite), emissivity scales with the thickness
   of the cloud layer.
 - `:lwp`: Expression given by [Stephens1978](@cite) where emissivity is an exponential of LWP.
 - `<: Number`: emissivity is just the provided number or symbolic expression.
@@ -77,10 +81,9 @@ function cloud_emissivity(version = 1.0; fraction = true)
     elseif version == :clt
         # inspired by Randal & Suarez 1984, emissivity depends on "depth"
         # The depth 200 is chosen to match the 10mb pressure used in Randal & Suarez
-        @parameters ε_c_depth = 100.0 [description = "depth above which ε_c becomes 1"]
+        @parameters ε_c_depth = 100.0 [description = "thickness above which ε_C becomes 1"]
         expr =  min(CLT/ε_c_depth, 1) # use smoothstep if you don't want clamping
     elseif version == :lwp
-        LWP = liquid_water_path_linear()
         expr = 1 - exp(-0.158*LWP)
     elseif version isa Number
         expr = version
@@ -90,10 +93,45 @@ function cloud_emissivity(version = 1.0; fraction = true)
     if fraction
         expr *= C
     end
-    return ε_c ~ expr
+    return ε_C ~ expr
 end
 
-function liquid_water_path_linear(T_t = T_t, z_cb = z_lcl, z_ct = z_b, q_b = q_b) # cloud base and top heights
+
+"""
+    cloud_albedo(version = 0.38; fraction = true)
+
+Provide a process for `α_C`, the cloud albedo.
+If `fraction == true`, the expression is further multiplied by the cloud fraction `C`.
+
+When `version == :lwp` we use an approach inspired by [Datseris2021](@cite),
+using the expression from [Lacis1974](@cite)
+```math
+\\alpha_C = 0.13\\tau_C/(1 + 0.13\\tau_C)
+```
+where ``\\tau_C`` is the cloud optical depth (_not_ the cloud fraction relaxation timescale).
+The optical depth is estimated as a function
+of the Liquid Water Path, fitted from Fig. 1 of [Stephens1978](@cite) as
+
+```math
+\\tau_C = \\frac{x^1.7}{10 + x}
+```
+with ``x`` the LWP in g/m².
+The expression fits very accurately for LWP up to 10³.
+"""
+function cloud_albedo(version = 0.38; fraction = true)
+    if version == :lwp
+        tau = LWP^1.7/(10 + LWP)
+        expr = 0.13tau/(1 + 0.13tau)
+    elseif version isa Number
+        expr = version
+    end
+    if fraction
+        expr *= C
+    end
+    return α_C ~ expr
+end
+
+function liquid_water_path_linear(T_t = T_t, z_cb = z_cb, z_ct = z_ct, q_b = q_b) # cloud base and top heights
     if z_cb ≥ z_ct
         return 0.0
     elseif any(isnan, (z_cb, z_ct))
@@ -137,6 +175,7 @@ function liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
     return LWP
 end
 @register_symbolic liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
+
 
 
 ###########################################################################################

@@ -32,6 +32,9 @@ end
 # Two versions exist because it is not conceptually clear
 # whether the cloud emissivity should be ∝ C or
 # only the cooling should be ∝ C ...
+# TODO: Remove the artifially proportional versions. Never scale them with C,
+# the emissivity should take care of this!
+
 """
     cloud_longwave_cooling()
 
@@ -40,13 +43,13 @@ Provide an equation for CTRC_lw.
 function cloud_longwave_cooling(; cloud_fraction = false) # default `ε_C` has cloud fraction.
     if cloud_fraction
         eqs = [
-            CTRClw ~ C*(L_c - ε_c*L_FTR),
-            CRClw ~ CTRClw + C*(L_c - ε_c*L_b - ε_c*(1 - ε_b)*L₀),
+            CTRClw ~ C*(L_c - ε_C*L_FTR),
+            CRClw ~ CTRClw + C*(L_c - ε_C*L_b - ε_C*(1 - ε_b)*L₀),
         ]
     else
         eqs = [
-            CTRClw ~ L_c - ε_c*L_FTR, # cloud top cooling
-            CRClw ~ CTRClw + L_c - ε_c*L_b - ε_c*(1 - ε_b)*L₀, # plus cloud bottom cooling
+            CTRClw ~ L_c - ε_C*L_FTR, # cloud top cooling
+            CRClw ~ CTRClw + L_c - ε_C*L_b - ε_C*(1 - ε_b)*L₀, # plus cloud bottom cooling
         ]
     end
     return eqs
@@ -68,10 +71,10 @@ function mlm_radiative_cooling(version = :three_layer)
         # I'll write stuff explicitly as I've fucked up before
         L_up_surf = L₀
         L_up_lcl = L_up_surf*(1 - ε_b) + L_b
-        L_up_top = L_up_lcl*(1 - ε_c) + L_c
+        L_up_top = L_up_lcl*(1 - ε_C) + L_c
 
         L_down_top = L_FTR
-        L_down_lcl = L_down_top*(1 - ε_c) + L_c
+        L_down_lcl = L_down_top*(1 - ε_C) + L_c
         L_down_surf = L_down_lcl*(1 - ε_b) + L_b
 
         return ΔF ~ (L_up_top - L_down_top) + (L_down_surf - L_up_surf)
@@ -84,7 +87,7 @@ function mlm_radiative_cooling(version = :three_layer)
         # ΔTₑ to become -25 with this equation, as it can be at most -10.1
         # because q₊ is realistically never below 1.
         # So how do they plot -25 in the paper figure????????
-        ΔF ~ C*0.9*σ_SB*(T_c^4 - (T_c - 10.1 + 3.1*log(CO2) + 5.3*log(q₊))^4)
+        ΔF ~ C*0.9*σ_SB*(T_C^4 - (T_C - 10.1 + 3.1*log(CO2) + 5.3*log(q₊))^4)
     elseif version == :Gesso2014
         ΔF ~ max(82.0 - 7.9*q₊, 1.0) # I am clamping here for numerical stability. Perhaps I shouldn't?
     else
@@ -104,7 +107,7 @@ See the source code for possible versions.
 """
 function downwards_longwave_radiation(version = :three_layer)
     if version == :three_layer
-        return Ld ~ L_b + (1 - ε_b)*L_c + (1 - ε_b)*(1 - ε_c)*L_FTR
+        return Ld ~ L_b + (1 - ε_b)*L_c + (1 - ε_b)*(1 - ε_C)*L_FTR
     elseif version == :two_layer
         return Ld ~ L_b + (1 - ε_b)*L_c
     elseif version == :single_layer
@@ -171,14 +174,13 @@ end
 function albedo(version = :multiplicative)
     @parameters begin
         # clouds
-        (α_C = 0.38), [description = "albedo of clouds at 100% cloud cover"]
         (α_a = 0.275),  [description = "albedo of atmosphere without clouds"]
         (α_s = 0.05), [description = "albedo of surface"]
     end
     if version == :multiplicative
-        return α ~ 1 - (1 - α_s)*(1 - α_a)*(1 - α_C*C)
+        return α ~ 1 - (1 - α_s)*(1 - α_a)*(1 - α_C)
     elseif version == :additive
-        return α ~ α_s + α_a + α_C*C
+        return α ~ α_s + α_a + α_C
     elseif version isa Number
         return α ~ version
     else
