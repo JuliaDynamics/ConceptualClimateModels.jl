@@ -1,7 +1,7 @@
 """
     decoupling_variable(version = :Bretherton1997)
 
-Return an equation for ``\\mathcal{D}``, the decoupling variable.
+Provide an equation for ``\\mathcal{D}``, the decoupling variable.
 """
 function decoupling_variable(version = :Bretherton1997)
     if version == :Bretherton1997

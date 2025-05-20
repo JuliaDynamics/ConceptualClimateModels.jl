@@ -16,7 +16,7 @@ function __init__()
             w_m ~ 0,
             w_v ~ 0,
             T_t ~ temperature_exact(z_b, s_b, q_b), # it isn't guaranteed that this will be used!
-            T_lcl ~ s_b - g*CLT/cₚ, # from the cloud base height exact function
+            T_lcl ~ s_b - g*CLT/cₚ, # analytically resolve coz no liquid water
             q_x ~ 0,
             s_x ~ 0,
             bbl_emission_temperature(),

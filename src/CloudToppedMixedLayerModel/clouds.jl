@@ -1,15 +1,15 @@
 """
-    cf_dynamic()
+    cf_dynamic(; thinness_limiter = false)
 
-Provide the equations ``\\tau_C dC/dt = C_\\mathcal{D} - C`` as well as the
-equation that defines ``C_\\mathcal{D}`` as a function of the decoupling
-variable ``\\mathcal{D}``. The function uses the curve fitted to data
+Provide the equation ``\\tau_C dC/dt = C_\\infty - C`` as well as as many
+more equations necessary to define ``C_\\infty``, in particular for
+``C_\\mathcal{D}`` and/or ``C_\\theta``
+The function uses the curve fitted to data
 in [Datseris2025](@cite).
 """
-function cf_dynamic(fit = :sigmoid)
+function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
     # During the reserch of the project I did a bunch of different fits.
     # The paper shows only the sigmoidal fit.
-
     starts = Dict(:exp => 1.0, :power => 1.0, :sigmoid => 0.5)
     scales = Dict(:exp => 0.4, :power => 0.8, :sigmoid => 1.0)
 
@@ -35,9 +35,22 @@ function cf_dynamic(fit = :sigmoid)
         error("unknown specification")
     end
 
+    # now we also define the thresholding to zero
+    @parameters CLT_κ = 20.0 [description = "scale over which C must be zero if CLT is too small, m"]
+    C_κ_proc = SigmoidProcess(C_κ, CLT; left = 0, right = 1, scale = CLT_κ, start = 0)
+
+    # Then decide what defines C_∞
+    if thinness_limiter
+        C_∞_proc = C_∞ ~ C_𝒟*C_κ
+    else
+        C_∞_proc = C_∞ ~ C_𝒟
+    end
+
     return [
         C_𝒟_proc,
-        ExpRelaxation(C, C_𝒟, τ_C),
+        C_κ_proc,
+        C_∞_proc,
+        ExpRelaxation(C, C_∞, τ_C),
         # the decoupling index is just a translation of decoupling fit
         i_𝒟 ~ (Cmax - C_𝒟)/(Cmax - Cmin),
     ]

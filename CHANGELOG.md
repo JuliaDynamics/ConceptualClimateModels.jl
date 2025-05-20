@@ -7,6 +7,7 @@
 - Function `cloud_layer_thickness` replaced by `cloud_base_height` which clarifies better what each variable means and how it is computed.
 - Implement LWP-dependent emissivity for clouds.
 - Implemented LWP-dependent albedo for clouds. Added function `cloud_albedo` and added variable `α_C` that can be scaled by cloud fraction or not. Default settings for everything leave things as they were in previous version.
+- Added a new option when deciding the relaxation cloud fraction that limits it based on CLT.
 
 # v1
 
