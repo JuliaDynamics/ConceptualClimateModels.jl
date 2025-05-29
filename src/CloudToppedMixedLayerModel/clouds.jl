@@ -3,9 +3,8 @@
 
 Provide the equation ``\\tau_C dC/dt = C_\\infty - C`` as well as as many
 more equations necessary to define ``C_\\infty``, in particular for
-``C_\\mathcal{D}`` and/or ``C_\\theta``
-The function uses the curve fitted to data
-in [Datseris2025](@cite).
+``C_\\mathcal{D}`` and/or ``C_\\kappa``.
+The function uses the curve fitted to data in [Datseris2025](@cite).
 """
 function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
     # During the reserch of the project I did a bunch of different fits.
@@ -36,8 +35,8 @@ function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
     end
 
     # now we also define the thresholding to zero
-    @parameters CLT_κ = 20.0 [description = "scale over which C must be zero if CLT is too small, m"]
-    C_κ_proc = SigmoidProcess(C_κ, CLT; left = 0, right = 1, scale = CLT_κ, start = 0)
+    @parameters CLT_κ = 100.0 [description = "scale over which C must be zero if CLT is too small, m"]
+    C_κ_proc = ClampedLinearProcess(C_κ, CLT; left = 0, right = 1, right_driver = CLT_κ, left_driver = CLT_κ - 50)
 
     # Then decide what defines C_∞
     if thinness_limiter
@@ -119,12 +118,12 @@ If `fraction == true`, the expression is further multiplied by the cloud fractio
 When `version == :lwp` we use an approach inspired by [Datseris2021](@cite),
 using the expression from [Lacis1974](@cite)
 ```math
-\\alpha_C = 0.13\\tau_C/(1 + 0.13\\tau_C)
+\\alpha_C = \\alpha_C^{max} \\frac{\\tau_C}{\\tau_C + 1/(\\sqrt{3}(1-g_C))}
 ```
-where ``\\tau_C`` is the cloud optical depth (_not_ the cloud fraction relaxation timescale).
+where ``\\tau_C`` is the cloud optical depth (_not_ the cloud fraction relaxation timescale)
+and ``g_C`` the asymmetry factor for the cloud particle phase function.
 The optical depth is estimated as a function
 of the Liquid Water Path, fitted from Fig. 1 of [Stephens1978](@cite) as
-
 ```math
 \\tau_C = \\frac{x^1.7}{10 + x}
 ```
@@ -133,8 +132,9 @@ The expression fits very accurately for LWP up to 10³.
 """
 function cloud_albedo(version = 0.38; fraction = true)
     if version == :lwp
+        @parameters g_C = 0.925 α_C_max = 1.0
         tau = LWP^1.7/(10 + LWP)
-        expr = 0.13tau/(1 + 0.13tau)
+        expr = α_C_max*tau/(2/(sqrt(3)*(1 - g_C)) + tau)
     elseif version isa Number
         expr = version
     end
