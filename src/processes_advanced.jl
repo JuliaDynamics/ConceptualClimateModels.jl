@@ -1,5 +1,6 @@
 # TODO: Logistic function is faster than tanh in Julia on windows 10
-export SigmoidProcess
+# Is it worth re-writing the Sigmoid process on logistic function?
+export SigmoidProcess, ClampedLinearProcess
 
 """
     SigmoidProcess <: Process
@@ -58,4 +59,40 @@ function ProcessBasedModelling.rhs(p::SigmoidProcess)
 end
 function sigmoid_expression(T, left, right, scale, reference)
     return left + (right - left)*(1 + tanh(2(T - reference)/(scale)))*0.5
+end
+
+"""
+    ClampedLinearProcess <: Process
+    ClampedLinearProcess(variable, driver; left, right, left_driver, right_driver)
+
+A common process for when a `variable` has a clamped linear dependence on a `driver` variable.
+It is similar with the `SigmoidalProcess` but not smooth.
+
+The `variable` increases linearly as a function of `driver`.
+It increases from value `left` at driver's value `left_driver` to value
+`right` at driver's value `right_driver`. The `variable` stays
+at its left/right value respectively when the driver exceeds the given bounds.
+
+The input keywords can all be real numbers or `@parameter` named parameters.
+"""
+struct ClampedLinearProcess <: Process
+    variable
+    driver_variable
+    left
+    right
+    left_driver
+    right_driver
+end
+
+function ClampedLinearProcess(variable, driver_variable; left = 0, right = 1, left_driver = 1, right_driver = 1)
+    return ClampedLinearProcess(variable, driver_variable, left, right, left_driver, right_driver)
+end
+
+function ProcessBasedModelling.rhs(p::ClampedLinearProcess)
+    x = p.driver_variable
+    # Create the names for everything
+    (; left, right, left_driver, right_driver) = p
+    expr = left + (x - left_driver)*(right - left)/(right_driver - left_driver)
+    expr = clamp(expr, left, right)
+    return expr
 end
