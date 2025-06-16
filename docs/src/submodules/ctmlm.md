@@ -25,6 +25,7 @@ CloudToppedMixedLayerModel.cloud_emission_temperature
 CloudToppedMixedLayerModel.cloud_emissivity
 CloudToppedMixedLayerModel.cloud_albedo
 CloudToppedMixedLayerModel.cloud_base_height
+CloudToppedMixedLayerModel.liquid_water_path
 CloudToppedMixedLayerModel.decoupling_variable
 CloudToppedMixedLayerModel.decoupling_ratios
 ```

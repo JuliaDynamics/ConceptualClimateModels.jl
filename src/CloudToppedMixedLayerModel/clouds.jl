@@ -7,7 +7,7 @@ more equations necessary to define ``C_\\infty``, in particular for
 The function uses the curve fitted to data in [Datseris2025](@cite).
 """
 function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
-    # During the reserch of the project I did a bunch of different fits.
+    # During the research of the project I did a bunch of different fits.
     # The paper shows only the sigmoidal fit.
     starts = Dict(:exp => 1.0, :power => 1.0, :sigmoid => 0.5)
     scales = Dict(:exp => 0.4, :power => 0.8, :sigmoid => 1.0)
@@ -34,12 +34,11 @@ function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
         error("unknown specification")
     end
 
-    # now we also define the thresholding to zero
-    @parameters CLT_κ = 100.0 [description = "scale over which C must be zero if CLT is too small, m"]
-    C_κ_proc = ClampedLinearProcess(C_κ, CLT; left = 0, right = 1, right_driver = CLT_κ, left_driver = CLT_κ - 50)
-
     # Then decide what defines C_∞
     if thinness_limiter
+        # now we also define the thresholding to zero
+        @parameters CLT_κ = 100.0 [description = "scale over which C must be zero if CLT is too small, m"]
+        C_κ_proc = ClampedLinearProcess(C_κ, CLT; left = 0, right = 1, right_driver = CLT_κ, left_driver = CLT_κ - 50)
         C_∞_proc = C_∞ ~ C_𝒟*C_κ
     else
         C_∞_proc = C_∞ ~ C_𝒟
@@ -142,6 +141,17 @@ function cloud_albedo(version = 0.38; fraction = true)
         expr *= C
     end
     return α_C ~ expr
+end
+
+"""
+    liquid_water_path()
+
+Provide a process for the liquid water path `LWP` being proportional to `CLT^2`
+by using the assumption that liquid water specific humidity increases linearly with
+height within the cloud layer.
+"""
+function liquid_water_path()
+    return LWP ~ liquid_water_path_linear()
 end
 
 function liquid_water_path_linear(T_t = T_t, z_cb = z_cb, z_ct = z_ct, q_b = q_b) # cloud base and top heights
