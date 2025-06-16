@@ -33,12 +33,12 @@ function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
     else
         error("unknown specification")
     end
+    # now we also define the thresholding to zero
+    @parameters CLT_κ = 100.0 [description = "scale over which C must be zero if CLT is too small, m"]
+    C_κ_proc = ClampedLinearProcess(C_κ, CLT; left = 0, right = 1, right_driver = CLT_κ, left_driver = CLT_κ - 50)
 
     # Then decide what defines C_∞
     if thinness_limiter
-        # now we also define the thresholding to zero
-        @parameters CLT_κ = 100.0 [description = "scale over which C must be zero if CLT is too small, m"]
-        C_κ_proc = ClampedLinearProcess(C_κ, CLT; left = 0, right = 1, right_driver = CLT_κ, left_driver = CLT_κ - 50)
         C_∞_proc = C_∞ ~ C_𝒟*C_κ
     else
         C_∞_proc = C_∞ ~ C_𝒟
