@@ -12,6 +12,8 @@
 ## General
 
 - Added a new advanced process: `ClampedLinearProcess`.
+- Propagate dispatch of `has_symbolic_var` called with a dynamical system.
+- New function `try_set_parameter!`.
 
 # v1
 
