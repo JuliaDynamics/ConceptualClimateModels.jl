@@ -1,3 +1,6 @@
+# TODO: All of the functionality here could be ported to DynamicalSystems.jl
+# behind an extension.
+
 export processes_to_coupledodes
 export dynamical_system_summary
 export all_equations
