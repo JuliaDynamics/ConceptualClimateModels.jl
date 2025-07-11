@@ -56,9 +56,9 @@ as in [Datseris2025](@cite).
 """
 function mlm_radiative_cooling(version = :three_layer)
     if version == :ctrc
-        return ΔF ~ CTRC
+        return ΔF_s ~ CTRC
     elseif version == :crc
-        return ΔF ~ CRC
+        return ΔF_s ~ CRC
     elseif version == :three_layer
         # I'll write stuff explicitly as I've fucked up before
         L_up_surf = L₀
@@ -69,21 +69,21 @@ function mlm_radiative_cooling(version = :three_layer)
         L_down_lcl = L_down_top*(1 - ε_C) + L_c
         L_down_surf = L_down_lcl*(1 - ε_b) + L_b
 
-        return ΔF ~ (L_up_top - L_down_top) + (L_down_surf - L_up_surf)
+        return ΔF_s ~ (L_up_top - L_down_top) + (L_down_surf - L_up_surf)
     elseif version == :top_bottom
         bottom = L_b - ε_b*L₀
-        ΔF ~ CTRC + bottom
+        ΔF_s ~ CTRC + bottom
     elseif version == :Singer2023
         # The equations in the paper are different
         # from the equations in the code... Plus it is impossible for the Singer
         # ΔTₑ to become -25 with this equation, as it can be at most -10.1
         # because q₊ is realistically never below 1.
         # So how do they plot -25 in the paper figure????????
-        ΔF ~ C*0.9*σ_SB*(T_C^4 - (T_C - 10.1 + 3.1*log(CO2) + 5.3*log(q₊))^4)
+        ΔF_s ~ C*0.9*σ_SB*(T_C^4 - (T_C - 10.1 + 3.1*log(CO2) + 5.3*log(q₊))^4)
     elseif version == :Gesso2014
-        ΔF ~ max(82.0 - 7.9*q₊, 1.0) # I am clamping here for numerical stability. Perhaps I shouldn't?
+        ΔF_s ~ max(82.0 - 7.9*q₊, 1.0) # I am clamping here for numerical stability. Perhaps I shouldn't?
     else
-        error("Incorrect version for ΔF.")
+        error("Incorrect version for ΔF_s.")
     end
 end
 
