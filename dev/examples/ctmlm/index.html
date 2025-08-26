@@ -11,16 +11,16 @@ eqs = [
     CTMLM.s₀ ~ CTMLM.s₊ - 12.5,
     CTMLM.ρ₀ ~ 1,
     CTMLM.q₀ ~ CTMLM.q_saturation(288.96 + 1.25),
-    CTMLM.ΔF ~ 40.0
+    CTMLM.ΔF_s ~ 40.0
 ]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Any}:
- TimeDerivative[TimeDerivative(z_b(t), -w_m(t) + w_e(t) - D*z_b(t), LiteralParameter{Float64}(1.1574074074074073e-5)), TimeDerivative(s_b(t), -1.1574074074074073e-5s_x(t) + ((0.00099601593625498SHF(t)) / ρ₀(t) + (-0.00099601593625498ΔF(t)) / ρ₀(t) + Δ₊s(t)*w_e(t)) / z_b(t), LiteralParameter{Float64}(1.1574074074074073e-5)), TimeDerivative(q_b(t), -1.1574074074074073e-5q_x(t) + (LHF(t) / (2530.0ρ₀(t)) + Δ₊q(t)*w_e(t)) / z_b(t), LiteralParameter{Float64}(1.1574074074074073e-5))]
- w_e(t) ~ (e_e*ΔF(t)) / (1004.0Δ₊s(t)*ρ₀(t))
+ TimeDerivative[TimeDerivative(z_b(t), -w_m(t) + w_e(t) - D*z_b(t), LiteralParameter{Float64}(1.1574074074074073e-5)), TimeDerivative(s_b(t), -1.1574074074074073e-5s_x(t) + ((0.00099601593625498(SHF(t) - ΔF_s(t))) / ρ₀(t) + Δ₊s(t)*w_e(t)) / z_b(t), LiteralParameter{Float64}(1.1574074074074073e-5)), TimeDerivative(q_b(t), -1.1574074074074073e-5q_x(t) + ((-ΔF_q(t) + LHF(t)) / (2530.0ρ₀(t)) + Δ₊q(t)*w_e(t)) / z_b(t), LiteralParameter{Float64}(1.1574074074074073e-5))]
+ w_e(t) ~ (e_e*ΔF_s(t)) / (1004.0Δ₊s(t)*ρ₀(t))
  s₊(t) ~ 300.0
  q₊(t) ~ 1.56
  s₀(t) ~ -12.5 + s₊(t)
  ρ₀(t) ~ 1
  q₀(t) ~ 12.404970818808321
- ΔF(t) ~ 40.0</code></pre><p>We now give these equations to the main function that creates a <code>DynamicalSystem</code> from the processes (and we also provide <code>CTMLM</code> to obtain default processes from)</p><pre><code class="language-julia hljs">ds = processes_to_coupledodes(eqs, CTMLM)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-dimensional CoupledODEs
+ ΔF_s(t) ~ 40.0</code></pre><p>We now give these equations to the main function that creates a <code>DynamicalSystem</code> from the processes (and we also provide <code>CTMLM</code> to obtain default processes from)</p><pre><code class="language-julia hljs">ds = processes_to_coupledodes(eqs, CTMLM)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-dimensional CoupledODEs
  deterministic: true
  discrete time: false
  in-place:      false
@@ -29,7 +29,7 @@ eqs = [
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
  parameters:    [0.9, 3.0e-6, 0.0012, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
- state:         [1200.0, 290.0, 11.0]
+ state:         [11.0, 290.0, 1200.0]
 </code></pre><p>We also make sure to use the same parameter values as in the paper:</p><pre><code class="language-julia hljs">set_parameter!(ds, :D, 4e-6)
 set_parameter!(ds, :c_d, 0.0011)
 set_parameter!(ds, :U, 0.008/0.0011) # U*c_d = 0.008
@@ -41,27 +41,28 @@ set_parameter!(ds, :e_e, 1.0) # effective emissivity</code></pre><p>And that&#39
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
  parameters:    [1.0, 4.0e-6, 0.0011, 7.2727272727272725, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
- time:          101.2313081995482
- state:         [796.8127490039881, 287.49999999999983, 9.315240240774243]
+ time:          100.10196159861358
+ state:         [9.315240208837562, 287.4999999999997, 796.8127490039915]
 </code></pre><p>leading to a steady state with height <span>$z_b$</span> (<span>$h_\infty$</span> in (<a href="../../references/#Stevens2006">Stevens, 2006</a>)) of about 800 meters as in the paper. Extracting the variable <span>$\sigma$</span> of Eq. 38 is also very easy:</p><pre><code class="language-julia hljs">Δs = CTMLM.s₊ - CTMLM.s₀ # symbolic variable not existing in the graph of the `ds`
-σ = observe_state(ds, CTMLM.V * Δs / CTMLM.ΔF * cₚ)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2.5100000000000002</code></pre><p>and we get the same value (note multiplication by <code>cₚ</code>, because <code>s</code> is in units of K).</p><p>If you want to see a list of all equations that compose the dynamical system then do</p><pre><code class="language-julia hljs">all_equations(ds)</code></pre><p class="math-container">\[ \begin{align}
+σ = observe_state(ds, CTMLM.V * Δs / CTMLM.ΔF_s * cₚ)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2.5100000000000002</code></pre><p>and we get the same value (note multiplication by <code>cₚ</code>, because <code>s</code> is in units of K).</p><p>If you want to see a list of all equations that compose the dynamical system then do</p><pre><code class="language-julia hljs">all_equations(ds)</code></pre><p class="math-container">\[ \begin{align}
+\frac{\mathrm{d} \mathtt{q\_b}\left( t \right)}{\mathrm{d}t} &amp;=  - 86400 \left( 1.1574 \cdot 10^{-5} \mathtt{q\_x}\left( t \right) + \frac{\frac{\mathtt{{\Delta}F\_q}\left( t \right) - \mathtt{LHF}\left( t \right)}{2530 \mathtt{\rho_0}\left( t \right)} - \mathtt{\Delta.q}\left( t \right) \mathtt{w\_e}\left( t \right)}{\mathtt{z\_b}\left( t \right)} \right) \\
+\frac{\mathrm{d} \mathtt{s\_b}\left( t \right)}{\mathrm{d}t} &amp;=  - 86400 \left( \frac{\frac{ - 0.00099602 \left( \mathtt{SHF}\left( t \right) - \mathtt{{\Delta}F\_s}\left( t \right) \right)}{\mathtt{\rho_0}\left( t \right)} - \mathtt{\Delta.s}\left( t \right) \mathtt{w\_e}\left( t \right)}{\mathtt{z\_b}\left( t \right)} + 1.1574 \cdot 10^{-5} \mathtt{s\_x}\left( t \right) \right) \\
 \frac{\mathrm{d} \mathtt{z\_b}\left( t \right)}{\mathrm{d}t} &amp;=  - 86400 \left( \mathtt{w\_m}\left( t \right) - \mathtt{w\_e}\left( t \right) + D \mathtt{z\_b}\left( t \right) \right) \\
-\frac{\mathrm{d} \mathtt{s\_b}\left( t \right)}{\mathrm{d}t} &amp;=  - 86400 \left( \frac{\frac{0.00099602 \mathtt{{\Delta}F}\left( t \right)}{\mathtt{\rho_0}\left( t \right)} + \frac{ - 0.00099602 \mathtt{SHF}\left( t \right)}{\mathtt{\rho_0}\left( t \right)} - \mathtt{\Delta.s}\left( t \right) \mathtt{w\_e}\left( t \right)}{\mathtt{z\_b}\left( t \right)} + 1.1574 \cdot 10^{-5} \mathtt{s\_x}\left( t \right) \right) \\
-\frac{\mathrm{d} \mathtt{q\_b}\left( t \right)}{\mathrm{d}t} &amp;=  - 86400 \left( 1.1574 \cdot 10^{-5} \mathtt{q\_x}\left( t \right) + \frac{\frac{ - \mathtt{LHF}\left( t \right)}{2530 \mathtt{\rho_0}\left( t \right)} - \mathtt{\Delta.q}\left( t \right) \mathtt{w\_e}\left( t \right)}{\mathtt{z\_b}\left( t \right)} \right) \\
 \mathtt{\rho_0}\left( t \right) &amp;= 1 \\
 \mathtt{s.}\left( t \right) &amp;= 300 \\
-\mathtt{{\Delta}F}\left( t \right) &amp;= 40 \\
-\mathtt{q.}\left( t \right) &amp;= 1.56 \\
+\mathtt{{\Delta}F\_s}\left( t \right) &amp;= 40 \\
 \mathtt{q_0}\left( t \right) &amp;= 12.405 \\
-\mathtt{w\_m}\left( t \right) &amp;= 0 \\
-\mathtt{s\_x}\left( t \right) &amp;= 0 \\
 V\left( t \right) &amp;= U \mathtt{c\_d} \\
 \mathtt{q\_x}\left( t \right) &amp;= 0 \\
+\mathtt{s\_x}\left( t \right) &amp;= 0 \\
+\mathtt{w\_m}\left( t \right) &amp;= 0 \\
+\mathtt{{\Delta}F\_q}\left( t \right) &amp;= 0 \\
+\mathtt{q.}\left( t \right) &amp;= 1.56 \\
 \mathtt{\Delta.s}\left( t \right) &amp;=  - \mathtt{s\_b}\left( t \right) + \mathtt{s.}\left( t \right) \\
 \mathtt{s_0}\left( t \right) &amp;= -12.5 + \mathtt{s.}\left( t \right) \\
-\mathtt{\Delta.q}\left( t \right) &amp;=  - \mathtt{q\_b}\left( t \right) + \mathtt{q.}\left( t \right) \\
 \mathtt{\Delta_{0}q}\left( t \right) &amp;= \mathtt{q\_b}\left( t \right) - \mathtt{q_0}\left( t \right) \\
-\mathtt{w\_e}\left( t \right) &amp;= \frac{\mathtt{e\_e} \mathtt{{\Delta}F}\left( t \right)}{1004 \mathtt{\Delta.s}\left( t \right) \mathtt{\rho_0}\left( t \right)} \\
+\mathtt{\Delta.q}\left( t \right) &amp;=  - \mathtt{q\_b}\left( t \right) + \mathtt{q.}\left( t \right) \\
+\mathtt{w\_e}\left( t \right) &amp;= \frac{\mathtt{e\_e} \mathtt{{\Delta}F\_s}\left( t \right)}{1004 \mathtt{\Delta.s}\left( t \right) \mathtt{\rho_0}\left( t \right)} \\
 \mathtt{\Delta_{0}s}\left( t \right) &amp;= \mathtt{s\_b}\left( t \right) - \mathtt{s_0}\left( t \right) \\
 \mathtt{LHF}\left( t \right) &amp;=  - 2530 \mathtt{\Delta_{0}q}\left( t \right) V\left( t \right) \mathtt{\rho_0}\left( t \right) \\
 \mathtt{SHF}\left( t \right) &amp;=  - 1004 V\left( t \right) \mathtt{\rho_0}\left( t \right) \mathtt{\Delta_{0}s}\left( t \right)
@@ -72,9 +73,9 @@ V\left( t \right) &amp;= U \mathtt{c\_d} \\
     ## Cloud stuff
     CTMLM.cf_dynamic(),
     CTMLM.decoupling_variable(),
-    CTMLM.cloud_layer_thickness(:Bolton1980),
+    CTMLM.cloud_base_height(:Bolton1980),
     CTMLM.CTRC ~ 10 + 40*CTMLM.C, # cloud top radiative cooling
-    CTMLM.ΔF ~ CTMLM.CTRC, # same equation
+    CTMLM.ΔF_s ~ CTMLM.CTRC, # same equation
     ## rest the same
     CTMLM.s₊ ~ 301200.0/cₚ,
     CTMLM.q₊ ~ 1.56,
@@ -90,25 +91,25 @@ ds = processes_to_coupledodes(eqs, CTMLM)</code></pre><pre class="documenter-exa
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [0.9, 3.0e-6, 1.0, 0.5, 1.0, 0.2, 2.0, 0.0012, 6.0, 0.0  …  0.0, 0.0, 11.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ parameters:    [0.9, 3.0e-6, 1.0, 0.5, 1.0, 0.2, 100.0, 2.0, 0.0012, 6.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
- state:         [1200.0, 290.0, 11.0, 1.0]
+ state:         [11.0, 290.0, 1200.0, 1.0]
 </code></pre><p>And we run the model to a steady state:</p><pre><code class="language-julia hljs">set_parameter!(ds, :D, 4e-6)
 set_parameter!(ds, :c_d, 0.0009)
 set_parameter!(ds, :U, 6.8) # U*c_d = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity
 
 step!(ds, 100.0)
-observe_state.(ds, (:z_b, :q_b, :s_b, :C)) # get state variables by name</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(763.5014071360263, 8.79470024236792, 287.5, 0.7081938771333666)</code></pre><h2 id="Climate-change-scenario:-increasing-SST"><a class="docs-heading-anchor" href="#Climate-change-scenario:-increasing-SST">Climate change scenario: increasing SST</a><a id="Climate-change-scenario:-increasing-SST-1"></a><a class="docs-heading-anchor-permalink" href="#Climate-change-scenario:-increasing-SST" title="Permalink"></a></h2><p>If you want to study multistability for alternate cloud states (Cumulus vs Stratocumulus), or perform continuations (like the climate change scenarios in (<a href="../../references/#Datseris2025">Datseris, 2025</a>)), visit the documentation of Attractors.jl.</p><p>As a brief example we will perform a simple climate change scenario where SST increases with a constant rate. First, we modify the equations so that <code>s₀, q₀</code> are derived from a prescribed SST:</p><pre><code class="language-julia hljs">@parameters SST = 290.0
+observe_state.(ds, (:z_b, :q_b, :s_b, :C)) # get state variables by name</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(763.5014057710669, 8.794700233030296, 287.50000000000017, 0.7081938746297317)</code></pre><h2 id="Climate-change-scenario:-increasing-SST"><a class="docs-heading-anchor" href="#Climate-change-scenario:-increasing-SST">Climate change scenario: increasing SST</a><a id="Climate-change-scenario:-increasing-SST-1"></a><a class="docs-heading-anchor-permalink" href="#Climate-change-scenario:-increasing-SST" title="Permalink"></a></h2><p>If you want to study multistability for alternate cloud states (Cumulus vs Stratocumulus), or perform continuations (like the climate change scenarios in (<a href="../../references/#Datseris2025">Datseris, 2025</a>)), visit the documentation of Attractors.jl.</p><p>As a brief example we will perform a simple climate change scenario where SST increases with a constant rate. First, we modify the equations so that <code>s₀, q₀</code> are derived from a prescribed SST:</p><pre><code class="language-julia hljs">@parameters SST = 290.0
 eqs = [
     CTMLM.mlm_dynamic(),
     CTMLM.entrainment_velocity(:Stevens2006; use_augmentation = false),
     ## Cloud stuff
     CTMLM.cf_dynamic(),
     CTMLM.decoupling_variable(),
-    CTMLM.cloud_layer_thickness(:Bolton1980),
+    CTMLM.cloud_base_height(:Bolton1980),
     CTMLM.CTRC ~ 10 + 40*CTMLM.C, # cloud top radiative cooling
-    CTMLM.ΔF ~ CTMLM.CTRC, # same equation
+    CTMLM.ΔF_s ~ CTMLM.CTRC, # same equation
     ## Usage of SST
     CTMLM.s₀ ~ SST,
     CTMLM.q₀ ~ CTMLM.q_saturation(SST),
@@ -130,13 +131,13 @@ ds</code></pre><pre class="documenter-example-output"><code class="nohighlight h
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [1.0, 290.0, 4.0e-6, 1.0, 0.5, 1.0, 0.2, 2.0, 0.0009, 6.8  …  0.0, 0.0, 11.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ parameters:    [1.0, 290.0, 4.0e-6, 1.0, 0.5, 1.0, 0.2, 100.0, 2.0, 0.0009  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
- state:         [1200.0, 290.0, 11.0, 1.0]
+ state:         [11.0, 290.0, 1200.0, 1.0]
 </code></pre><p>To perform global continuation we need to create an attractor mapper, which we create here by tessellating the state space. Have a look at the Attractors.jl tutorial if the next few lines of code are puzzling to you</p><pre><code class="language-julia hljs">grid = (
-    (0:100.0:3000), # height
-    (270:5.0:330), # static energy
     (1:1.0:25), # specific humidity
+    (270:5.0:330), # static energy
+    (0:100.0:3000), # height
     (0:0.1:1), # cloud fraction
 )
 
@@ -145,11 +146,11 @@ sampler, = statespace_sampler(grid)
 mapper = AttractorsViaRecurrences(ds, grid)
 ascm = AttractorSeedContinueMatch(mapper)
 
-fs = basins_fractions(mapper, sampler)
+fs = basins_fractions(mapper, sampler; show_progress = false)
 attractors = extract_attractors(mapper)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Dict{Int64, StateSpaceSet{4, Float64, SVector{4, Float64}}} with 1 entry:
   1 =&gt; 4-dimensional StateSpaceSet{Float64} with 1 points</code></pre><p>with the <code>sampler, mapper, ascm</code> data structures in order, we can easily now run a global continuation with changing SST:</p><pre><code class="language-julia hljs">prange = 290:1:310
 pidx = :SST
-fractions_cont, attractors_cont = global_continuation(ascm, prange, pidx, sampler)
+fractions_cont, attractors_cont = global_continuation(ascm, prange, pidx, sampler; show_progress = false)
 attractors_cont</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">21-element Vector{Dict{Int64, StateSpaceSet{4, Float64, SVector{4, Float64}}}}:
  Dict(1 =&gt; 4-dimensional StateSpaceSet{Float64} with 1 points)
  Dict(1 =&gt; 4-dimensional StateSpaceSet{Float64} with 1 points)
@@ -173,11 +174,11 @@ attractors_cont</code></pre><pre class="documenter-example-output"><code class="
  Dict()</code></pre><p>if you are not sure what the output means, no worries, just have a look at the Attractors.jl documentation. Here we visualize the cloud fraction:</p><pre><code class="language-julia hljs">using CairoMakie
 
 # cloud fraction and height values of last point on the attractor
-values = [A -&gt; A[end][4], A -&gt; A[end][1]]
+varvalues = [A -&gt; A[end][4], A -&gt; A[end][3]]
 
 fig = plot_basins_attractors_curves(
-	fractions_cont, attractors_cont, values, prange,
+	fractions_cont, attractors_cont, varvalues, prange,
 )
 content(fig[2,1]).ylabel = &quot;C&quot;
 content(fig[3,1]).ylabel = &quot;z_b&quot;
-fig</code></pre><img src="64246da0.png" alt="Example block output"/><p>we see for our ad hoc parameterizations, the dynamical system has no stable states for SST &gt; 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.</p><p>The model diverges due to the definition of the entrainment velocity (which is proportional to <code>ΔF/Δ₊s</code>) in combination with a fixed <code>s₊</code>: the model reaches a state where <code>Δ₊s</code> is so small that height increases unnaturally well beyond the state space tessellation we defined.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../globalmeanebm/">« Global mean EBM</a><a class="docs-footer-nextpage" href="../../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.1 on <span class="colophon-date" title="Friday 11 April 2025 09:50">Friday 11 April 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig</code></pre><img src="0f2b4965.png" alt="Example block output"/><p>we see for our ad hoc parameterizations, the dynamical system has no stable states for SST &gt; 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.</p><p>The model diverges due to the definition of the entrainment velocity (which is proportional to <code>ΔF_s/Δ₊s</code>) in combination with a fixed <code>s₊</code>: the model reaches a state where <code>Δ₊s</code> is so small that height increases unnaturally well beyond the state space tessellation we defined.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../globalmeanebm/">« Global mean EBM</a><a class="docs-footer-nextpage" href="../../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Tuesday 26 August 2025 14:55">Tuesday 26 August 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
