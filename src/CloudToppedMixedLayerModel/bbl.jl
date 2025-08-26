@@ -13,13 +13,13 @@ function mlm_dynamic()
         # clearing, and mass influx, again due to cloud clearing.
         TimeDerivative(z_b, w_e - D*z_b - w_m, LiteralParameter(1/sec_in_day)),
         # Stevens is a bit sloppy with units here because a multiplication with a density
-        # is required. Specifically, ds/dt does not have the same units as ΔF/z.
-        # one needs to further divide ΔF/z with a density ρ in units of kg/m^3.
+        # is required. Specifically, ds/dt does not have the same units as ΔF_s/z.
+        # one needs to further divide ΔF_s/z with a density ρ in units of kg/m^3.
         # I believe Stevens 2006 assumes a density of 1 and doesn't put it anywhere.
-        # Here we do modify the equations with a density of ρ₀ dividing ΔF.
+        # Here we do modify the equations with a density of ρ₀ dividing ΔF_s.
         # (Also note that s is in cₚ units, q in g/kg)
-        TimeDerivative(s_b, (w_e*Δ₊s + SHF/ρ₀/cₚ - ΔF/ρ₀/cₚ)/z_b - s_x/sec_in_day, LiteralParameter(1/sec_in_day)),
-        TimeDerivative(q_b, (w_e*Δ₊q + LHF/(ρ₀*(ℓ_v/1e3)))/z_b - q_x/sec_in_day, LiteralParameter(1/sec_in_day)),
+        TimeDerivative(s_b, (w_e*Δ₊s + (SHF - ΔF_s)/ρ₀/cₚ)/z_b - s_x/sec_in_day, LiteralParameter(1/sec_in_day)),
+        TimeDerivative(q_b, (w_e*Δ₊q + (LHF - ΔF_q)/(ρ₀*(ℓ_v/1e3)))/z_b - q_x/sec_in_day, LiteralParameter(1/sec_in_day)),
     ]
 end
 
@@ -36,18 +36,18 @@ function bbl_boundary_stevens2006()
     # The rest of the values are in Sec. 4.2.
     # where every component of the equations becomes a fixed constant:
     return [
-        w_e ~ e_e*ΔF/(Δ₊s*cₚ), # ΔF needs to be divided with ρ0 but stevens 2006 assumes ρ0 = 1.
+        w_e ~ e_e*ΔF_s/(Δ₊s*cₚ), # ΔF_s needs to be divided with ρ0 but stevens 2006 assumes ρ0 = 1.
         s₊ ~ s₊_fixed,
         s₀ ~ s₊ - 12.5e3/cₚ,
         q₊ ~ q₊_fixed,
-        ΔF ~ ΔF_fixed,
+        ΔF_s ~ ΔF_fixed,
         ρ₀ ~ 1, # this is assumed by Stevens 2006 and is required to give exactly same results
         q₀ ~ q_saturation(288.96 + 1.25), # see discussion above Eq. (9) in Stevens 2006
     ]
 end
 
 """
-    bbl_stevens2006_steadystate(fixed; z_b, q_b, s_b, CLT)
+    bbl_stevens2006_steadystate(fixed; z_b, q_b, s_b, RCT)
 
 Return the equations 35-38 in [Stevens2006](@cite)
 describing the analytically solved steady state of the MLM.
@@ -57,15 +57,15 @@ If we attempt to couple them with the dynamic equations for ``C``,
 then the following:
 ```
 z_b ~ h⃰ * (e_e*σ_38)/(1 + σ_38 - e_e),
-σ_38 ~ V*Δs*cₚ/(ΔF/ρ₀),
+σ_38 ~ V*Δs*cₚ/(ΔF_s/ρ₀),
 ```
-yields a circular dependency: `z_b` depends on `σ_38` which depends on `ΔF`
+yields a circular dependency: `z_b` depends on `σ_38` which depends on `ΔF_s`
 which depends on `T_t` which depends on `z_b`.
 To resolve this a `fixed` option is given, which can be any of:
-`ΔF, z_b, w_s, T_t`. This quantity is set fixed and becomes a parameter
+`ΔF_s, z_b, w_s, T_t`. This quantity is set fixed and becomes a parameter
 so that the equation for `z_b` is closed.
 """
-function bbl_stevens2006_steadystate(fixed = :ΔF; z_b=z_b, s_b=s_b, q_b=q_b, CLT=CLT) # changing the variables allows defining observables!
+function bbl_stevens2006_steadystate(fixed = :ΔF_s; z_b=z_b, s_b=s_b, q_b=q_b, RCT=RCT) # changing the variables allows defining observables!
     @variables σ_38(t), Δs(t), Δq(t), h⃰(t), η⃰(t), η_b(t)
     eqss = [
 
@@ -74,11 +74,11 @@ function bbl_stevens2006_steadystate(fixed = :ΔF; z_b=z_b, s_b=s_b, q_b=q_b, CL
         q_b ~ q₀ + (q₊ - q₀)*(e_e)/(1 + σ_38),
         Δs ~ s₊ - s₀,
         Δq ~ q₊ - q₀,
-        σ_38 ~ V*Δs*cₚ/(ΔF/ρ₀),  # we added the extra division with ρ₀ for correct units
-        h⃰ ~ (ΔF/ρ₀)/(D*Δs*cₚ),   # we added the extra division with ρ₀ for correct units
+        σ_38 ~ V*Δs*cₚ/(ΔF_s/ρ₀),  # we added the extra division with ρ₀ for correct units
+        h⃰ ~ (ΔF_s/ρ₀)/(D*Δs*cₚ),   # we added the extra division with ρ₀ for correct units
         η⃰ ~ Rv*s₀^2/(ℓ_v*cₚ*g), # should be around 1500 m.
-        η_b ~ -η⃰*log(1 + e_e/(1 + σ_38)*Δq/q₀) - ΔF/(V*g)*(1 - e_e),
-        CLT ~ 1 - η_b/z_b,
+        η_b ~ -η⃰*log(1 + e_e/(1 + σ_38)*Δq/q₀) - ΔF_s/(V*g)*(1 - e_e),
+        RCT ~ 1 - η_b/z_b,
         # We also need equations/values for q₊ and s₊
         # but this is done by combining these equations with `ftr_bblm_coupler`!
     ]
@@ -95,10 +95,10 @@ function bbl_stevens2006_steadystate(fixed = :ΔF; z_b=z_b, s_b=s_b, q_b=q_b, CL
     elseif fixed == :w_s
         @parameters w_s = 0.005 # from 0.001 to 0.01
         push!(eqss, z_b ~ w_e - w_s)
-    elseif fixed == :ΔF
+    elseif fixed == :ΔF_s
         push!(eqss,
             z_b ~ h⃰ * (e_e*σ_38)/(1 + σ_38 - e_e),
-            ParameterProcess(ΔF, 40.0)
+            ParameterProcess(ΔF_s, 40.0)
         )
     end
     return eqss
@@ -142,12 +142,12 @@ Keyword `use_augmentation` adds the decoupling-based augmentation described in [
 """
 function entrainment_velocity(version = :Stevens2006;
         e_e = version == :Stevens2006 ? 0.9 : 0.5,
-        w_e = w_e, ΔF = ΔF, Δs = Δ₊s, use_shear = false, use_augmentation = true
+        w_e = w_e, ΔF_s = ΔF_s, Δs = Δ₊s, use_shear = false, use_augmentation = true
     )
     @parameters (e_e = e_e), [description = "Entrainment efficiency. Scales entrainment velocity"]
 
     if version == :Stevens2006
-        x = e_e*ΔF/ρ₀/(Δs*cₚ) # corrected Stevens2006 with ΔF divided with ρ0
+        x = e_e*ΔF_s/ρ₀/(Δs*cₚ) # corrected Stevens2006 with ΔF_s divided with ρ0
     elseif version ∈ (:LL96, :Gesso2014) # From Dal Gesso 2014
         # we obtain the beta coefficiencs from Stevens 2002 and set them to constants
         ϵ1 = 0.608
@@ -159,7 +159,7 @@ function entrainment_velocity(version = :Stevens2006;
         # formula of the appendix for Lewellen and Lewellen (1998).
         # The factors of the equation are the coeffients after eq. (14) which
         # are based on the beta parameters (stated as A, B after equation 9).
-        SLT = 1 - CLT # = cloud base height / inversion height
+        SLT = 1 - RCT # = cloud base height / inversion height
         # liquid water potential temperature inversion jump can be
         # estimated analytically as a function of s, q: θl = (s - g*z)/(cₚ*Π(z))
         # since the inversion jump height is approximated as 0,
@@ -172,10 +172,10 @@ function entrainment_velocity(version = :Stevens2006;
         Δ₊θvs = As*Δ₊θl + Bs*Δ₊q
         if version == :LL96
             # This is the Lewellen & Lewellen 1998 version:
-            x = 2*e_e*ΔF / (SLT^2*Δ₊θvd + (1 - SLT^2)*Δ₊θvs)
+            x = 2*e_e*ΔF_s / (SLT^2*Δ₊θvd + (1 - SLT^2)*Δ₊θvs)
         elseif version == :Gesso2014
             # And this is equation 15 of Dal Gesso 2014:
-            x = 5*e_e*ΔF / (2Δ₊θl + 2.5*e_e*(SLT^2*Δ₊θvd + (1 - SLT^2)*Δ₊θvs))
+            x = 5*e_e*ΔF_s / (2Δ₊θl + 2.5*e_e*(SLT^2*Δ₊θvd + (1 - SLT^2)*Δ₊θvs))
         end
         # in both cases the units of `x` appear to be already in mm/s so
         x = x/1e3
@@ -195,7 +195,7 @@ function entrainment_velocity(version = :Stevens2006;
     w = x + shear
     if use_augmentation
         @parameters β₋ = 0.3
-        w = w*(1 + i_𝒟*CLT*β₋/2*V)
+        w = w*(1 + i_𝒟*RCT*β₋/2*V)
     end
     return w_e ~ w
 end
@@ -263,9 +263,8 @@ In the codebase we practically always approximate Tv by T.
 """
 pressure(z, T) = p₀ * exp((-g * z) / (Rd * T))
 
-"moist air density"
-function rho(z, T)
-    return pressure(z, T) / (Rd * T)
+function moist_air_density(z, T) # in same units as q!
+    return pressure(z, T) / (1e3*Rd*T)
 end
 
 """

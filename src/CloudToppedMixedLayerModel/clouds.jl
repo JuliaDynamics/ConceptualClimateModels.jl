@@ -1,15 +1,14 @@
 """
-    cf_dynamic()
+    cf_dynamic(; thinness_limiter = false)
 
-Provide the equations ``\\tau_C dC/dt = C_\\mathcal{D} - C`` as well as the
-equation that defines ``C_\\mathcal{D}`` as a function of the decoupling
-variable ``\\mathcal{D}``. The function uses the curve fitted to data
-in [Datseris2025](@cite).
+Provide the equation ``\\tau_C dC/dt = C_\\infty - C`` as well as as many
+more equations necessary to define ``C_\\infty``, in particular for
+``C_\\mathcal{D}`` and/or ``C_\\kappa``.
+The function uses the curve fitted to data in [Datseris2025](@cite).
 """
-function cf_dynamic(fit = :sigmoid)
-    # During the reserch of the project I did a bunch of different fits.
+function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
+    # During the research of the project I did a bunch of different fits.
     # The paper shows only the sigmoidal fit.
-
     starts = Dict(:exp => 1.0, :power => 1.0, :sigmoid => 0.5)
     scales = Dict(:exp => 0.4, :power => 0.8, :sigmoid => 1.0)
 
@@ -34,10 +33,22 @@ function cf_dynamic(fit = :sigmoid)
     else
         error("unknown specification")
     end
+    # now we also define the thresholding to zero
+    @parameters CLT_κ = 100.0 [description = "scale over which C must be zero if CLT is too small, m"]
+    C_κ_proc = ClampedLinearProcess(C_κ, CLT; left = 0, right = 1, right_driver = CLT_κ, left_driver = CLT_κ - 50)
+
+    # Then decide what defines C_∞
+    if thinness_limiter
+        C_∞_proc = C_∞ ~ C_𝒟*C_κ
+    else
+        C_∞_proc = C_∞ ~ C_𝒟
+    end
 
     return [
         C_𝒟_proc,
-        ExpRelaxation(C, C_𝒟, τ_C),
+        C_κ_proc,
+        C_∞_proc,
+        ExpRelaxation(C, C_∞, τ_C),
         # the decoupling index is just a translation of decoupling fit
         i_𝒟 ~ (Cmax - C_𝒟)/(Cmax - Cmin),
     ]
@@ -50,24 +61,28 @@ Return a process for ``T_C``. Versions are `:top, :base, :mean`.
 """
 function cloud_emission_temperature(version = :mean)
     if version == :mean
-        return T_c ~ (T_t + T_lcl)/2
+        return T_C ~ (T_t + T_lcl)/2
     elseif version == :top
-        return T_c ~ T_t
+        return T_C ~ T_t
     elseif version == :base
-        return T_c ~ T_lcl
+        return T_C ~ T_lcl
     end
 end
 
+
+###########################################################################################
+# Emissivity and albedo
+###########################################################################################
 """
     cloud_emissivity(version = 1.0; fraction = true)
 
-Provide an equation for the effective emissivity of the cloud layer.
+Provide an equation for the effective emissivity `ε_C` of the cloud layer.
 Options for `version`:
 
-- `:clt`: inspired by [RandalSuarez1984](@cite), emissivity scales with the depth
+- `:clt`: inspired by [RandalSuarez1984](@cite), emissivity scales with the thickness
   of the cloud layer.
-- `:liquid_water_path`: Exponential of LWP.
-- `<: Number`: emissiviy is just the provided number or symbolic expression.
+- `:lwp`: Expression given by [Stephens1978](@cite) where emissivity is an exponential of LWP.
+- `<: Number`: emissivity is just the provided number or symbolic expression.
 
 If `fraction = true` the emissivity is further multiplied by the cloud fraction.
 """
@@ -77,11 +92,10 @@ function cloud_emissivity(version = 1.0; fraction = true)
     elseif version == :clt
         # inspired by Randal & Suarez 1984, emissivity depends on "depth"
         # The depth 200 is chosen to match the 10mb pressure used in Randal & Suarez
-        @parameters ε_c_depth = 100.0 [description = "depth above which ε_c becomes 1"]
-        expr =  min(CLT*z_b/ε_c_depth, 1) # use smoothstep if you don't want clamping
-    elseif version == :liquid_water_path
-        LWP = liquid_water_path(T_t, CLT, z_b, s_b, q_b)
-        expr = 1 - exp(-(0.15*1e3)*LWP)
+        @parameters ε_c_depth = 100.0 [description = "thickness above which ε_C becomes 1"]
+        expr =  min(CLT/ε_c_depth, 1) # use smoothstep if you don't want clamping
+    elseif version == :lwp
+        expr = 1 - exp(-0.158*LWP)
     elseif version isa Number
         expr = version
     else
@@ -90,68 +104,128 @@ function cloud_emissivity(version = 1.0; fraction = true)
     if fraction
         expr *= C
     end
-    return ε_c ~ expr
+    return ε_C ~ expr
 end
 
-function liquid_water_path(T_t, CLT, z_b, s_b, q_b)
-    z_lcl = z_b - CLT*z_b # base of cloud layer
-    if z_lcl >= z_b
+
+"""
+    cloud_albedo(version = 0.38; fraction = true)
+
+Provide a process for `α_C`, the cloud albedo.
+If `fraction == true`, the expression is further multiplied by the cloud fraction `C`.
+
+When `version == :lwp` we use an approach inspired by [Datseris2021](@cite),
+using the expression from [Lacis1974](@cite)
+```math
+\\alpha_C = \\alpha_C^{max} \\frac{\\tau_C}{\\tau_C + 1/(\\sqrt{3}(1-g_C))}
+```
+where ``\\tau_C`` is the cloud optical depth (_not_ the cloud fraction relaxation timescale)
+and ``g_C`` the asymmetry factor for the cloud particle phase function.
+The optical depth is estimated as a function
+of the Liquid Water Path, fitted from Fig. 1 of [Stephens1978](@cite) as
+```math
+\\tau_C = \\frac{x^1.7}{10 + x}
+```
+with ``x`` the LWP in g/m².
+The expression fits very accurately for LWP up to 10³.
+"""
+function cloud_albedo(version = 0.38; fraction = true)
+    if version == :lwp
+        @parameters g_C = 0.925 α_C_max = 1.0
+        tau = LWP^1.7/(10 + LWP)
+        expr = α_C_max*tau/(2/(sqrt(3)*(1 - g_C)) + tau)
+    elseif version isa Number
+        expr = version
+    end
+    if fraction
+        expr *= C
+    end
+    return α_C ~ expr
+end
+
+"""
+    liquid_water_path()
+
+Provide a process for the liquid water path `LWP` being proportional to `CLT^2`
+by using the assumption that liquid water specific humidity increases linearly with
+height within the cloud layer.
+"""
+function liquid_water_path()
+    return LWP ~ liquid_water_path_linear()
+end
+
+function liquid_water_path_linear(T_t = T_t, z_cb = z_cb, z_ct = z_ct, q_b = q_b) # cloud base and top heights
+    if z_cb ≥ z_ct
         return 0.0
-    elseif any(isnan, (z_b, CLT))
+    elseif any(isnan, (z_cb, z_ct))
         return NaN
     end
-    # we have to do the integral of ρ*q_l over z from z_lcl to z_b
-    # normally we would use the exact temperature
-    # T(z) = temperature_exact(z, s_b, q_b)
-    # but it is safe to assume that temperature decreases linearly
-    # within the cloud layer and with constant slope. We can estimate this
-    # by obtaining the temperature at cloud top and cloud base,
-    # assuming 0 liquid water at cloud base:
-    Tb = s_b - g*z_lcl/cₚ # this is more than T_t
-    # we then define the linear interpolation
-    T(z) = Tb + (T_t - Tb)*(z - z_lcl)/(z_b - z_lcl)
-    # We do exactly the same thing for the liquid water, which also increases linearly
-    # and is zero at cloud base
+    # we have to do the integral of ρ*q_l over z from z_lcl to z_b.
+    # To do so we will use the assumption that q_l increases linearly
+    # from being 0 at the cloud base, to its max value at the cloud top.
+    # Estimating the max value is rather simple:
+    q_l_top = q_liquid(T_t, q_b, z_ct)
+    # we will also use the assumption that the density remains constant
+    # in the height of the cloud which allows us to analytically resolve the integral
+    # (otherwise it is a function of temperature and the integral cannot be resolved)
+    ρ_ref = moist_air_density(z_cb, T_t) # use different height and temperature to get the average
+    return 0.5*ρ_ref*q_l_top*(z_ct - z_cb)^2
+end
+@register_symbolic liquid_water_path_linear(T_t, z_cb, z_ct, q_b)
+
+function liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
+    # This function gives practically identical results to the linear, but it is 1000x
+    # slower, probably more. No reason to use it!!!
+    z_lcl = z_b - RCT*z_b # base of cloud layer
+    if z_lcl ≥ z_b
+        return 0.0
+    elseif any(isnan, (z_b, RCT))
+        return NaN
+    end
+    T(z) = temperature_exact(z, s_b, q_b)
+    # For the liquid water we assume linear increase from 0 to max value at cloud top
     q_l_top = q_liquid(T_t, q_b, z_b)
-    q_l(z) = q_l_top*(z - z_lcl)/(z_b - z_lcl)
+    q_l(z) = q_l_top*(z - z_lcl)
     # We now do a discretized integral
-    # TODO: Find an analytic expression this is numerically inaccurate and costy.
-    dz = 10.0
+    dz = 1.0
     zs = z_lcl:dz:z_b
     LWP = 0.0
     for z in zs
-        LWP += rho(z, T(z)) * q_l(z) * dz
+        LWP += moist_air_density(z, T(z)) * q_l(z) * dz
     end
+    # Note that this version has convergence problems in the ODE solve
+    # the resulting curve LWP(t) vs t is not smooth
     return LWP
 end
-@register_symbolic liquid_water_path(T_t, CLT, z_b, s_b, q_b)
+@register_symbolic liquid_water_path_exact(T_t, RCT, z_b, s_b, q_b)
+
 
 
 ###########################################################################################
 # Cloud base height / lifting condensation level
 ###########################################################################################
 """
-    cloud_layer_thickness(version = :exact)
+    cloud_base_height(version = :exact, z_cb = z_lcl)
 
-Provide an equation for the relative/normalized cloud layer thickness CLT.
-The options for version are:
+Provide an equation for the cloud base height captured by variable `z_cb`.
 - `:exact`: exact estimation by figuring out when `q_liquid` first becomes positive.
   Computationally costly as it requires interpolations.
 - `:Bolton1980`: Well known approximate expression by Bolton, 1980.
+
+Because so far all versions calculate the lifting condensation level, `z_cb`
+defaults to `z_lcl`. (and the default process for `z_cb` is for it to be `z_lcl`).
 """
-function cloud_layer_thickness(lcltype = :exact)
-    if lcltype == :exact
-        z_lcl = cloud_base_height_exact(s_b, q_b, z_b)
-    elseif lcltype == :Zhang2006 # same as 2005 and 2009 papers and 2006 dissertation
-        z_lcl = cloud_base_height_zhang2006(s_b, q_b, z_b)
-    elseif lcltype == :Bolton1980
-        z_lcl = cloud_base_height_bolton1980(s_b, q_b)
-    elseif lcltype == :romps2017
-        z_lcl = cloud_base_height_romps2017(s_b, q_b)
+function cloud_base_height(version = :exact, z_cb = z_lcl)
+    if version == :exact
+        z = cloud_base_height_exact(s_b, q_b, z_b)
+    elseif version == :Zhang2006 # same as 2005 and 2009 papers and 2006 dissertation
+        z = cloud_base_height_zhang2006(s_b, q_b, z_b)
+    elseif version == :Bolton1980
+        z = cloud_base_height_bolton1980(s_b, q_b)
     else
         error("incorrect specification for type for the lcl")
     end
-    return CLT ~ clamp((z_b - z_lcl)/z_b, 0, 1)
+    return z_cb ~ z
 end
 
 function cloud_base_height_exact(s, q, z)
@@ -205,7 +279,7 @@ end
 
 # This gives identical results to the Bolton version
 # while being dramatically more expensive computationally.
-# We do not use it anywhere in the paper therefore.
+# We do not use it anywhere therefore.
 # (That's why `LambertW` is not installed, if you try to run it it will error)
 function cloud_base_height_romps2017(s, q)
     T = temperature_0_z(s) # equal to s.

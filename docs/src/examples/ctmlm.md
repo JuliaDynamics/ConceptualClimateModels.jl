@@ -22,7 +22,7 @@ eqs = [
     CTMLM.s₀ ~ CTMLM.s₊ - 12.5,
     CTMLM.ρ₀ ~ 1,
     CTMLM.q₀ ~ CTMLM.q_saturation(288.96 + 1.25),
-    CTMLM.ΔF ~ 40.0
+    CTMLM.ΔF_s ~ 40.0
 ]
 ```
 
@@ -50,7 +50,7 @@ leading to a steady state with height ``z_b`` (``h_\infty`` in [Stevens2006](@ci
 
 ```@example MAIN
 Δs = CTMLM.s₊ - CTMLM.s₀ # symbolic variable not existing in the graph of the `ds`
-σ = observe_state(ds, CTMLM.V * Δs / CTMLM.ΔF * cₚ)
+σ = observe_state(ds, CTMLM.V * Δs / CTMLM.ΔF_s * cₚ)
 ```
 and we get the same value (note multiplication by `cₚ`, because `s` is in units of K).
 
@@ -76,9 +76,9 @@ eqs = [
     ## Cloud stuff
     CTMLM.cf_dynamic(),
     CTMLM.decoupling_variable(),
-    CTMLM.cloud_layer_thickness(:Bolton1980),
+    CTMLM.cloud_base_height(:Bolton1980),
     CTMLM.CTRC ~ 10 + 40*CTMLM.C, # cloud top radiative cooling
-    CTMLM.ΔF ~ CTMLM.CTRC, # same equation
+    CTMLM.ΔF_s ~ CTMLM.CTRC, # same equation
     ## rest the same
     CTMLM.s₊ ~ 301200.0/cₚ,
     CTMLM.q₊ ~ 1.56,
@@ -115,9 +115,9 @@ eqs = [
     ## Cloud stuff
     CTMLM.cf_dynamic(),
     CTMLM.decoupling_variable(),
-    CTMLM.cloud_layer_thickness(:Bolton1980),
+    CTMLM.cloud_base_height(:Bolton1980),
     CTMLM.CTRC ~ 10 + 40*CTMLM.C, # cloud top radiative cooling
-    CTMLM.ΔF ~ CTMLM.CTRC, # same equation
+    CTMLM.ΔF_s ~ CTMLM.CTRC, # same equation
     ## Usage of SST
     CTMLM.s₀ ~ SST,
     CTMLM.q₀ ~ CTMLM.q_saturation(SST),
@@ -140,9 +140,9 @@ To perform global continuation we need to create an attractor mapper, which we c
 ```@example MAIN
 
 grid = (
-    (0:100.0:3000), # height
-    (270:5.0:330), # static energy
     (1:1.0:25), # specific humidity
+    (270:5.0:330), # static energy
+    (0:100.0:3000), # height
     (0:0.1:1), # cloud fraction
 )
 
@@ -151,7 +151,7 @@ sampler, = statespace_sampler(grid)
 mapper = AttractorsViaRecurrences(ds, grid)
 ascm = AttractorSeedContinueMatch(mapper)
 
-fs = basins_fractions(mapper, sampler)
+fs = basins_fractions(mapper, sampler; show_progress = false)
 attractors = extract_attractors(mapper)
 ```
 
@@ -160,7 +160,7 @@ with the `sampler, mapper, ascm` data structures in order, we can easily now run
 ```@example MAIN
 prange = 290:1:310
 pidx = :SST
-fractions_cont, attractors_cont = global_continuation(ascm, prange, pidx, sampler)
+fractions_cont, attractors_cont = global_continuation(ascm, prange, pidx, sampler; show_progress = false)
 attractors_cont
 ```
 
@@ -170,10 +170,10 @@ if you are not sure what the output means, no worries, just have a look at the A
 using CairoMakie
 
 # cloud fraction and height values of last point on the attractor
-values = [A -> A[end][4], A -> A[end][1]]
+varvalues = [A -> A[end][4], A -> A[end][3]]
 
 fig = plot_basins_attractors_curves(
-	fractions_cont, attractors_cont, values, prange,
+	fractions_cont, attractors_cont, varvalues, prange,
 )
 content(fig[2,1]).ylabel = "C"
 content(fig[3,1]).ylabel = "z_b"
@@ -182,4 +182,4 @@ fig
 
 we see for our ad hoc parameterizations, the dynamical system has no stable states for SST > 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.
 
-The model diverges due to the definition of the entrainment velocity (which is proportional to `ΔF/Δ₊s`) in combination with a fixed `s₊`: the model reaches a state where `Δ₊s` is so small that height increases unnaturally well beyond the state space tessellation we defined.
+The model diverges due to the definition of the entrainment velocity (which is proportional to `ΔF_s/Δ₊s`) in combination with a fixed `s₊`: the model reaches a state where `Δ₊s` is so small that height increases unnaturally well beyond the state space tessellation we defined.

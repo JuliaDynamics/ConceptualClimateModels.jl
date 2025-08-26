@@ -423,6 +423,7 @@ plausible_ic_sampler
 plausible_grid
 dynamical_system_summary
 named_current_parameters
+try_set_parameter!
 ```
 
 ## API Reference

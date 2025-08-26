@@ -1,7 +1,11 @@
+# TODO: All of the functionality here could be ported to DynamicalSystems.jl
+# behind an extension.
+
 export processes_to_coupledodes
 export dynamical_system_summary
 export all_equations
 export named_current_parameters
+export try_set_parameter!
 
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
@@ -92,4 +96,22 @@ function named_current_parameters(ds::DynamicalSystem)
     params_values = current_parameter.(ds, params_names)
     params = Dict(params_names .=> params_values)
     return params
+end
+
+ProcessBasedModelling.has_symbolic_var(ds::DynamicalSystem, var) =
+has_symbolic_var(referrenced_sciml_model(ds), var)
+
+"""
+    try_set_parameter!(ds::DynamicalSystem, symbol, value)
+
+An extension of `set_parameter!` for as symbolic parameter,
+that first checks if the symbol exists in the referenced MTK model,
+and if not, it warns and returns `nothing`.
+"""
+function try_set_parameter!(ds::DynamicalSystem, symbol, value)
+    if !has_symbolic_var(ds, symbol)
+        @warn "Symbolic parameter $(p) does not exist in system"
+        return nothing
+    end
+    set_parameter!(ds, symbol, value)
 end

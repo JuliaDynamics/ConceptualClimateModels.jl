@@ -16,10 +16,11 @@ function __init__()
             w_m ~ 0,
             w_v ~ 0,
             T_t ~ temperature_exact(z_b, s_b, q_b), # it isn't guaranteed that this will be used!
-            T_lcl ~ s_b - g*CLT*z_b/cₚ, # from the cloud base height exact function
+            T_lcl ~ s_b - g*CLT/cₚ, # analytically resolve coz no liquid water
             q_x ~ 0,
             s_x ~ 0,
             bbl_emission_temperature(),
+            ΔF_q ~ 0.0,
 
             # Exchanges
             ParameterProcess(SST_X, 0),
@@ -32,7 +33,7 @@ function __init__()
             SHF ~ -ρ₀*V*Δ₀s*cₚ, # defined as positive and s is in cp units
 
             # Radiation
-            L_c ~ σ_SB*ε_c*T_c^4,
+            L_c ~ σ_SB*ε_C*T_C^4,
             L_b ~ σ_SB*ε_b*T_b^4,
             L_FTR ~ σ_SB*ε_FTR*T_FTR^4,
             Lnet ~ L₀ - Ld, # Ld is whatever reaches the surface
@@ -43,9 +44,13 @@ function __init__()
             albedo(),
 
             # Clouds
+            z_cb ~ z_lcl,
+            z_ct ~ z_b,
+            CLT ~ max(z_ct - z_cb, 0),
+            RCT ~ min(CLT/z_b, 1), # note: not devided by cloud top but by boundary layer.
             CRC ~ CRClw - CRCsw,
             CTRC ~ CTRClw - CRCsw,
-            LWP ~ liquid_water_path(T_t, CLT, z_b, s_b, q_b),
+            LWP ~ liquid_water_path_linear(),
             cloud_emission_temperature(),
 
             # Decoupling

@@ -1,11 +1,11 @@
 """
     decoupling_variable(version = :Bretherton1997)
 
-Return an equation for ``\\mathcal{D}``, the decoupling variable.
+Provide an equation for ``\\mathcal{D}``, the decoupling variable.
 """
 function decoupling_variable(version = :Bretherton1997)
     if version == :Bretherton1997
-        return 𝒟 ~ CLT*LHF/CTRC
+        return 𝒟 ~ RCT*LHF/CTRC
     elseif dversion == :Chung2012
         return 𝒟 ~ LHF/CTRC
     else
@@ -21,7 +21,7 @@ Return equations for ``\\mathcal{d}_q, \\mathcal{d}_s`` as in [Datseris2025](@ci
 function decoupling_ratios()
     # Clamping this makes the simulation more stable;
     # the data from de Roode 2016 never exceed 0.5
-    α ~ clamp((CTBBL.z_b*CTBBL.CLT/2750)^1.3, 0, 0.5),
+    α ~ clamp((CTBBL.z_b*CTBBL.RCT/2750)^1.3, 0, 0.5),
     return [𝒹_q ~ α, 𝒹_s ~ 0.5α]
 end
 
