@@ -44,9 +44,9 @@ end
 Provide equation for ``s_+``. To do this, a boundary condition must be provided
 that is a fixed parameter. `version` argument decides this:
 
-- `:difference`: the starting temperature difference across inversion is a fixed parameter.
-- `:temperature`: the starting temperature after the inversion is a fixed parameter.
-- `:static_energy`: the starting moist static energy after the inversion is a fixed parameter.
+- `:difference`: the temperature difference across inversion is a fixed parameter.
+- `:temperature`: the temperature after the inversion is a fixed parameter.
+- `:static_energy`: the moist static energy after the inversion is a fixed parameter.
 
 Besides these, we can also specify whether CO2 increase also increases temperature difference,
 and whether decreasing ``C`` decreases temperature difference due to cloud thinning
@@ -66,7 +66,7 @@ function mlm_s₊(
     # First, prepare the augmentation of the inversion
     Δ₊T_aux = δ_Δ₊T
     if cloud_effect
-        # This is done in Singer & Schendier but I don't think it is correct.
+        # This is done in Singer & Schneider but I don't think it is correct.
         # It is not justified in any way that I found reasonable.
         Δ₊T_aux += - Δ₊T_C*(1 - C)
     end
