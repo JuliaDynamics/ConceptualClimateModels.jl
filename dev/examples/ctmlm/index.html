@@ -1,6 +1,133 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Cloud Topped Mixed Layer Model · ConceptualClimateModels.jl</title><meta name="title" content="Cloud Topped Mixed Layer Model · ConceptualClimateModels.jl"/><meta property="og:title" content="Cloud Topped Mixed Layer Model · ConceptualClimateModels.jl"/><meta property="twitter:title" content="Cloud Topped Mixed Layer Model · ConceptualClimateModels.jl"/><meta name="description" content="Documentation for ConceptualClimateModels.jl."/><meta property="og:description" content="Documentation for ConceptualClimateModels.jl."/><meta property="twitter:description" content="Documentation for ConceptualClimateModels.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&amp;display=swap" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">ConceptualClimateModels.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Introduction</a></li><li><a class="tocitem" href="../../tutorial/">Tutorial</a></li><li><span class="tocitem">Submodules</span><ul><li><a class="tocitem" href="../../submodules/globalmeanebm/">Global mean EBM</a></li><li><a class="tocitem" href="../../submodules/ctmlm/">Cloud Topped Mixed Layer Model</a></li></ul></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../globalmeanebm/">Global mean EBM</a></li><li class="is-active"><a class="tocitem" href>Cloud Topped Mixed Layer Model</a><ul class="internal"><li><a class="tocitem" href="#Fixed-states-of-Stevens-2006"><span>Fixed states of Stevens 2006</span></a></li><li><a class="tocitem" href="#Adding-clouds"><span>Adding clouds</span></a></li><li><a class="tocitem" href="#Climate-change-scenario:-increasing-SST"><span>Climate change scenario: increasing SST</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Cloud Topped Mixed Layer Model</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Cloud Topped Mixed Layer Model</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaDynamics/ConceptualClimateModels.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaDynamics/ConceptualClimateModels.jl/blob/main/docs/src/examples/ctmlm.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="ctmlm_examples"><a class="docs-heading-anchor" href="#ctmlm_examples">CloudToppedMixedLayerModel</a><a id="ctmlm_examples-1"></a><a class="docs-heading-anchor-permalink" href="#ctmlm_examples" title="Permalink"></a></h1><pre><code class="language-julia hljs">using DynamicalSystems, ConceptualClimateModels
-import ConceptualClimateModels.CloudToppedMixedLayerModel as CTMLM</code></pre><h2 id="Fixed-states-of-Stevens-2006"><a class="docs-heading-anchor" href="#Fixed-states-of-Stevens-2006">Fixed states of Stevens 2006</a><a id="Fixed-states-of-Stevens-2006-1"></a><a class="docs-heading-anchor-permalink" href="#Fixed-states-of-Stevens-2006" title="Permalink"></a></h2><p>Here we want to recreate the same bulk boundary layer model defined in (<a href="../../references/#Stevens2006">Stevens, 2006</a>), equations 31-33.</p><pre><code class="language-julia hljs">const cₚ = 1004.0 # heat capacity at constant pressure (J/K/kg)
+import ConceptualClimateModels.CloudToppedMixedLayerModel as CTMLM</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Precompiling DynamicalSystems...
+   1742.5 ms  ? DiffEqBase
+   1057.8 ms  ? DiffEqBase → DiffEqBaseForwardDiffExt
+   1244.5 ms  ? DiffEqBase → DiffEqBaseChainRulesCoreExt
+   1268.7 ms  ? DiffEqBase → DiffEqBaseMeasurementsExt
+   1372.2 ms  ? DiffEqBase → DiffEqBaseSparseArraysExt
+   1738.7 ms  ? DiffEqBase → DiffEqBaseDistributionsExt
+   1174.3 ms  ? OrdinaryDiffEqCore
+    620.2 ms  ? OrdinaryDiffEqCore → OrdinaryDiffEqCoreEnzymeCoreExt
+    626.3 ms  ? OrdinaryDiffEqTsit5
+   1442.2 ms  ? DynamicalSystemsBase
+   1017.5 ms  ? Attractors
+   1104.2 ms  ? ChaosTools
+   1107.2 ms  ? PredefinedDynamicalSystems
+Info Given DynamicalSystems was explicitly requested, output will be shown live 
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+   1016.6 ms  ? DynamicalSystems
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+Precompiling DiffEqBaseMeasurementsExt...
+   1610.1 ms  ? DiffEqBase
+Info Given DiffEqBaseMeasurementsExt was explicitly requested, output will be shown live 
+┌ Warning: Module DiffEqBase with build ID ffffffff-ffff-ffff-ace3-f22f7b9e01cc is missing from the cache.
+│ This may mean DiffEqBase [2b5f629d-d688-5b77-993f-72d75c75574e] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+    635.9 ms  ? DiffEqBase → DiffEqBaseMeasurementsExt
+┌ Warning: Module DiffEqBase with build ID ffffffff-ffff-ffff-ace3-f22f7b9e01cc is missing from the cache.
+│ This may mean DiffEqBase [2b5f629d-d688-5b77-993f-72d75c75574e] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+Precompiling PredefinedDynamicalSystems...
+   1632.2 ms  ? DiffEqBase
+    997.5 ms  ? DiffEqBase → DiffEqBaseForwardDiffExt
+    995.0 ms  ? OrdinaryDiffEqCore
+   1165.2 ms  ? DiffEqBase → DiffEqBaseSparseArraysExt
+    611.6 ms  ? OrdinaryDiffEqCore → OrdinaryDiffEqCoreEnzymeCoreExt
+    611.0 ms  ? OrdinaryDiffEqTsit5
+   1450.7 ms  ? DynamicalSystemsBase
+Info Given PredefinedDynamicalSystems was explicitly requested, output will be shown live 
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+    717.9 ms  ? PredefinedDynamicalSystems
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+Precompiling Attractors...
+   1718.3 ms  ? DiffEqBase
+    989.5 ms  ? DiffEqBase → DiffEqBaseForwardDiffExt
+   1159.4 ms  ? DiffEqBase → DiffEqBaseSparseArraysExt
+   1432.1 ms  ? OrdinaryDiffEqCore
+   1463.4 ms  ? DiffEqBase → DiffEqBaseDistributionsExt
+    621.2 ms  ? OrdinaryDiffEqCore → OrdinaryDiffEqCoreEnzymeCoreExt
+    617.2 ms  ? OrdinaryDiffEqTsit5
+   1443.7 ms  ? DynamicalSystemsBase
+Info Given Attractors was explicitly requested, output will be shown live 
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+   1023.7 ms  ? Attractors
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+Precompiling AttractorsVisualizations...
+   1747.6 ms  ? DiffEqBase
+   1086.6 ms  ? DiffEqBase → DiffEqBaseForwardDiffExt
+   1258.7 ms  ? DiffEqBase → DiffEqBaseUnitfulExt
+   1363.3 ms  ? DiffEqBase → DiffEqBaseChainRulesCoreExt
+   1370.7 ms  ? DiffEqBase → DiffEqBaseSparseArraysExt
+   1679.2 ms  ? DiffEqBase → DiffEqBaseDistributionsExt
+   1140.2 ms  ? OrdinaryDiffEqCore
+    648.8 ms  ? OrdinaryDiffEqCore → OrdinaryDiffEqCoreEnzymeCoreExt
+    626.3 ms  ? OrdinaryDiffEqTsit5
+   1510.6 ms  ? DynamicalSystemsBase
+   1119.5 ms  ? Attractors
+Info Given AttractorsVisualizations was explicitly requested, output will be shown live 
+┌ Warning: Module Attractors with build ID ffffffff-ffff-ffff-96fe-817a70c5411e is missing from the cache.
+│ This may mean Attractors [f3fd9213-ca85-4dba-9dfd-7fc91308fec7] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+    698.3 ms  ? Attractors → AttractorsVisualizations
+┌ Warning: Module Attractors with build ID ffffffff-ffff-ffff-96fe-817a70c5411e is missing from the cache.
+│ This may mean Attractors [f3fd9213-ca85-4dba-9dfd-7fc91308fec7] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+Precompiling ChaosTools...
+   1645.0 ms  ? DiffEqBase
+   1162.1 ms  ? DiffEqBase → DiffEqBaseMeasurementsExt
+   1226.7 ms  ? DiffEqBase → DiffEqBaseForwardDiffExt
+   1430.7 ms  ? DiffEqBase → DiffEqBaseSparseArraysExt
+   1654.7 ms  ? OrdinaryDiffEqCore
+   1665.7 ms  ? DiffEqBase → DiffEqBaseDistributionsExt
+    625.0 ms  ? OrdinaryDiffEqCore → OrdinaryDiffEqCoreEnzymeCoreExt
+    617.3 ms  ? OrdinaryDiffEqTsit5
+   1467.4 ms  ? DynamicalSystemsBase
+Info Given ChaosTools was explicitly requested, output will be shown live 
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+    711.4 ms  ? ChaosTools
+┌ Warning: Module DynamicalSystemsBase with build ID ffffffff-ffff-ffff-b0c0-365d90580e03 is missing from the cache.
+│ This may mean DynamicalSystemsBase [6e36e845-645a-534a-86f2-f5d4aa5a06b4] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+Precompiling DynamicalSystemsVisualizations...
+   1664.0 ms  ? DiffEqBase
+   1197.8 ms  ? DiffEqBase → DiffEqBaseForwardDiffExt
+   1239.5 ms  ? DiffEqBase → DiffEqBaseChainRulesCoreExt
+   1264.1 ms  ? DiffEqBase → DiffEqBaseMeasurementsExt
+   1425.1 ms  ? DiffEqBase → DiffEqBaseSparseArraysExt
+   1726.0 ms  ? DiffEqBase → DiffEqBaseDistributionsExt
+    867.2 ms  ? DiffEqBase → DiffEqBaseUnitfulExt
+   1264.2 ms  ? OrdinaryDiffEqCore
+    613.8 ms  ? OrdinaryDiffEqCore → OrdinaryDiffEqCoreEnzymeCoreExt
+    622.7 ms  ? OrdinaryDiffEqTsit5
+   1448.4 ms  ? DynamicalSystemsBase
+   1018.1 ms  ? Attractors
+   1137.0 ms  ? PredefinedDynamicalSystems
+   1138.9 ms  ? ChaosTools
+    626.7 ms  ? Attractors → AttractorsVisualizations
+   1015.1 ms  ? DynamicalSystems
+Info Given DynamicalSystemsVisualizations was explicitly requested, output will be shown live 
+┌ Warning: Module DynamicalSystems with build ID ffffffff-ffff-ffff-2630-e4db2c0c92ad is missing from the cache.
+│ This may mean DynamicalSystems [61744808-ddfa-5f27-97ff-6e42cc95d634] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541
+    632.1 ms  ? DynamicalSystems → DynamicalSystemsVisualizations
+┌ Warning: Module DynamicalSystems with build ID ffffffff-ffff-ffff-2630-e4db2c0c92ad is missing from the cache.
+│ This may mean DynamicalSystems [61744808-ddfa-5f27-97ff-6e42cc95d634] does not support precompilation but is imported by a module that does.
+└ @ Base loading.jl:2541</code></pre><h2 id="Fixed-states-of-Stevens-2006"><a class="docs-heading-anchor" href="#Fixed-states-of-Stevens-2006">Fixed states of Stevens 2006</a><a id="Fixed-states-of-Stevens-2006-1"></a><a class="docs-heading-anchor-permalink" href="#Fixed-states-of-Stevens-2006" title="Permalink"></a></h2><p>Here we want to recreate the same bulk boundary layer model defined in (<a href="../../references/#Stevens2006">Stevens, 2006</a>), equations 31-33.</p><pre><code class="language-julia hljs">const cₚ = 1004.0 # heat capacity at constant pressure (J/K/kg)
 
 eqs = [
     CTMLM.mlm_dynamic(),
@@ -31,8 +158,8 @@ eqs = [
  time:          0.0
  state:         [11.0, 290.0, 1200.0]
 </code></pre><p>We also make sure to use the same parameter values as in the paper:</p><pre><code class="language-julia hljs">set_parameter!(ds, :D, 4e-6)
-set_parameter!(ds, :c_d, 0.0011)
-set_parameter!(ds, :U, 0.008/0.0011) # U*c_d = 0.008
+set_parameter!(ds, :d_c, 0.0011)
+set_parameter!(ds, :U, 0.008/0.0011) # U*d_c = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity</code></pre><p>And that&#39;s all. We can run the system to its steady state:</p><pre><code class="language-julia hljs">step!(ds, 100.0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-dimensional CoupledODEs
  deterministic: true
  discrete time: false
@@ -52,7 +179,7 @@ set_parameter!(ds, :e_e, 1.0) # effective emissivity</code></pre><p>And that&#39
 \mathtt{s.}\left( t \right) &amp;= 300 \\
 \mathtt{{\Delta}F\_s}\left( t \right) &amp;= 40 \\
 \mathtt{q_0}\left( t \right) &amp;= 12.405 \\
-V\left( t \right) &amp;= U \mathtt{c\_d} \\
+V\left( t \right) &amp;= U \mathtt{d\_c} \\
 \mathtt{q\_x}\left( t \right) &amp;= 0 \\
 \mathtt{s\_x}\left( t \right) &amp;= 0 \\
 \mathtt{w\_m}\left( t \right) &amp;= 0 \\
@@ -91,12 +218,12 @@ ds = processes_to_coupledodes(eqs, CTMLM)</code></pre><pre class="documenter-exa
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [0.9, 3.0e-6, 1.0, 0.5, 1.0, 0.2, 100.0, 2.0, 0.0012, 6.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ parameters:    [0.9, 3.0e-6, 1.0, 0.2, 1.0, 0.5, 100.0, 2.0, 0.0012, 6.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
  state:         [11.0, 290.0, 1200.0, 1.0]
 </code></pre><p>And we run the model to a steady state:</p><pre><code class="language-julia hljs">set_parameter!(ds, :D, 4e-6)
-set_parameter!(ds, :c_d, 0.0009)
-set_parameter!(ds, :U, 6.8) # U*c_d = 0.008
+set_parameter!(ds, :d_c, 0.0009)
+set_parameter!(ds, :U, 6.8) # U*d_c = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity
 
 step!(ds, 100.0)
@@ -121,8 +248,8 @@ eqs = [
 
 ds = processes_to_coupledodes(eqs, CTMLM)
 set_parameter!(ds, :D, 4e-6)
-set_parameter!(ds, :c_d, 0.0009)
-set_parameter!(ds, :U, 6.8) # U*c_d = 0.008
+set_parameter!(ds, :d_c, 0.0009)
+set_parameter!(ds, :U, 6.8) # U*d_c = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity
 ds</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4-dimensional CoupledODEs
  deterministic: true
@@ -131,7 +258,7 @@ ds</code></pre><pre class="documenter-example-output"><code class="nohighlight h
  dynamic rule:  GeneratedFunctionWrapper
  ODE solver:    Tsit5
  ODE kwargs:    (abstol = 1.0e-6, reltol = 1.0e-6)
- parameters:    [1.0, 290.0, 4.0e-6, 1.0, 0.5, 1.0, 0.2, 100.0, 2.0, 0.0009  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ parameters:    [1.0, 290.0, 4.0e-6, 1.0, 0.2, 1.0, 0.5, 100.0, 2.0, 0.0009  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
  time:          0.0
  state:         [11.0, 290.0, 1200.0, 1.0]
 </code></pre><p>To perform global continuation we need to create an attractor mapper, which we create here by tessellating the state space. Have a look at the Attractors.jl tutorial if the next few lines of code are puzzling to you</p><pre><code class="language-julia hljs">grid = (
@@ -181,4 +308,4 @@ fig = plot_basins_attractors_curves(
 )
 content(fig[2,1]).ylabel = &quot;C&quot;
 content(fig[3,1]).ylabel = &quot;z_b&quot;
-fig</code></pre><img src="0f2b4965.png" alt="Example block output"/><p>we see for our ad hoc parameterizations, the dynamical system has no stable states for SST &gt; 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.</p><p>The model diverges due to the definition of the entrainment velocity (which is proportional to <code>ΔF_s/Δ₊s</code>) in combination with a fixed <code>s₊</code>: the model reaches a state where <code>Δ₊s</code> is so small that height increases unnaturally well beyond the state space tessellation we defined.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../globalmeanebm/">« Global mean EBM</a><a class="docs-footer-nextpage" href="../../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Tuesday 26 August 2025 14:55">Tuesday 26 August 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig</code></pre><img src="2a58bdb2.png" alt="Example block output"/><p>we see for our ad hoc parameterizations, the dynamical system has no stable states for SST &gt; 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.</p><p>The model diverges due to the definition of the entrainment velocity (which is proportional to <code>ΔF_s/Δ₊s</code>) in combination with a fixed <code>s₊</code>: the model reaches a state where <code>Δ₊s</code> is so small that height increases unnaturally well beyond the state space tessellation we defined.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../globalmeanebm/">« Global mean EBM</a><a class="docs-footer-nextpage" href="../../references/">References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 28 August 2025 15:44">Thursday 28 August 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
