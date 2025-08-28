@@ -139,6 +139,7 @@ end
 Return an equation for the entrainment velocity ``w_e``.
 Versions are `:Stevens2006, :Gesso2014, :LL96`.
 Keyword `use_augmentation` adds the decoupling-based augmentation described in [Datseris2025](@cite).
+Keyword `use_shear` adds the shear augmentation from [Zhang2009](@cite).
 """
 function entrainment_velocity(version = :Stevens2006;
         e_e = version == :Stevens2006 ? 0.9 : 0.5,
@@ -164,7 +165,7 @@ function entrainment_velocity(version = :Stevens2006;
         # estimated analytically as a function of s, q: θl = (s - g*z)/(cₚ*Π(z))
         # since the inversion jump height is approximated as 0,
         # Δ₊θl = (Δ₊s - 0)/(cₚ*Π(z_b)); and since our units of s are already
-        # divided by cₚ, we have the very simple relationship of
+        # divided by cₚ, we have the very simple relationship of Δ₊θl = Δ₊s/Π
         p_z = pressure(z_b, (T_t + T₊)/2) # so that I don't deal with change in pressure across inversion
         Π = (p_z/p₀)^0.286 # approximate Rd/cp; checked for correctness
         Δ₊θl = Δ₊s/Π
@@ -177,7 +178,7 @@ function entrainment_velocity(version = :Stevens2006;
             # And this is equation 15 of Dal Gesso 2014:
             x = 5*e_e*ΔF_s / (2Δ₊θl + 2.5*e_e*(SLT^2*Δ₊θvd + (1 - SLT^2)*Δ₊θvs))
         end
-        # in both cases the units of `x` appear to be already in mm/s so
+        # in both cases the units of `x` appear to be in mm/s so
         x = x/1e3
         # Unfortunately, during integration this equation for x is very unstable.
         # it can become negative due to the fact that Δ₊q is negative and can be
@@ -195,7 +196,7 @@ function entrainment_velocity(version = :Stevens2006;
     w = x + shear
     if use_augmentation
         @parameters β₋ = 0.3
-        w = w*(1 + i_𝒟*RCT*β₋/2*V)
+        w = w*(1 + i_Λ*RCT*β₋/2*V)
     end
     return w_e ~ w
 end

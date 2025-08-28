@@ -35,8 +35,8 @@ ds = processes_to_coupledodes(eqs, CTMLM)
 We also make sure to use the same parameter values as in the paper:
 ```@example MAIN
 set_parameter!(ds, :D, 4e-6)
-set_parameter!(ds, :c_d, 0.0011)
-set_parameter!(ds, :U, 0.008/0.0011) # U*c_d = 0.008
+set_parameter!(ds, :d_c, 0.0011)
+set_parameter!(ds, :U, 0.008/0.0011) # U*d_c = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity
 ```
 
@@ -93,8 +93,8 @@ ds = processes_to_coupledodes(eqs, CTMLM)
 And we run the model to a steady state:
 ```@example MAIN
 set_parameter!(ds, :D, 4e-6)
-set_parameter!(ds, :c_d, 0.0009)
-set_parameter!(ds, :U, 6.8) # U*c_d = 0.008
+set_parameter!(ds, :d_c, 0.0009)
+set_parameter!(ds, :U, 6.8) # U*d_c = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity
 
 step!(ds, 100.0)
@@ -129,8 +129,8 @@ eqs = [
 
 ds = processes_to_coupledodes(eqs, CTMLM)
 set_parameter!(ds, :D, 4e-6)
-set_parameter!(ds, :c_d, 0.0009)
-set_parameter!(ds, :U, 6.8) # U*c_d = 0.008
+set_parameter!(ds, :d_c, 0.0009)
+set_parameter!(ds, :U, 6.8) # U*d_c = 0.008
 set_parameter!(ds, :e_e, 1.0) # effective emissivity
 ds
 ```

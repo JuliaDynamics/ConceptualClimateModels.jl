@@ -28,7 +28,7 @@ function __init__()
             q₀ ~ q_saturation(SST), # surface = 100% humid since its ocean
             s₀ ~ SST,
             RH_b ~ q_b/q₀,
-            V ~ U*c_d,
+            V ~ U*d_c,
             LHF ~ -ρ₀*(ℓ_v/1e3)*V*Δ₀q, # defined as positive, and q is in g/kg
             SHF ~ -ρ₀*V*Δ₀s*cₚ, # defined as positive and s is in cp units
 
@@ -54,8 +54,8 @@ function __init__()
             cloud_emission_temperature(),
 
             # Decoupling
-            𝒹_s ~ 0,
-            𝒹_q ~ 0,
+            λ_s ~ 0,
+            λ_q ~ 0,
         ],
         Ref(CloudToppedMixedLayerModel)
     )
