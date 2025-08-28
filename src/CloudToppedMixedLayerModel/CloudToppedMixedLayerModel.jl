@@ -62,9 +62,9 @@ ctbbl_parameters = @parameters begin # the default values give results very clos
     (U = 6.0), [bounds = (3.0, 9.0), description = "surface wind speed (m/s)"]
     # The drag coefficient is crucial. Smaller values promote more stratocumulus
     # while having a small direct impact on SST (through evaporative cooling).
-    # Both `U` and `c_d` are equivalent in the eyes of the model; they have same effect.
-    (c_d = 0.0012), [bounds = (7.9e-4, 0.0021), description = "aerodynamic bulk drag/transfer coefficient"]
-    # values of V = c_d*U range from = [
+    # Both `U` and `d_c` are equivalent in the eyes of the model; they have same effect.
+    (d_c = 0.0012), [bounds = (7.9e-4, 0.0021), description = "aerodynamic bulk drag/transfer coefficient"]
+    # values of V = d_c*U range from = [
     #     0.015, # Lilly 1968
     #     0.0021 * 7, # chung and teixeira 2012, same as Lilly
     #     8e-4*7.0 = 0.0056, # Singer & Schneider 2023a
@@ -89,7 +89,7 @@ ctbbl_variables = @variables begin
     # Variables that can be dynamic (d/dt) have a default value.
     # Clouds
     (C(t) = 1.0), [bounds = (0.0, 1.0), description = "cloud fraction"]
-    i_𝒟(t), [description = "decoupling index: 0 at coupled, 1 at decoupled"]
+    i_Λ(t), [description = "decoupling index: 0 at coupled, 1 at decoupled"]
     LWP(t), [description = "liquid water path within the cloud layer, g/m^2"]
     z_cb(t), [description = "height of the cloud base, m"]
     z_ct(t), [description = "height of the cloud top = top of the boundary layer = at inversion, m"]
@@ -97,10 +97,10 @@ ctbbl_variables = @variables begin
     α_C(t), [description = "albedo of cloud layer per cloud fraction"]
     T_C(t), [description = "cloud layer emission temperature, K"]
     L_c(t), [description = "Cloud-top emitted longwave radiation, W/m²"]
-    C_𝒟(t), [description = "cloud fraction (sigmoid) as a function of decoupling"]
+    C_Λ(t), [description = "cloud fraction (sigmoid) as a function of decoupling"]
     C_κ(t), [description = "thresholded cloud fraction as a function of CLT"]
     C_∞(t), [description = "relaxation cloud fraction"]
-    𝒟(t), [description = "decoupling pamarameter: when ≥ 𝒟c, Sc decouples into Cu"]
+    Λ(t), [description = "decoupling pamarameter: when ≥ Λc, Sc decouples into Cu"]
     CLT(t), [description = "cloud layer thickness = (z_ct - z_cb)/z_b, m"]
     RCT(t), [description = "relative cloud thickness (normalized) = CLT/z_b"]
     CRC(t), [description = "cloud layer total radiative cooling, W/m²"]
@@ -148,8 +148,8 @@ ctbbl_variables = @variables begin
     s_x(t), [description = "export of static energy, K/day"]
     V(t), [description = "surface exchange velocity = U*drag"]
     ζ(t), [description = "cumulus state nondimensional mixing height as in Stevens 2006"]
-    𝒹_s(t), [description = "decoupling ratio for liquid water static energy s, as in Eq.(1) of de Roode 2016"]
-    𝒹_q(t), [description = "decoupling ratio for total water specific humidity"]
+    λ_s(t), [description = "decoupling ratio for liquid water static energy s, as in Eq.(1) of de Roode 2016"]
+    λ_q(t), [description = "decoupling ratio for total water specific humidity"]
     # Above boundary layer/cloud top beyond
     T_FTR(t), [description = "emission temperature of free troposphere"]
     Δ₊T(t), [description = "temperature inversion strength, T₊ - T_t, K"]

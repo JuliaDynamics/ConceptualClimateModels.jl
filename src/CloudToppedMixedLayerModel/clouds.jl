@@ -3,7 +3,7 @@
 
 Provide the equation ``\\tau_C dC/dt = C_\\infty - C`` as well as as many
 more equations necessary to define ``C_\\infty``, in particular for
-``C_\\mathcal{D}`` and/or ``C_\\kappa``.
+``C_\\Lambda`` and/or ``C_\\kappa``.
 The function uses the curve fitted to data in [Datseris2025](@cite).
 """
 function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
@@ -13,8 +13,8 @@ function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
     scales = Dict(:exp => 0.4, :power => 0.8, :sigmoid => 1.0)
 
     @parameters begin
-        (𝒟t = starts[fit]), [description = "scale of 𝒟 over which we go to Stratocumulus saturation in the sigmoidal curve"]
-        (𝒟s = scales[fit]), [description = "when 𝒟>𝒟t the boundary layer is practically decoupled and we transition to cumulus"]
+        (Λt = starts[fit]), [description = "scale of Λ over which we go to Stratocumulus saturation in the sigmoidal curve"]
+        (Λs = scales[fit]), [description = "when Λ>Λt the boundary layer is practically decoupled and we transition to cumulus"]
         (Cmax = 1.0), [description = "maximum (stratocumulus) cloud fraction"]
         (Cmin = 0.2), [description = "minimum (cumulus) cloud fraction"]
     end
@@ -25,11 +25,11 @@ function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
             # D < start && return Cmax
             return min((Cmax - Cmin)*exp(-scale*(D - start)) + Cmin, Cmax)
         end
-        C_𝒟_proc = C_𝒟 ~ fitexp(𝒟, Cmax, Cmin, 𝒟t, 𝒟s)
+        C_Λ_proc = C_Λ ~ fitexp(Λ, Cmax, Cmin, Λt, Λs)
     elseif fit == :power
-        C_𝒟_proc = C_𝒟 ~ ifelse(D < 𝒟t, Cmax, 1/(D-𝒟t+1)^𝒟s)
+        C_Λ_proc = C_Λ ~ ifelse(Λ < Λt, Cmax, 1/(Λ-Λt+1)^Λs)
     elseif fit == :sigmoid
-        C_𝒟_proc = SigmoidProcess(C_𝒟, 𝒟; left = Cmax, right = Cmin, scale = 𝒟s, start = 𝒟t)
+        C_Λ_proc = SigmoidProcess(C_Λ, Λ; left = Cmax, right = Cmin, scale = Λs, start = Λt)
     else
         error("unknown specification")
     end
@@ -39,18 +39,18 @@ function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
 
     # Then decide what defines C_∞
     if thinness_limiter
-        C_∞_proc = C_∞ ~ C_𝒟*C_κ
+        C_∞_proc = C_∞ ~ C_Λ*C_κ
     else
-        C_∞_proc = C_∞ ~ C_𝒟
+        C_∞_proc = C_∞ ~ C_Λ
     end
 
     return [
-        C_𝒟_proc,
+        C_Λ_proc,
         C_κ_proc,
         C_∞_proc,
         ExpRelaxation(C, C_∞, τ_C),
         # the decoupling index is just a translation of decoupling fit
-        i_𝒟 ~ (Cmax - C_𝒟)/(Cmax - Cmin),
+        i_Λ ~ (Cmax - C_Λ)/(Cmax - Cmin),
     ]
 end
 

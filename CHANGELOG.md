@@ -8,6 +8,7 @@
 - Implement LWP-dependent emissivity for clouds.
 - Implemented LWP-dependent albedo for clouds. Added function `cloud_albedo` and added variable `α_C` that can be scaled by cloud fraction or not. Default settings for everything leave things as they were in previous version.
 - Added a new option when deciding the relaxation cloud fraction that limits it based on CLT so that too thin clouds also have small cloud fraction.
+- Renamed for clarity: `c_d` -> `d_c`, 𝒟 -> Λ, 𝒹 -> λ.
 
 ## General
 
