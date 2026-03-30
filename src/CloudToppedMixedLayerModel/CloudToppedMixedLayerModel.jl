@@ -92,7 +92,7 @@ ctbbl_variables = @variables begin
     i_Λ(t), [description = "decoupling index: 0 at coupled, 1 at decoupled"]
     LWP(t), [description = "liquid water path within the cloud layer, g/m^2"]
     z_cb(t), [description = "height of the cloud base, m"]
-    z_ct(t), [description = "height of the cloud top = top of the boundary layer = at inversion, m"]
+    z_ct(t), [description = "height of the cloud top = top of the boundary layer, m"]
     ε_C(t), [description = "emissivity of cloud layer, normally per cloud fraction"]
     α_C(t), [description = "albedo of cloud layer per cloud fraction"]
     T_C(t), [description = "cloud layer emission temperature, K"]
@@ -156,6 +156,7 @@ ctbbl_variables = @variables begin
     T₊(t), [description = "above boundary layer temperature (after inversion)"]
     s₊(t), [description = "above boundary layer liquid water static energy"]
     q₊(t), [description = "above cloud total water specific humidity"]
+    z₊(t), [description = "height of temperature inversion = top of the boundary layer, m"]
     ε_FTR(t), [description = "emissivity of the free troposphere"]
     S(t), [description = "insolation, W/m²"] # not a parameter, because can turn seasonal cycle on.
 end

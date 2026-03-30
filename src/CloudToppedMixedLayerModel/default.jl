@@ -21,6 +21,7 @@ function __init__()
             s_x ~ 0,
             bbl_emission_temperature(),
             ΔF_q ~ 0.0,
+            z₊ ~ z_b,
 
             # Exchanges
             ParameterProcess(SST_X, 0),
