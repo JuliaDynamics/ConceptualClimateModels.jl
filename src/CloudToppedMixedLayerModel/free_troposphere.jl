@@ -97,7 +97,7 @@ function mlm_s₊(
         ]
     elseif inversion_fixing == :lapse_rate
         eqs = [
-            T₊ ~ T₊_ref - Γ_T*(z_b - 1000),
+            T₊ ~ T₊_ref - Γ_T*(z_b - 1000.0),
             s₊ ~ T₊ + g*z_b/cₚ,
         ]
     else
@@ -110,14 +110,22 @@ end
     mlm_q₊(version = :relative)
 
 Provide equation for ``q_+``. If `version = :relative` then
-make free tropospheric relative humidity a free parameter.
-Else if `version = :constant` then make ``q_+`` itself a parameter.
+make free tropospheric relative humidity `RH₊` a free parameter.
+Else if `version = :constant` then make `q₊` itself a parameter.
+Else if `version = :lapse_rate` prescribe ``q_+ = q_{+, ref} - \\Gamma_q(z_b - 1000)``
+which introduces parameters `Γ_q = 1.5e-3, q₊_ref = 2.0`.
 """
 function mlm_q₊(humidity_fixing = :relative)
     if humidity_fixing == :relative
         return q₊ ~ RH₊ * q_saturation(T₊)
     elseif humidity_fixing == :constant
         return ParameterProcess(q₊, 1.5)
+    elseif humidity_fixing == :lapse_rate
+        @parameters begin
+            (q₊_ref = 2.0), [description = "reference specific humidity above inversion (for lapse rate), q/kg"]
+            (Γ_q = 1.5e-3), [description = "specific humidity lapse rate, g/kg/m"]
+        end
+        return q₊ ~ q₊_ref - Γ_q * (z_b - 1000.0)
     end
 end
 
