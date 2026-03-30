@@ -135,7 +135,7 @@ ctbbl_variables = @variables begin
     T_t(t), [description = "temperature at the cloud top = top of the boundary layer = before inversion, K"]
     T_lcl(t), [description = "temperature at the lifting condensation level, K"]
     z_lcl(t), [description = "height of the lifting condensation level starting from surface, m"]
-    w_e(t), [description = "entrainment velocity"]
+    w_e(t), [description = "entrainment velocity, m/s"]
     T_b(t), [description = "emission temperature of boundary layer"]
     Δ₊s(t), [description = "s₊ - s_b, as in Stevens2006"]
     Δ₊sᵥ(t), [description = "virtual s₊ - s_b, as in Singer Schneider"]
