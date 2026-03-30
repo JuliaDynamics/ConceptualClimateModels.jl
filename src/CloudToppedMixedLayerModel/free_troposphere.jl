@@ -41,12 +41,14 @@ end
         CO2_effect = false,
     )
 
-Provide equation for ``s_+``. To do this, a boundary condition must be provided
-that is a fixed parameter. `version` argument decides this:
+Provide equation for ``s_+`` depending on `version` with options:
 
 - `:difference`: the temperature difference across inversion is a fixed parameter.
 - `:temperature`: the temperature after the inversion is a fixed parameter.
 - `:static_energy`: the moist static energy after the inversion is a fixed parameter.
+- `:lapse_rate`: the temperature after the inversion is fixed and given by a prescribed
+  lapse rate, ``T_+ = T_{+,ref} + \\Gamma_T (z_b - 1000)``  as in [Salazar2023](@cite)
+  which introduces two additional parameters: `Γ_T = 6.5e-3, T₊_ref = 290.0`
 
 Besides these, we can also specify whether CO2 increase also increases temperature difference,
 and whether decreasing ``C`` decreases temperature difference due to cloud thinning
@@ -61,6 +63,8 @@ function mlm_s₊(
         (Δ₊T_C = 10.0), [description = "temperature decrease in the inversion due to cloud thinning (max lost K for 100% C.F.), K"]
         (s₊_0 = 300.0), [description = "prescribed moist static energy above inversion normalized by cₚ, K"]
         (T₊_0 = 292.0), [description = "prescribed temperature above inversion without CO2 or cloud effects, K"]
+        (T₊_ref = 290.0), [description = "reference temperature above inversion (for lapse rate), K"]
+        (Γ_T = 6.5e-3), [description = "free tropospheric temperature lapse rate, K/m"]
     end
 
     # First, prepare the augmentation of the inversion
@@ -85,13 +89,16 @@ function mlm_s₊(
         eqs = [
             T₊ ~ T₊_0 + Δ₊T_aux,
             s₊ ~ T₊ + g*z_b/cₚ,
-            Δ₊T ~ T₊ - T_t, # observable
         ]
-    elseif fixed == :static_energy
+    elseif inversion_fixing == :static_energy
         eqs = [
             s₊ ~ s₊_0 + Δ₊T_aux,
             T₊ ~ s₊ - g*z_b/cₚ,
-            Δ₊T ~ T₊ - T_t, # observable
+        ]
+    elseif inversion_fixing == :lapse_rate
+        eqs = [
+            T₊ ~ T₊_ref - Γ_T*(z_b - 1000),
+            s₊ ~ T₊ + g*z_b/cₚ,
         ]
     else
         error("incorrect specification for what to stay fixed!")
