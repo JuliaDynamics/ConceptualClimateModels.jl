@@ -124,7 +124,7 @@ and ``g_C`` the asymmetry factor for the cloud particle phase function.
 The optical depth is estimated as a function
 of the Liquid Water Path, fitted from Fig. 1 of [Stephens1978](@cite) as
 ```math
-\\tau_C = \\frac{x^1.7}{10 + x}
+\\tau_C = \\frac{x^{1.7}}{10 + x}
 ```
 with ``x`` the LWP in g/m².
 The expression fits very accurately for LWP up to 10³.

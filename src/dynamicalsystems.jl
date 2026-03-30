@@ -36,7 +36,7 @@ function processes_to_coupledodes(proc, default = [];
         diffeq = DEFAULT_DIFFEQ, inplace::Bool = false, split::Bool = false, kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
-    ssys = structural_simplify(sys; split)
+    ssys = mtkcompile(sys; split)
     if isnothing(inplace)
         D = length(unknowns(ssys))
         inplace = D > 5
@@ -45,9 +45,9 @@ function processes_to_coupledodes(proc, default = [];
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value. This also means
     if inplace
-        prob = ODEProblem(ssys, nothing, (0.0, Inf), nothing)
+        prob = ODEProblem(ssys, nothing, (0.0, Inf))
     else
-        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf), nothing; u0_constructor = x->SVector(x...))
+        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...))
     end
     ds = CoupledODEs(prob, diffeq)
     return ds
@@ -88,7 +88,7 @@ end
 """
     named_current_parameters(ds::DynamicalSystem)
 
-Return a dictionary mapping parameters of `ds` (as `Symbol`s) to their values.
+Return a dictionary mapping parameter names of `ds` (as `Symbol`s) to their values.
 """
 function named_current_parameters(ds::DynamicalSystem)
     mtk = referrenced_sciml_model(ds)
@@ -110,7 +110,7 @@ and if not, it warns and returns `nothing`.
 """
 function try_set_parameter!(ds::DynamicalSystem, symbol, value)
     if !has_symbolic_var(ds, symbol)
-        @warn "Symbolic parameter $(p) does not exist in system"
+        @warn "Symbolic parameter $(symbol) does not exist in system"
         return nothing
     end
     set_parameter!(ds, symbol, value)
