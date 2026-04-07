@@ -22,6 +22,7 @@ function __init__()
             bbl_emission_temperature(),
             ΔF_q ~ 0.0,
             z₊ ~ z_b,
+            TimeDerivative(SST, (ASW - Lnet - LHF - SHF + SST_X), τ_SST),
 
             # Exchanges
             ParameterProcess(SST_X, 0),
