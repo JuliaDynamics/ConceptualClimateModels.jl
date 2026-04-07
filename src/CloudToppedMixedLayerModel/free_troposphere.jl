@@ -3,15 +3,16 @@
 
 Return an equation for ``T_{FTR}``. `γ` is as in [Datseris2025](@cite).
 `add_co2` will add an additional warming term `ECS_CO2*log2(CO2/400)`.
+Introduces two extra parameters, `T_FTR_0, T₊_0`.
 """
-function free_troposphere_emission_temperature(version = 1.0; add_co2 = true)
+function free_troposphere_emission_temperature(version = 1.0; add_co2 = true, T₊_0_init = 5.0)
     # We measure the subtropical component of T_FTR from T₊
     # not from T_t, because that's what makes sense due to physical continuity.
     # T₊ already has a CO2 component so we are careful here to add it only
     # to the tropical component of T_FTR!
     @parameters begin
         (T_FTR_0 = 290.0), [description = "prescribed temperature emission of free troposphere without CO2 effects, K"]
-        (T₊_0 = 5.0), [description = "Subtracted temperature from T₊ when defining T_FTR as a T₊, K"]
+        (T₊_0 = T₊_0_init), [description = "Subtracted temperature from T₊ when defining T_FTR as a T₊, K"]
     end
     if version == :strong # strong influence of subtropical
         weight = 0.0

@@ -25,15 +25,18 @@ function __init__()
 
             # Exchanges
             ParameterProcess(SST_X, 0),
-            ParameterProcess(S, 400.18),
             q₀ ~ q_saturation(SST), # surface = 100% humid since its ocean
             s₀ ~ SST,
             RH_b ~ q_b/q₀,
             V ~ U*d_c,
             LHF ~ -ρ₀*(ℓ_v/1e3)*V*Δ₀q, # defined as positive, and q is in g/kg
             SHF ~ -ρ₀*V*Δ₀s*cₚ, # defined as positive and s is in cp units
+
+            # Free troposphere
+            ParameterProcess(S, 400.18),
             Δ₊T ~ T₊ - T_t, # definition
             T₊ ~ s₊ - g*z_b/cₚ, # definition
+            T_FTR ~ T₊,
 
             # Radiation
             L_c ~ σ_SB*ε_C*T_C^4,
