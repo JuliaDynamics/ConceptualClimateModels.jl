@@ -64,7 +64,7 @@ In the compiled documentation these render via LaTeX but running this in the REP
 
 ## Adding clouds
 
-We can add clouds to the mixed layer model using the same decoupling-based approach as in [Datseris2025](@cite) (while keeping SST a fixed boundary condition)
+We can add clouds to the mixed layer model using the same decoupling-based approach as in [Datseris2026](@cite) (while keeping SST a fixed boundary condition)
 just by including a couple more equations to the ones already defined,
 so that ``C, \mathcal{D}`` have a process assigned to them.
 We will also augment `ΔF` to be partially proportional to `C` using a very simple ad-hoc approach.
@@ -103,7 +103,7 @@ observe_state.(ds, (:z_b, :q_b, :s_b, :C)) # get state variables by name
 
 ## Climate change scenario: increasing SST
 
-If you want to study multistability for alternate cloud states (Cumulus vs Stratocumulus), or perform continuations (like the climate change scenarios in [Datseris2025](@cite)), visit the documentation of Attractors.jl.
+If you want to study multistability for alternate cloud states (Cumulus vs Stratocumulus), or perform continuations (like the climate change scenarios in [Datseris2026](@cite)), visit the documentation of Attractors.jl.
 
 As a brief example we will perform a simple climate change scenario where SST increases with a constant rate. First, we modify the equations so that `s₀, q₀` are derived from a prescribed SST:
 

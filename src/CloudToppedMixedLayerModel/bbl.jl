@@ -1,9 +1,9 @@
 """
     mlm_dynamic()
 
-Provide equations 1-3 in [Datseris2025](@cite) (or, 31-33 in [Stevens2006](@cite))
+Provide equations 1-3 in [Datseris2026](@cite) (or, 31-33 in [Stevens2006](@cite))
 defining the bulk boundary layer dynamics.
-An additional auxilary velocity ``-w_m`` is added in the equation for ``z_b``
+An additional auxilary velocity ``w_m`` is added in the equation for ``z_b``
 and two auxilary export terms ``q_x, s_x`` are added to the equations for ``q_b, s_b``.
 All these auxilarity terms are 0 by default (otherwise, assign a process to them).
 """
@@ -11,7 +11,7 @@ function mlm_dynamic()
     return [
         # We add two more velocities that can depend on clouds: ventillation due to cloud
         # clearing, and mass influx, again due to cloud clearing.
-        TimeDerivative(z_b, w_e - D*z_b - w_m, LiteralParameter(1/sec_in_day)),
+        TimeDerivative(z_b, w_e + w_D + w_m, LiteralParameter(1/sec_in_day)),
         # Stevens is a bit sloppy with units here because a multiplication with a density
         # is required. Specifically, ds/dt does not have the same units as ΔF_s/z.
         # one needs to further divide ΔF_s/z with a density ρ in units of kg/m^3.
@@ -138,7 +138,7 @@ end
 
 Return an equation for the entrainment velocity ``w_e``.
 Versions are `:Stevens2006, :Gesso2014, :LL96`.
-Keyword `use_augmentation` adds the decoupling-based augmentation described in [Datseris2025](@cite).
+Keyword `use_augmentation` adds the decoupling-based augmentation described in [Datseris2026](@cite).
 Keyword `use_shear` adds the shear augmentation from [Zhang2009](@cite).
 """
 function entrainment_velocity(version = :Stevens2006;

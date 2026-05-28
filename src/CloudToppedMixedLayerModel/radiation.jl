@@ -52,7 +52,7 @@ end
 
 Provide an equation for ``\\Delta F_s``, the radiative cooling of the boundary layer
 (assumming ``\\Delta F_q = 0``). Versions are: `:three_layer, :ctrc, :Gesso2014`
-as in [Datseris2025](@cite).
+as in [Datseris2026](@cite).
 """
 function mlm_radiative_cooling(version = :three_layer)
     if version == :ctrc

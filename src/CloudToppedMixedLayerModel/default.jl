@@ -14,7 +14,6 @@ function __init__()
             Δ₀s ~ s_b - s₀,
             ζ ~ 0,
             w_m ~ 0,
-            w_v ~ 0,
             T_t ~ temperature_exact(z_b, s_b, q_b), # it isn't guaranteed that this will be used!
             T_lcl ~ s_b - g*CLT/cₚ, # analytically resolve coz no liquid water
             q_x ~ 0,
@@ -37,7 +36,8 @@ function __init__()
             ParameterProcess(S, 400.18),
             Δ₊T ~ T₊ - T_t, # definition
             T₊ ~ s₊ - g*z_b/cₚ, # definition
-            T_FTR ~ T₊,
+            T_FTR ~ T₊, # emission temperature by default = afte inversion
+            w_D ~ - D * z_b, # subsidence
 
             # Radiation
             L_c ~ σ_SB*ε_C*T_C^4,

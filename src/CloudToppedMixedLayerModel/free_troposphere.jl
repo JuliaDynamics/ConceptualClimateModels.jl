@@ -1,7 +1,7 @@
 """
     free_troposphere_emission_temperature(γ = 1.0; add_co2 = true)
 
-Return an equation for ``T_{FTR}``. `γ` is as in [Datseris2025](@cite).
+Return an equation for ``T_{FTR}``. `γ` is as in [Datseris2026](@cite).
 `add_co2` will add an additional warming term `ECS_CO2*log2(CO2/400)`.
 Introduces two extra parameters, `T_FTR_0, T₊_0`.
 """

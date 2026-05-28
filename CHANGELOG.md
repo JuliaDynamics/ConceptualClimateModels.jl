@@ -1,3 +1,10 @@
+# v1.3
+
+## `CloudToppedMixedLayerModel`
+
+- New variable `w_D` added, representing the subsidence velocity.
+  It is defaulting to `- D * z_b`, and replaces it in the equation for `z_b`.
+
 # v1.2
 
 ## `CloudToppedMixedLayerModel`

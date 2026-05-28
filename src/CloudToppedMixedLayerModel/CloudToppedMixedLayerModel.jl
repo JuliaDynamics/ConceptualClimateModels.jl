@@ -4,7 +4,7 @@
 Submodule providing processes about cloud topped mixed layer models (MLMs).
 This combines existing equations on MLM by [Stevens2006](@cite) and [Bretherton1997](@cite),
 with surface energy balance and dynamic cloud equations.
-It is developed as part of the research article [Datseris2025](@cite).
+It is developed as part of the research article [Datseris2026](@cite).
 If you use this submodule, please cite the paper.
 
 The organization is as follows:
@@ -108,8 +108,8 @@ ctbbl_variables = @variables begin
     CTRClw(t), [description = "longwave cloud-top radiative cooling, W/m²"]
     CRClw(t), [description = "longwave component of CRC, W/m²"]
     CRCsw(t), [description = "shortwave component of CRC, W/m²"]
-    w_v(t), [description = "ventilation velocity in the absence of stratocumulus"]
-    w_m(t), [description = "mass influx velocity in the absence of stratocumulus"]
+    w_m(t), [description = "mass flux velocity, m/s"]
+
     # Surface
     (SST(t) = 290.0), [bounds = (270.0, 310.0), description = "SCT sea surface temperature"]
     SST_X(t), [description = "Energy exchange at SST due to diffusion, ocean heat uptake, or whatever else"]
@@ -159,6 +159,7 @@ ctbbl_variables = @variables begin
     z₊(t), [description = "height of temperature inversion = top of the boundary layer, m"]
     ε_FTR(t), [description = "emissivity of the free troposphere"]
     S(t), [description = "insolation, W/m²"] # not a parameter, because can turn seasonal cycle on.
+    w_D(t), [description = "subsidence velocity at the top of the boundary layer, m/s"]
 end
 
 # include all other processes files

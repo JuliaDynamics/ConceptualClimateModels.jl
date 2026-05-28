@@ -16,7 +16,7 @@ end
 """
     decoupling_ratios()
 
-Return equations for ``\\lambda_q, \\lambda_s`` as in [Datseris2025](@cite).
+Return equations for ``\\lambda_q, \\lambda_s`` as in [Datseris2026](@cite).
 """
 function decoupling_ratios()
     # Clamping this makes the simulation more stable;

@@ -4,7 +4,7 @@
 Provide the equation ``\\tau_C dC/dt = C_\\infty - C`` as well as as many
 more equations necessary to define ``C_\\infty``, in particular for
 ``C_\\Lambda`` and/or ``C_\\kappa``.
-The function uses the curve fitted to data in [Datseris2025](@cite).
+The function uses the curve fitted to data in [Datseris2026](@cite).
 """
 function cf_dynamic(fit = :sigmoid; thinness_limiter = false)
     # During the research of the project I did a bunch of different fits.
