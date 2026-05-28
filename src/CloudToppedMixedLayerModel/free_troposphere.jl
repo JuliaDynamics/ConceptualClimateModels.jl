@@ -48,7 +48,7 @@ Provide equation for ``s_+`` depending on `version` with options:
 - `:temperature`: the temperature after the inversion is a fixed parameter.
 - `:static_energy`: the moist static energy after the inversion is a fixed parameter.
 - `:lapse_rate`: the temperature after the inversion is fixed and given by a prescribed
-  lapse rate, ``T_+ = T_{+,ref} + \\Gamma_T (z_b - 1000)``  as in [Salazar2023](@cite)
+  lapse rate, ``T_+ = T_{+,ref} + \\Gamma_T (z_b - 1000)`` as in [Salazar2023](@cite)
   which introduces two additional parameters: `Γ_T = 6.5e-3, T₊_ref = 290.0`
 
 Besides these, we can also specify whether CO2 increase also increases temperature difference,
@@ -114,7 +114,7 @@ Provide equation for ``q_+``. If `version = :relative` then
 make free tropospheric relative humidity `RH₊` a free parameter.
 Else if `version = :constant` then make `q₊` itself a parameter.
 Else if `version = :lapse_rate` prescribe ``q_+ = q_{+, ref} - \\Gamma_q(z_b - 1000)``
-which introduces parameters `Γ_q = 1.5e-3, q₊_ref = 2.0`.
+which introduces parameters `Γ_q = 1.5e-3, q₊_ref = 2.0`, inspired by [Park2004](@cite).
 """
 function mlm_q₊(humidity_fixing = :relative)
     if humidity_fixing == :relative
