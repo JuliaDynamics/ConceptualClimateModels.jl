@@ -34,6 +34,6 @@ bib = CitationBibliography(
 
 build_docs_with_style(pages, ConceptualClimateModels, GlobalMeanEBM, CloudToppedMixedLayerModel, ProcessBasedModelling;
     authors = "George Datseris <datseris.george@gmail.com>",
-    bib, warnonly = [:doctest, :missing_docs, :cross_references],
+    bib, warnonly = [:doctest, :missing_docs, :cross_references, :linkcheck],
     repo = Remotes.GitHub("JuliaDynamics", "ConceptualClimateModels.jl")
 )

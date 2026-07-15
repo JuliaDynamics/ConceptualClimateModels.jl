@@ -7,33 +7,42 @@ export all_equations
 export named_current_parameters
 export try_set_parameter!
 
+# This is needed because otherwise we get the error:
+# This ODE requires a DAE initialization and thus a nonlinear solve but no nonlinear solve
+# has been loaded. To solve this problem, do `using OrdinaryDiffEqNonlinearSolve` or pass
+# a custom `nlsolve` choice into the `initializealg`.
+using OrdinaryDiffEqNonlinearSolve
+
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
 """
     processes_to_coupledodes(processes [, default]; kw...)
 
-Convert a given `Vector` of processes to a `DynamicalSystem`, in particular `CoupledODEs`.
+Convert a given `Vector` of processes to `CoupledODEs`.
 All processes represent symbolic equations managed by ModelingToolkit.jl.
 `default` is a vector for default processes that "process-less" variables
 introduced in `processes` will obtain.
-Use [`processes_to_mtkmodel`](@ref) to obtain the MTK model before it is structurally
-simplified and converted to a `DynamicalSystem`.
+Use [`processes_to_mtkmodel`](@ref) to obtain the MTK model before it is compiled
+and converted to `CoupledODEs`.
 See also [`processes_to_mtkmodel`](@ref) for more details on what `processes` is,
 or see the online [Tutorial](@ref).
 
 ## Keyword arguments
 
-- `diffeq`: options passed to DifferentialEquations.jl ODE solving
+- `diffeq`: options passed to OrdinaryDiffEq.jl ODE solving
   when constructing the `CoupledODEs`.
 - `inplace`: whether the dynamical system will be in place or not.
   Defaults to `true` if the system dimension is ≤ 5.
 - `split = false`: whether to split parameters as per ModelingToolkit.jl.
   Note the default is not ModelingToolkit's default, i.e., no splitting occurs.
-  This accelerates parameter access, assuming all parameters are of the same type.
+  This accelerates parameter access by assuming all parameters are of the same type.
+- `probkw = (warn_initialize_determined = false, )`: keyword arguments expanded into
+  the creation of `ODEProblem`.
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
 function processes_to_coupledodes(proc, default = [];
-        diffeq = DEFAULT_DIFFEQ, inplace::Bool = false, split::Bool = false, kwargs...
+        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false,
+        probkw = (warn_initialize_determined = false, ), kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
     ssys = mtkcompile(sys; split)
@@ -45,9 +54,9 @@ function processes_to_coupledodes(proc, default = [];
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value. This also means
     if inplace
-        prob = ODEProblem(ssys, nothing, (0.0, Inf))
+        prob = ODEProblem(ssys, nothing, (0.0, Inf); probkw...)
     else
-        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...))
+        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...), probkw...)
     end
     ds = CoupledODEs(prob, diffeq)
     return ds
