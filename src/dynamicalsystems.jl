@@ -7,6 +7,12 @@ export all_equations
 export named_current_parameters
 export try_set_parameter!
 
+# This is needed because otherwise we get the error:
+# This ODE requires a DAE initialization and thus a nonlinear solve but no nonlinear solve
+# has been loaded. To solve this problem, do `using OrdinaryDiffEqNonlinearSolve` or pass
+# a custom `nlsolve` choice into the `initializealg`.
+using OrdinaryDiffEqNonlinearSolve
+
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
 
 """
@@ -30,10 +36,13 @@ or see the online [Tutorial](@ref).
 - `split = false`: whether to split parameters as per ModelingToolkit.jl.
   Note the default is not ModelingToolkit's default, i.e., no splitting occurs.
   This accelerates parameter access by assuming all parameters are of the same type.
+- `probkw = (warn_initialize_determined = false, )`: keyword arguments expanded into
+  the creation of `ODEProblem`.
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
 function processes_to_coupledodes(proc, default = [];
-        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false, kwargs...
+        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false,
+        probkw = (warn_initialize_determined = false, ), kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
     ssys = mtkcompile(sys; split)
@@ -45,9 +54,9 @@ function processes_to_coupledodes(proc, default = [];
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value. This also means
     if inplace
-        prob = ODEProblem(ssys, nothing, (0.0, Inf))
+        prob = ODEProblem(ssys, nothing, (0.0, Inf); probkw...)
     else
-        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...))
+        prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...), probkw...)
     end
     ds = CoupledODEs(prob, diffeq)
     return ds
