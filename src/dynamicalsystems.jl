@@ -111,7 +111,7 @@ has_symbolic_var(referrenced_sciml_model(ds), var)
 """
     try_set_parameter!(ds::DynamicalSystem, symbol, value)
 
-An extension of `set_parameter!` for as symbolic parameter,
+An extension of `set_parameter!` for a symbolic parameter,
 that first checks if the symbol exists in the referenced MTK model,
 and if not, it warns and returns `nothing`.
 """
