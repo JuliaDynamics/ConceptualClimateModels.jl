@@ -33,15 +33,13 @@ or see the online [Tutorial](@ref).
   when constructing the `CoupledODEs`.
 - `inplace`: whether the dynamical system will be in place or not.
   Defaults to `true` if the system dimension is ≤ 5.
-- `split = false`: whether to split parameters as per ModelingToolkit.jl.
-  Note the default is not ModelingToolkit's default, i.e., no splitting occurs.
-  This accelerates parameter access by assuming all parameters are of the same type.
+- `split = true`: whether to split parameters as per ModelingToolkit.jl.
 - `probkw = (warn_initialize_determined = false, )`: keyword arguments expanded into
   the creation of `ODEProblem`.
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
 function processes_to_coupledodes(proc, default = [];
-        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false,
+        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = true,
         probkw = (warn_initialize_determined = false, ), kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
@@ -113,7 +111,7 @@ has_symbolic_var(referrenced_sciml_model(ds), var)
 """
     try_set_parameter!(ds::DynamicalSystem, symbol, value)
 
-An extension of `set_parameter!` for as symbolic parameter,
+An extension of `set_parameter!` for a symbolic parameter,
 that first checks if the symbol exists in the referenced MTK model,
 and if not, it warns and returns `nothing`.
 """

@@ -12,6 +12,7 @@ function __init__()
             Δ₊q ~ q₊ - q_b,
             Δ₀q ~ q_b - q₀,
             Δ₀s ~ s_b - s₀,
+
             ζ ~ 0,
             w_m ~ 0,
             T_t ~ temperature_exact(z_b, s_b, q_b), # it isn't guaranteed that this will be used!

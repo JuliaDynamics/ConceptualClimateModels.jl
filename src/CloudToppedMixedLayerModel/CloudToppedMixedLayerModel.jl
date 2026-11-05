@@ -122,7 +122,7 @@ ctbbl_variables = @variables begin
     Lnet(t), [description = "net longwave radiation leaving (cooling) the surface, W/m²"]
     L_b(t), [description = "down/up longwave radiation emitted by boundary layer, W/m²"]
     L_FTR(t), [description = "longwave radiation emitted by free troposphere, W/m²"]
-    ρ₀(t), [description = "moist air density at the surface"]
+    ρ₀(t), [description = "moist air density at the surface, kg/m³"]
     q₀(t), [description = "sea surface total water specific humidity = saturation specific humidity"]
     s₀(t), [description = "sea surface liquid water static energy"]
     # Boundary layer / thermodynamics
