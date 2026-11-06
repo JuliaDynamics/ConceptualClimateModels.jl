@@ -45,8 +45,8 @@ CloudToppedMixedLayerModel.matsunobu_emissivity
 
 ```@docs
 CloudToppedMixedLayerModel.free_troposphere_emission_temperature
-CloudToppedMixedLayerModel.mlm_s₊
-CloudToppedMixedLayerModel.mlm_q₊
+CloudToppedMixedLayerModel.mlm_sᵤ
+CloudToppedMixedLayerModel.mlm_qᵤ
 ```
 
 ## Default processes

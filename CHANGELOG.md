@@ -14,7 +14,7 @@
 ## `CloudToppedMixedLayerModel`
 
 - Added lapse rate option for s+ and q+ when coupling to the free troposphere
-- Free temperature emission temperature T_FTR now defaults to T₊ if not given an equation.
+- Free temperature emission temperature T_FTR now defaults to Tᵤ if not given an equation.
 
 # v1.1
 
