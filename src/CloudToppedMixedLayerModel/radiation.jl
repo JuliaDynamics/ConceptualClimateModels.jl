@@ -77,11 +77,11 @@ function mlm_radiative_cooling(version = :three_layer)
         # The equations in the paper are different
         # from the equations in the code... Plus it is impossible for the Singer
         # ΔTₑ to become -25 with this equation, as it can be at most -10.1
-        # because q₊ is realistically never below 1.
+        # because qᵤ is realistically never below 1.
         # So how do they plot -25 in the paper figure????????
-        ΔF_s ~ C*0.9*σ_SB*(T_C^4 - (T_C - 10.1 + 3.1*log(CO2) + 5.3*log(q₊))^4)
+        ΔF_s ~ C*0.9*σ_SB*(T_C^4 - (T_C - 10.1 + 3.1*log(CO2) + 5.3*log(qᵤ))^4)
     elseif version == :Gesso2014
-        ΔF_s ~ max(82.0 - 7.9*q₊, 1.0) # I am clamping here for numerical stability. Perhaps I shouldn't?
+        ΔF_s ~ max(82.0 - 7.9*qᵤ, 1.0) # I am clamping here for numerical stability. Perhaps I shouldn't?
     else
         error("Incorrect version for ΔF_s.")
     end

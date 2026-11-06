@@ -1,3 +1,13 @@
+# Originally we were using extensively the unicode character `ᵤ` (subscript plus)
+# in variable names to denote "just above the top of the boundary layer".
+# Unfortunately MTK MTK uses ᵤ as a namespace separator for hierarchical models.
+# For some reason, presumably an edge case related to hierarchical models, it refuses
+# to collect initial conditions from variables with ᵤ in the name.
+# Aayush Sabharwal checked if it’s vestigial code I can remove or if it’s a legitimate edge
+# case and needs to be fixed some other way. Turns out, there is no other way.
+# So we are using instead `ᵤ` (subscript u). Subscript `t` unfortunately has some weird spacing rules.
+
+
 """
     CloudToppedMixedLayerModel
 
@@ -75,8 +85,8 @@ ctbbl_parameters = @parameters begin # the default values give results very clos
     #     and for U in (4, 8) it would give (0.004112, 0.008448)
     # ]
     (D = 3e-6), [description = "large scale divergence, 1/s"]
-    (RH₊ = 0.2), [description = "relative humidity above boundary layer"]
-    (δ_Δ₊T = 5.0), [description = "prescribed variability in temperature inversion (difference), K"]
+    (RHᵤ = 0.2), [description = "relative humidity above boundary layer"]
+    (δ_ΔᵤT = 5.0), [description = "prescribed variability in temperature inversion (difference), K"]
     (δ_FTR = 0.0), [description = "Environmental variability of T_FTR, K"]
     (CO2 = 400.0), [description = "CO2 concentration, ppm"]
     (ECS_CO2 = 3.0), [description = "tropospheric warming per doubling of CO2 (global warming), K"]
@@ -122,7 +132,7 @@ ctbbl_variables = @variables begin
     Lnet(t), [description = "net longwave radiation leaving (cooling) the surface, W/m²"]
     L_b(t), [description = "down/up longwave radiation emitted by boundary layer, W/m²"]
     L_FTR(t), [description = "longwave radiation emitted by free troposphere, W/m²"]
-    ρ₀(t), [description = "moist air density at the surface"]
+    ρ₀(t), [description = "moist air density at the surface, kg/m³"]
     q₀(t), [description = "sea surface total water specific humidity = saturation specific humidity"]
     s₀(t), [description = "sea surface liquid water static energy"]
     # Boundary layer / thermodynamics
@@ -137,9 +147,9 @@ ctbbl_variables = @variables begin
     z_lcl(t), [description = "height of the lifting condensation level starting from surface, m"]
     w_e(t), [description = "entrainment velocity, m/s"]
     T_b(t), [description = "emission temperature of boundary layer"]
-    Δ₊s(t), [description = "s₊ - s_b, as in Stevens2006"]
-    Δ₊sᵥ(t), [description = "virtual s₊ - s_b, as in Singer Schneider"]
-    Δ₊q(t), [description = "q₊ - q_b, as in Stevens2006"]
+    Δᵤs(t), [description = "sᵤ - s_b, as in Stevens2006"]
+    Δᵤsᵥ(t), [description = "virtual sᵤ - s_b, as in Singer Schneider"]
+    Δᵤq(t), [description = "qᵤ - q_b, as in Stevens2006"]
     Δ₀q(t), [description = "q_b - q₀, as in Stevens2006"]
     Δ₀s(t), [description = "s_b - s₀, as in Stevens2006"]
     ε_b(t), [description = "emissivity of bulk layer due to water vapor"]
@@ -152,11 +162,11 @@ ctbbl_variables = @variables begin
     λ_q(t), [description = "decoupling ratio for total water specific humidity"]
     # Above boundary layer/cloud top beyond
     T_FTR(t), [description = "emission temperature of free troposphere"]
-    Δ₊T(t), [description = "temperature inversion strength, T₊ - T_t, K"]
-    T₊(t), [description = "above boundary layer temperature (after inversion)"]
-    s₊(t), [description = "above boundary layer liquid water static energy"]
-    q₊(t), [description = "above cloud total water specific humidity"]
-    z₊(t), [description = "height of temperature inversion = top of the boundary layer, m"]
+    ΔᵤT(t), [description = "temperature inversion strength, Tᵤ - T_t, K"]
+    Tᵤ(t), [description = "above boundary layer temperature (after inversion)"]
+    sᵤ(t), [description = "above boundary layer liquid water static energy"]
+    qᵤ(t), [description = "above cloud total water specific humidity"]
+    zᵤ(t), [description = "height of temperature inversion = top of the boundary layer, m"]
     ε_FTR(t), [description = "emissivity of the free troposphere"]
     S(t), [description = "insolation, W/m²"] # not a parameter, because can turn seasonal cycle on.
     w_D(t), [description = "subsidence velocity at the top of the boundary layer, m/s"]

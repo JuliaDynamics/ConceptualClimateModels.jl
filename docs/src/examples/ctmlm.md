@@ -17,9 +17,9 @@ eqs = [
     CTMLM.mlm_dynamic(),
     CTMLM.entrainment_velocity(:Stevens2006; use_augmentation = false),
     ## Figure 1 and Sec. 4.2 provide these values:
-    CTMLM.s₊ ~ 301200.0/cₚ,
-    CTMLM.q₊ ~ 1.56,
-    CTMLM.s₀ ~ CTMLM.s₊ - 12.5,
+    CTMLM.sᵤ ~ 301200.0/cₚ,
+    CTMLM.qᵤ ~ 1.56,
+    CTMLM.s₀ ~ CTMLM.sᵤ - 12.5,
     CTMLM.ρ₀ ~ 1,
     CTMLM.q₀ ~ CTMLM.q_saturation(288.96 + 1.25),
     CTMLM.ΔF_s ~ 40.0
@@ -49,7 +49,7 @@ step!(ds, 100.0)
 leading to a steady state with height ``z_b`` (``h_\infty`` in [Stevens2006](@cite)) of about 800 meters as in the paper. Extracting the variable ``\sigma`` of Eq. 38 is also very easy:
 
 ```@example MAIN
-Δs = CTMLM.s₊ - CTMLM.s₀ # symbolic variable not existing in the graph of the `ds`
+Δs = CTMLM.sᵤ - CTMLM.s₀ # symbolic variable not existing in the graph of the `ds`
 σ = observe_state(ds, CTMLM.V * Δs / CTMLM.ΔF_s * cₚ)
 ```
 and we get the same value (note multiplication by `cₚ`, because `s` is in units of K).
@@ -80,9 +80,9 @@ eqs = [
     CTMLM.CTRC ~ 10 + 40*CTMLM.C, # cloud top radiative cooling
     CTMLM.ΔF_s ~ CTMLM.CTRC, # same equation
     ## rest the same
-    CTMLM.s₊ ~ 301200.0/cₚ,
-    CTMLM.q₊ ~ 1.56,
-    CTMLM.s₀ ~ CTMLM.s₊ - 12.5,
+    CTMLM.sᵤ ~ 301200.0/cₚ,
+    CTMLM.qᵤ ~ 1.56,
+    CTMLM.s₀ ~ CTMLM.sᵤ - 12.5,
     CTMLM.ρ₀ ~ 1,
     CTMLM.q₀ ~ CTMLM.q_saturation(288.96 + 1.25),
 ]
@@ -122,8 +122,8 @@ eqs = [
     CTMLM.s₀ ~ SST,
     CTMLM.q₀ ~ CTMLM.q_saturation(SST),
     ## rest the same
-    CTMLM.s₊ ~ 301200.0/cₚ,
-    CTMLM.q₊ ~ 1.56,
+    CTMLM.sᵤ ~ 301200.0/cₚ,
+    CTMLM.qᵤ ~ 1.56,
     CTMLM.ρ₀ ~ 1,
 ]
 
@@ -182,4 +182,4 @@ fig
 
 we see for our ad hoc parameterizations, the dynamical system has no stable states for SST > 297. Before that cloud fraction decreases very fast from a Stratocumulus state to a Cumulus one.
 
-The model diverges due to the definition of the entrainment velocity (which is proportional to `ΔF_s/Δ₊s`) in combination with a fixed `s₊`: the model reaches a state where `Δ₊s` is so small that height increases unnaturally well beyond the state space tessellation we defined.
+The model diverges due to the definition of the entrainment velocity (which is proportional to `ΔF_s/Δᵤs`) in combination with a fixed `sᵤ`: the model reaches a state where `Δᵤs` is so small that height increases unnaturally well beyond the state space tessellation we defined.
