@@ -11,6 +11,7 @@ export try_set_parameter!
 # This ODE requires a DAE initialization and thus a nonlinear solve but no nonlinear solve
 # has been loaded. To solve this problem, do `using OrdinaryDiffEqNonlinearSolve` or pass
 # a custom `nlsolve` choice into the `initializealg`.
+using DiffEqBase, SciMLLogging
 using OrdinaryDiffEqNonlinearSolve
 
 DEFAULT_DIFFEQ = DynamicalSystemsBase.DEFAULT_DIFFEQ
@@ -33,15 +34,13 @@ or see the online [Tutorial](@ref).
   when constructing the `CoupledODEs`.
 - `inplace`: whether the dynamical system will be in place or not.
   Defaults to `true` if the system dimension is ≤ 5.
-- `split = false`: whether to split parameters as per ModelingToolkit.jl.
-  Note the default is not ModelingToolkit's default, i.e., no splitting occurs.
-  This accelerates parameter access by assuming all parameters are of the same type.
+- `split = true`: whether to split parameters as per ModelingToolkit.jl.
 - `probkw = (warn_initialize_determined = false, )`: keyword arguments expanded into
   the creation of `ODEProblem`.
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
 function processes_to_coupledodes(proc, default = [];
-        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = false,
+        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = true, verbose = false,
         probkw = (warn_initialize_determined = false, ), kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
@@ -51,6 +50,14 @@ function processes_to_coupledodes(proc, default = [];
         inplace = D > 5
     end
 
+    if verbose == true
+        verbose = DEVerbosity(SciMLLogging.None())
+    elseif verbose == false
+        verbose = DEVerbosity()
+    end
+
+    diffeq = (diffeq..., verbose = verbose, )
+
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value. This also means
     if inplace
@@ -58,6 +65,7 @@ function processes_to_coupledodes(proc, default = [];
     else
         prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...), probkw...)
     end
+    # ds = CoupledODEs(prob, diffeq) # TODO FIX THISO CRUCIALLY WTF
     ds = CoupledODEs(prob, diffeq)
     return ds
 end
@@ -113,7 +121,7 @@ has_symbolic_var(referrenced_sciml_model(ds), var)
 """
     try_set_parameter!(ds::DynamicalSystem, symbol, value)
 
-An extension of `set_parameter!` for as symbolic parameter,
+An extension of `set_parameter!` for a symbolic parameter,
 that first checks if the symbol exists in the referenced MTK model,
 and if not, it warns and returns `nothing`.
 """
