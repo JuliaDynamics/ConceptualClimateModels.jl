@@ -8,8 +8,8 @@ function __init__()
         Union{Process, Equation}[
             # Boundary layer
             ρ₀ ~ p₀/(Rd*SST), # moist air surface density in kg/m³
-            Δᵤs ~ sᵤ - s_b,
-            Δᵤq ~ qᵤ - q_b,
+            Δₐs ~ sₐ - s_b,
+            Δₐq ~ qₐ - q_b,
             Δ₀q ~ q_b - q₀,
             Δ₀s ~ s_b - s₀,
 
@@ -21,7 +21,7 @@ function __init__()
             s_x ~ 0,
             bbl_emission_temperature(),
             ΔF_q ~ 0.0,
-            zᵤ ~ z_b,
+            zₐ ~ z_b,
             TimeDerivative(SST, (ASW - Lnet - LHF - SHF + SST_X), τ_SST),
 
             # Exchanges
@@ -35,9 +35,9 @@ function __init__()
 
             # Free troposphere
             ParameterProcess(S, 400.18),
-            ΔᵤT ~ Tᵤ - T_t, # definition
-            Tᵤ ~ sᵤ - g*z_b/cₚ, # definition
-            T_FTR ~ Tᵤ, # emission temperature by default = afte inversion
+            ΔₐT ~ Tₐ - T_t, # definition
+            Tₐ ~ sₐ - g*z_b/cₚ, # definition
+            T_FTR ~ Tₐ, # emission temperature by default = afte inversion
             w_D ~ - D * z_b, # subsidence
 
             # Radiation
@@ -46,7 +46,7 @@ function __init__()
             L_FTR ~ σ_SB*ε_FTR*T_FTR^4,
             Lnet ~ L₀ - Ld, # Ld is whatever reaches the surface
             ASW ~ S*(1 - α) - CRCsw, # Absorbed shortwave at the surface
-            ε_FTR ~ matsunobu_emissivity(RHᵤ, T_FTR),
+            ε_FTR ~ matsunobu_emissivity(RHₐ, T_FTR),
             ε_b ~ matsunobu_emissivity(RH_b, T_b),
             L₀ ~ σ_SB*SST^4,
             albedo(),

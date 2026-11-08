@@ -18,8 +18,8 @@ function mlm_dynamic()
         # I believe Stevens 2006 assumes a density of 1 and doesn't put it anywhere.
         # Here we do modify the equations with a density of ρ₀ dividing ΔF_s.
         # (Also note that s is in cₚ units, q in g/kg)
-        TimeDerivative(s_b, (w_e*Δᵤs + (SHF - ΔF_s)/ρ₀/cₚ)/z_b - s_x/sec_in_day, LiteralParameter(1/sec_in_day)),
-        TimeDerivative(q_b, (w_e*Δᵤq + (LHF - ΔF_q)/(ρ₀*(ℓ_v/1e3)))/z_b - q_x/sec_in_day, LiteralParameter(1/sec_in_day)),
+        TimeDerivative(s_b, (w_e*Δₐs + (SHF - ΔF_s)/ρ₀/cₚ)/z_b - s_x/sec_in_day, LiteralParameter(1/sec_in_day)),
+        TimeDerivative(q_b, (w_e*Δₐq + (LHF - ΔF_q)/(ρ₀*(ℓ_v/1e3)))/z_b - q_x/sec_in_day, LiteralParameter(1/sec_in_day)),
     ]
 end
 
@@ -28,18 +28,18 @@ end
 function bbl_boundary_stevens2006()
     @parameters begin
         ΔF_fixed = 40.0 # this is W/m^2.
-        qᵤ_fixed = 1.56 # e-3
-        sᵤ_fixed = 301200.0/cₚ
+        qₐ_fixed = 1.56 # e-3
+        sₐ_fixed = 301200.0/cₚ
     end
-    # Stevens 2006 provides values for qᵤ, sᵤ in Fig. 1.
+    # Stevens 2006 provides values for qₐ, sₐ in Fig. 1.
     # I prescribe q₀ by providing a fixed SST as in the paragraph above equation (9)
     # The rest of the values are in Sec. 4.2.
     # where every component of the equations becomes a fixed constant:
     return [
-        w_e ~ e_e*ΔF_s/(Δᵤs*cₚ), # ΔF_s needs to be divided with ρ0 but stevens 2006 assumes ρ0 = 1.
-        sᵤ ~ sᵤ_fixed,
-        s₀ ~ sᵤ - 12.5e3/cₚ,
-        qᵤ ~ qᵤ_fixed,
+        w_e ~ e_e*ΔF_s/(Δₐs*cₚ), # ΔF_s needs to be divided with ρ0 but stevens 2006 assumes ρ0 = 1.
+        sₐ ~ sₐ_fixed,
+        s₀ ~ sₐ - 12.5e3/cₚ,
+        qₐ ~ qₐ_fixed,
         ΔF_s ~ ΔF_fixed,
         ρ₀ ~ 1, # this is assumed by Stevens 2006 and is required to give exactly same results
         q₀ ~ q_saturation(288.96 + 1.25), # see discussion above Eq. (9) in Stevens 2006
@@ -71,15 +71,15 @@ function bbl_stevens2006_steadystate(fixed = :ΔF_s; z_b=z_b, s_b=s_b, q_b=q_b, 
 
         # Let's first write the remaining equations:
         s_b ~ s₀ - Δs*(1 - e_e)/σ_38,
-        q_b ~ q₀ + (qᵤ - q₀)*(e_e)/(1 + σ_38),
-        Δs ~ sᵤ - s₀,
-        Δq ~ qᵤ - q₀,
+        q_b ~ q₀ + (qₐ - q₀)*(e_e)/(1 + σ_38),
+        Δs ~ sₐ - s₀,
+        Δq ~ qₐ - q₀,
         σ_38 ~ V*Δs*cₚ/(ΔF_s/ρ₀),  # we added the extra division with ρ₀ for correct units
         h⃰ ~ (ΔF_s/ρ₀)/(D*Δs*cₚ),   # we added the extra division with ρ₀ for correct units
         η⃰ ~ Rv*s₀^2/(ℓ_v*cₚ*g), # should be around 1500 m.
         η_b ~ -η⃰*log(1 + e_e/(1 + σ_38)*Δq/q₀) - ΔF_s/(V*g)*(1 - e_e),
         RCT ~ 1 - η_b/z_b,
-        # We also need equations/values for qᵤ and sᵤ
+        # We also need equations/values for qₐ and sₐ
         # but this is done by combining these equations with `ftr_bblm_coupler`!
     ]
 
@@ -143,7 +143,7 @@ Keyword `use_shear` adds the shear augmentation from [Zhang2009](@cite).
 """
 function entrainment_velocity(version = :Stevens2006;
         e_e = version == :Stevens2006 ? 0.9 : 0.5,
-        w_e = w_e, ΔF_s = ΔF_s, Δs = Δᵤs, use_shear = false, use_augmentation = true
+        w_e = w_e, ΔF_s = ΔF_s, Δs = Δₐs, use_shear = false, use_augmentation = true
     )
     @parameters (e_e = e_e), [description = "Entrainment efficiency. Scales entrainment velocity"]
 
@@ -164,24 +164,24 @@ function entrainment_velocity(version = :Stevens2006;
         # liquid water potential temperature inversion jump can be
         # estimated analytically as a function of s, q: θl = (s - g*z)/(cₚ*Π(z))
         # since the inversion jump height is approximated as 0,
-        # Δᵤθl = (Δᵤs - 0)/(cₚ*Π(z_b)); and since our units of s are already
-        # divided by cₚ, we have the very simple relationship of Δᵤθl = Δᵤs/Π
-        p_z = pressure(z_b, (T_t + Tᵤ)/2) # so that I don't deal with change in pressure across inversion
+        # Δₐθl = (Δₐs - 0)/(cₚ*Π(z_b)); and since our units of s are already
+        # divided by cₚ, we have the very simple relationship of Δₐθl = Δₐs/Π
+        p_z = pressure(z_b, (T_t + Tₐ)/2) # so that I don't deal with change in pressure across inversion
         Π = (p_z/p₀)^0.286 # approximate Rd/cp; checked for correctness
-        Δᵤθl = Δᵤs/Π
-        Δᵤθvd = Ad*Δᵤθl + Bd*Δᵤq
-        Δᵤθvs = As*Δᵤθl + Bs*Δᵤq
+        Δₐθl = Δₐs/Π
+        Δₐθvd = Ad*Δₐθl + Bd*Δₐq
+        Δₐθvs = As*Δₐθl + Bs*Δₐq
         if version == :LL96
             # This is the Lewellen & Lewellen 1998 version:
-            x = 2*e_e*ΔF_s / (SLT^2*Δᵤθvd + (1 - SLT^2)*Δᵤθvs)
+            x = 2*e_e*ΔF_s / (SLT^2*Δₐθvd + (1 - SLT^2)*Δₐθvs)
         elseif version == :Gesso2014
             # And this is equation 15 of Dal Gesso 2014:
-            x = 5*e_e*ΔF_s / (2Δᵤθl + 2.5*e_e*(SLT^2*Δᵤθvd + (1 - SLT^2)*Δᵤθvs))
+            x = 5*e_e*ΔF_s / (2Δₐθl + 2.5*e_e*(SLT^2*Δₐθvd + (1 - SLT^2)*Δₐθvs))
         end
         # in both cases the units of `x` appear to be in mm/s so
         x = x/1e3
         # Unfortunately, during integration this equation for x is very unstable.
-        # it can become negative due to the fact that Δᵤq is negative and can be
+        # it can become negative due to the fact that Δₐq is negative and can be
         # very negative as integration occurs. I made the arbitrary choice here
         # to bound x within reasonable limits to make integration more stable
         x = clamp(x, 0.0, 0.01) # Dal Gesso 2014 finds x up to 0.004 only.
