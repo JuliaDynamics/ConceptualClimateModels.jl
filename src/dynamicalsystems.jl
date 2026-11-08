@@ -40,8 +40,7 @@ or see the online [Tutorial](@ref).
 - `kw...`: all other keywords are propagated to `processes_to_mtkmodel`.
 """
 function processes_to_coupledodes(proc, default = [];
-        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = true,
-        verbosity = false,
+        diffeq = DEFAULT_DIFFEQ, inplace = nothing, split::Bool = true, verbose = false,
         probkw = (warn_initialize_determined = false, ), kwargs...
     )
     sys = processes_to_mtkmodel(proc, default; kwargs...)
@@ -51,16 +50,14 @@ function processes_to_coupledodes(proc, default = [];
         inplace = D > 5
     end
 
-    if verbosity == true
+    if verbose == true
         verbose = DEVerbosity(SciMLLogging.None())
-    elseif verbosity == false
+    elseif verbose == false
         verbose = DEVerbosity()
     end
 
-    diffeq = (verbose = verbose, diffeq..., )
+    diffeq = (diffeq..., verbose = verbose, )
 
-    @show diffeq
-    @show "Hallo hall"
     # The usage of `nothing` for the initial state assumes all state variables
     # and all parameters have been defined with a default value. This also means
     if inplace
@@ -69,7 +66,7 @@ function processes_to_coupledodes(proc, default = [];
         prob = ODEProblem{false}(ssys, nothing, (0.0, Inf); u0_constructor = x->SVector(x...), probkw...)
     end
     # ds = CoupledODEs(prob, diffeq) # TODO FIX THISO CRUCIALLY WTF
-    ds = CoupledODEs(prob)
+    ds = CoupledODEs(prob, diffeq)
     return ds
 end
 
